@@ -1,7 +1,7 @@
 'use client';
 
 import Link from "next/link";
-import SoocialProof from "./components/SoocialProof";
+import SocialProof from "./Components/SocialProof";
 import SolutionSection from "./Components/SolutionSection";
 import Testmonial from "./Components/Testmonial";
 import Services from "./Components/Services";
@@ -40,7 +40,7 @@ export default function Hero() {
 
         </div>
       </section>
-      <SoocialProof />
+      <SocialProof />
       <SolutionSection />
       <Testmonial />
       <About />
