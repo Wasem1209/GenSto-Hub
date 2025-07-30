@@ -1,7 +1,7 @@
 import React from 'react';
 import { SocialIcon } from 'react-social-icons';
 
-export default function Footer() {
+export default function footer() {
   return (
     <footer className="bg-gray-900 text-white py-10 px-6">
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
@@ -21,7 +21,7 @@ export default function Footer() {
           <ul className="space-y-2">
             <li><a href="/privacy-policy" className="hover:text-gray-300">Privacy Policy</a></li>
             <li><a href="/terms-condition" className="hover:text-gray-300">Terms & Conditions</a></li>
-             <li><a href="/collaboration" className="hover:text-gray-300">Collaboration</a></li>
+            <li><a href="/collaboration" className="hover:text-gray-300">Collaboration</a></li>
           </ul>
         </div>
 
@@ -39,30 +39,30 @@ export default function Footer() {
         <div className='flex flex-col items-center-start'>
           <h3 className="text-lg text-center lg:text-center-left font-semibold mb-4">Follow Us</h3>
           <div className="flex justify-center  space-x-4">
-           <div className="flex space-x-4 hover:scale-110 transition-transform">
-           <SocialIcon url="https://facebook.com/YourPage" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
-           </div>
-           <div className="flex space-x-4 hover:scale-110 transition-transform">
-      <SocialIcon url="https://twitter.com/YourPage" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
-      </div>
-      <div className="flex space-x-4 hover:scale-110 transition-transform">
-      <SocialIcon url="https://instagram.com/YourPage" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
-      </div>
-      <div className="flex space-x-4 hover:scale-110 transition-transform">
-      <SocialIcon url="https://linkedin.com/in/YourPage" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
-      </div>
-      <div className="flex space-x-4 hover:scale-110 transition-transform">
-      <SocialIcon url="https://tiktok.com/@YourPage" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
-      </div>
-      <div className="flex space-x-4 hover:scale-110 transition-transform">
-      <SocialIcon url="https://youtube.com/YourPage" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
-           
-          </div>
-        </div>
+            <div className="flex space-x-4 hover:scale-110 transition-transform">
+              <SocialIcon url="https://facebook.com/YourPage" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
+            </div>
+            <div className="flex space-x-4 hover:scale-110 transition-transform">
+              <SocialIcon url="https://twitter.com/YourPage" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
+            </div>
+            <div className="flex space-x-4 hover:scale-110 transition-transform">
+              <SocialIcon url="https://instagram.com/YourPage" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
+            </div>
+            <div className="flex space-x-4 hover:scale-110 transition-transform">
+              <SocialIcon url="https://linkedin.com/in/YourPage" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
+            </div>
+            <div className="flex space-x-4 hover:scale-110 transition-transform">
+              <SocialIcon url="https://tiktok.com/@YourPage" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
+            </div>
+            <div className="flex space-x-4 hover:scale-110 transition-transform">
+              <SocialIcon url="https://youtube.com/YourPage" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
 
+            </div>
           </div>
+
         </div>
-    
+      </div>
+
 
       {/* Copyright */}
       <div className="mt-10 text-center text-sm text-gray-400">
