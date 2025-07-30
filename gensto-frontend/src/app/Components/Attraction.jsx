@@ -32,9 +32,9 @@ export default function JoinCommunity() {
                 </div>
 
                 {/* Right side illustration */}
-                <div className="flex-1 flex justify-center lg:justify-end">
+                <div className="flex-1 flex justify-center bg-white-700 lg:justify-end">
                     <Image
-                        src="/images/Official-philip.png"
+                        src="/animations/business-team.json"
                         alt="Join Community"
                         width={400}
                         height={400}
