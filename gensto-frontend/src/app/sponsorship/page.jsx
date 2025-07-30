@@ -128,7 +128,7 @@ export default function SponsorshipPage() {
               {/* Email CTA Button */}
               <a
                 href={`mailto:sponsorship@genstohub.com?subject=I want to become a ${tier.tier} Sponsor`}
-                className="mt-4 inline-block px-4 py-2 bg-blue-300 text-white rounded-lg hover:bg-blue-500 transition text-center"
+                className="mt-4 inline-block px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-blue-300 transition text-center"
               >
                 Become a {tier.tier} Sponsor
               </a>

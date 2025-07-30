@@ -8,7 +8,6 @@ import Services from "./Components/Services";
 import About from "./Components/About";
 import NewsLatter from "./Components/NewsLatter";
 import School from "./Components/School";
-import Attraction  from "./Components/Attraction";
 
 
 
@@ -44,7 +43,7 @@ export default function Hero() {
       <SolutionSection />
       <Testmonial />
       <About />
-      <Attraction />
+      
       <School />
        <Services />
       <NewsLatter />

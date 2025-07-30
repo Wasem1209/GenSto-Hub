@@ -1,7 +1,7 @@
 import React from 'react';
 import { SocialIcon } from 'react-social-icons';
 
-export default function footer() {
+const Footer = () => {
   return (
     <footer className="bg-gray-900 text-white py-10 px-6">
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
@@ -40,10 +40,10 @@ export default function footer() {
           <h3 className="text-lg text-center lg:text-center-left font-semibold mb-4">Follow Us</h3>
           <div className="flex justify-center  space-x-4">
             <div className="flex space-x-4 hover:scale-110 transition-transform">
-              <SocialIcon url="https://facebook.com/YourPage" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
+              <SocialIcon url="https://www.facebook.com/profile.php?id=61577237818068" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
             </div>
             <div className="flex space-x-4 hover:scale-110 transition-transform">
-              <SocialIcon url="https://twitter.com/YourPage" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
+              <SocialIcon url="https://.com/YourPage" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
             </div>
             <div className="flex space-x-4 hover:scale-110 transition-transform">
               <SocialIcon url="https://instagram.com/YourPage" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
@@ -71,3 +71,4 @@ export default function footer() {
     </footer>
   );
 };
+export default Footer;
