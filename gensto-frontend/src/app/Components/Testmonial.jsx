@@ -62,7 +62,7 @@ export default function Testimonials() {
         }
         return nextIndexes;
       });
-    }, 3000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [screenSize]);

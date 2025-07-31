@@ -70,9 +70,9 @@ export default function FAQPage() {
   };
 
   return (
-    <section className="bg-gray-50 py-16 px-6">
+    <section className="bg-gray-50 py-20 px-6">
       <div className="max-w-6xl mx-auto">
-        
+
         {/* Page Heading */}
         <h1 className="text-3xl md:text-4xl font-bold text-gray-800 text-center mb-6">
           Frequently Asked Questions
@@ -90,11 +90,10 @@ export default function FAQPage() {
                 setActiveCategory(category);
                 setOpenIndex(null);
               }}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                activeCategory === category
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
+              className={`px-4 py-2 rounded-full text-sm  font-medium transition ${activeCategory === category
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
             >
               {category}
             </button>
