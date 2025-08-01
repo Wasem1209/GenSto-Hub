@@ -61,7 +61,7 @@ useEffect(() => {
             </div>
             { /* Mobile dropdown Menu */ }
             {isOpen &&(
-                <div className="md:hidden bg-white px-4 pb-4">
+                <div className="md:hidden mr-4 bg-white px-4 pb-4">
                     <Link href="/" className="block py-2 text-gray-700 hover:text-blue-600">Home</Link>
                      <Link href="/about" className="block py-2 text-gray-700">About</Link>
                       <Link href="/service" className="block py-2 text-gray-700">Services</Link>

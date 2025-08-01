@@ -48,7 +48,7 @@ export default function PartnershipPage() {
   };
 
   return (
-    <section className="bg-gray-50 py-12 md:py-16 px-4 sm:px-6 md:px-10 lg:px-16">
+    <section className="bg-gray-50 mt-10 py-12 md:py-16 px-4 sm:px-6 md:px-10 lg:px-16">
       <div className="max-w-7xl mx-auto">
 
         {/*  Hero Section */}
@@ -57,8 +57,8 @@ export default function PartnershipPage() {
             Partner with GenSto Hub
           </h1>
           <p className="mt-4 text-gray-600 max-w-3xl mx-auto text-sm sm:text-base md:text-lg">
-            At GenSto Hub, we believe in the power of collaboration. We work with forward-thinking organizations, 
-            institutions, and investors to create meaningful change in education, technology, and innovation. 
+            At GenSto Hub, we believe in the power of collaboration. We work with forward-thinking organizations,
+            institutions, and investors to create meaningful change in education, technology, and innovation.
             Together, we can advance society with tech.
           </p>
         </div>

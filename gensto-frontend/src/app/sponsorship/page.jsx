@@ -4,7 +4,7 @@ import { Trophy, DollarSign, Users, Star, Mail, MessageCircle, CheckCircle, Meda
 
 export default function SponsorshipPage() {
   return (
-    <section className="bg-gray-50 py-12 md:py-16 px-4 sm:px-6 md:px-10 lg:px-16">
+    <section className="bg-gray-50 py-12 mt-8 md:py-16 px-4 sm:px-6 md:px-10 lg:px-16">
       <div className="max-w-7xl mx-auto">
 
         {/* Intro Section */}

@@ -43,7 +43,7 @@ export default function Footer() {
               <SocialIcon url="https://www.facebook.com/profile.php?id=61577237818068" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
             </div>
             <div className="flex space-x-4 hover:scale-110 transition-transform">
-              <SocialIcon url="https://.com/YourPage" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
+              <SocialIcon url="https://x.com/Gensto_code" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
             </div>
             <div className="flex space-x-4 hover:scale-110 transition-transform">
               <SocialIcon url="https://instagram.com/YourPage" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
@@ -55,7 +55,7 @@ export default function Footer() {
               <SocialIcon url="https://tiktok.com/@YourPage" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
             </div>
             <div className="flex space-x-4 hover:scale-110 transition-transform">
-              <SocialIcon url="https://youtube.com/YourPage" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
+              <SocialIcon url="https://youtube.com/@gensto-code?si=TY445z7PrbHNQkZr" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
 
             </div>
           </div>
