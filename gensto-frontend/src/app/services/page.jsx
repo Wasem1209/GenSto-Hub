@@ -35,7 +35,7 @@ const services = [
 
 export default function ServicesPage() {
   return (
-    <section className="bg-gray-50 py-16 px-6">
+    <section className="bg-gray-50 mt-8 py-16 px-6">
       <div className="max-w-7xl mx-auto text-center">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
           Our Services

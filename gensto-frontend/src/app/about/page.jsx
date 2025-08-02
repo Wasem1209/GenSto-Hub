@@ -33,7 +33,7 @@ const AboutPage = () => {
 
   return (
     <>
-      <div className="px-4 py-16 max-w-7xl mx-auto">
+      <div className="px-4 py-16 mt-8 max-w-7xl mx-auto">
         {/* Intro */}
         <h1 className="text-4xl font-bold text-center text-gray-600 mb-4">
           About GenSto Hub
