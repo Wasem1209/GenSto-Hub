@@ -8,55 +8,55 @@ export default function CoursesPage() {
       title: 'Computer Fundamentals School',
       icon: <Monitor className="w-10 h-10 text-blue-600" />,
       description: 'Learn the basics of computer literacy, operations, and applications.',
-      link: 'https://forms.gle/computerfundamentals'
+      link: 'https://forms.gle/LYh172VT13qyLcay5'
     },
     {
       title: 'IT Infrastructure School',
       icon: <Server className="w-10 h-10 text-indigo-600" />,
       description: 'Master the foundations of IT systems, networking, and infrastructure.',
-      link: 'https://forms.gle/itinfrastructure'
+      link: 'https://forms.gle/LYh172VT13qyLcay5'
     },
     {
       title: 'Frontend Web Development School',
       icon: <Layout className="w-10 h-10 text-green-600" />,
       description: 'Build engaging, responsive, and modern web interfaces.',
-      link: 'https://forms.gle/frontenddev'
+      link: 'https://forms.gle/LYh172VT13qyLcay5'
     },
     {
       title: 'Backend Web Development School',
       icon: <Code2 className="w-10 h-10 text-purple-600" />,
       description: 'Learn server-side programming and API development.',
-      link: 'https://forms.gle/backenddev'
+      link: 'https://forms.gle/LYh172VT13qyLcay5'
     },
     {
       title: 'Full-stack Web Development School',
       icon: <Layers className="w-10 h-10 text-orange-600" />,
       description: 'Combine frontend and backend skills to build complete web apps.',
-      link: 'https://forms.gle/fullstack'
+      link: 'https://forms.gle/LYh172VT13qyLcay5'
     },
     {
       title: 'Software Development School',
       icon: <Code2 className="w-10 h-10 text-red-600" />,
       description: 'Learn how to design, develop, and maintain software applications.',
-      link: 'https://forms.gle/softwaredev'
+      link: 'https://forms.gle/LYh172VT13qyLcay5'
     },
     {
       title: 'Cyber Security School',
       icon: <Shield className="w-10 h-10 text-teal-600" />,
       description: 'Understand security fundamentals to protect digital systems.',
-      link: 'https://forms.gle/cybersecurity'
+      link: 'https://forms.gle/LYh172VT13qyLcay5'
     },
     {
       title: 'Database School',
       icon: <Database className="w-10 h-10 text-pink-600" />,
       description: 'Learn how to manage, query, and maintain databases.',
-      link: 'https://forms.gle/database'
+      link: 'https://forms.gle/LYh172VT13qyLcay5'
     },
     {
       title: 'Data Analytics School',
       icon: <BarChart3 className="w-10 h-10 text-yellow-600" />,
       description: 'Gain skills to analyze and interpret data for business decisions.',
-      link: 'https://forms.gle/dataanalytics'
+      link: 'https://forms.gle/LYh172VT13qyLcay5'
     },
   ];
 
