@@ -55,7 +55,7 @@ useEffect(() => {
                 </ul>
             </nav>
             { /* Mobile Menu button */}
-            <div className="md:hidden ">
+            <div className="md:hidden mr-4 ">
                 <button onClick={toggleMenu} aria-label="Toggle menu">{isOpen ? <X className="w-6 h-6" /> : < Menu className="w-6 h-6" />}
                 </button>
             </div>
