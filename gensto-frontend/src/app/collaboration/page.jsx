@@ -5,7 +5,7 @@ import { Mail, MessageCircle, Users, Lightbulb, Handshake } from 'lucide-react';
 
 export default function CollaborationPage() {
   return (
-    <section className="bg-gray-50 py-16 px-4 sm:px-6 md:px-10 lg:px-16">
+    <section className="bg-gray-50 py-16 mt-8 px-4 sm:px-6 md:px-10 lg:px-16">
       <div className="max-w-6xl mx-auto">
 
         {/* Header Section */}
@@ -14,14 +14,14 @@ export default function CollaborationPage() {
             Collaborate With GenSto Hub
           </h1>
           <p className="mt-4 text-gray-600 max-w-3xl mx-auto text-sm sm:text-base md:text-lg">
-            At <strong>GenSto Hub</strong>, we believe in the power of collaboration. Whether you're an individual, 
-            an organization, or a tech innovator, there’s always an opportunity to work together. 
+            At <strong>GenSto Hub</strong>, we believe in the power of collaboration. Whether you're an individual,
+            an organization, or a tech innovator, there’s always an opportunity to work together.
             Let’s build meaningful partnerships that drive <strong>technology, education, and innovation forward</strong>.
           </p>
-          
+
         </div>
 
-       
+
 
         {/*  Why Collaborate Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center mb-12">
@@ -54,21 +54,21 @@ export default function CollaborationPage() {
         <div className="bg-blue-50 rounded-xl shadow-md p-8 sm:p-10 text-center mb-12">
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">Let’s Build Together</h2>
           <p className="text-gray-600 mt-3 max-w-2xl mx-auto text-sm sm:text-base md:text-lg">
-            We’re always open to working with <strong>educational institutions</strong>, <strong>tech firms</strong>, 
-            <strong> NGOs</strong>, and <strong>industry leaders</strong> who share our vision of advancing 
+            We’re always open to working with <strong>educational institutions</strong>, <strong>tech firms</strong>,
+            <strong> NGOs</strong>, and <strong>industry leaders</strong> who share our vision of advancing
             society with technology.
           </p>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
-            <a 
-              href="mailto:collaborate@genstohub.com?subject=I%20want%20to%20Collaborate%20with%20GenSto%20Hub"
+            <a
+              href="mailto:genstohub1@gmail.com?subject=I%20want%20to%20Collaborate%20with%20GenSto%20Hub"
               className="flex items-center justify-center gap-2 bg-gray-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow-md transition duration-300"
             >
               <Mail className="w-5 h-5" /> Email Us
             </a>
-            <a 
-              href="https://wa.me/2348012345678?text=Hello%20GenSto%20Hub!%20I%20am%20interested%20in%20collaborating%20with%20you."
+            <a
+              href="https://wa.me/2347061065498?text=Hello%20GenSto%20Hub!%20I%20am%20interested%20in%20collaborating%20with%20you."
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 bg-green-200 hover:bg-green-700 text-white px-6 py-3 rounded-lg shadow-md transition duration-300"

@@ -2,7 +2,7 @@
 
 export default function TermsAndConditionsPage() {
   return (
-    <section className="bg-gray-50 py-16 px-4 sm:px-6 md:px-10 lg:px-16">
+    <section className="bg-gray-50 py-16 px-4 mt-8 sm:px-6 md:px-10 lg:px-16">
       <div className="max-w-5xl mx-auto">
 
         {/* Page Header */}
@@ -11,8 +11,8 @@ export default function TermsAndConditionsPage() {
             Terms & Conditions
           </h1>
           <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
-            Welcome to <strong>GenSto Hub</strong>. By accessing or using our services, you agree 
-            to the following Terms & Conditions. Please read them carefully before using our 
+            Welcome to <strong>GenSto Hub</strong>. By accessing or using our services, you agree
+            to the following Terms & Conditions. Please read them carefully before using our
             website, products, and services.
           </p>
         </div>
@@ -24,8 +24,8 @@ export default function TermsAndConditionsPage() {
           <div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">1. Acceptance of Terms</h2>
             <p>
-              By accessing and using GenSto Hub’s services, you acknowledge that you have read, 
-              understood, and agree to be bound by these Terms & Conditions. If you do not agree, 
+              By accessing and using GenSto Hub’s services, you acknowledge that you have read,
+              understood, and agree to be bound by these Terms & Conditions. If you do not agree,
               you should stop using our services immediately.
             </p>
           </div>
@@ -34,8 +34,8 @@ export default function TermsAndConditionsPage() {
           <div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">2. Services Provided</h2>
             <p>
-              GenSto Hub provides training programs, consultancy, digital solutions, and other 
-              technology-based services. We reserve the right to modify or discontinue services at 
+              GenSto Hub provides training programs, consultancy, digital solutions, and other
+              technology-based services. We reserve the right to modify or discontinue services at
               any time without notice.
             </p>
           </div>
@@ -54,7 +54,7 @@ export default function TermsAndConditionsPage() {
           <div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">4. Payments & Refunds</h2>
             <p>
-              Payments for courses, services, and events must be completed before access is granted. 
+              Payments for courses, services, and events must be completed before access is granted.
               Refunds will be provided only under specific conditions outlined in our refund policy.
             </p>
           </div>
@@ -63,8 +63,8 @@ export default function TermsAndConditionsPage() {
           <div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">5. Intellectual Property</h2>
             <p>
-              All content, materials, and resources on GenSto Hub are protected by copyright, 
-              trademark, and intellectual property laws. You may not reproduce, distribute, or 
+              All content, materials, and resources on GenSto Hub are protected by copyright,
+              trademark, and intellectual property laws. You may not reproduce, distribute, or
               modify without written consent.
             </p>
           </div>
@@ -73,8 +73,8 @@ export default function TermsAndConditionsPage() {
           <div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">6. Limitation of Liability</h2>
             <p>
-              GenSto Hub is not liable for any indirect, incidental, or consequential damages arising 
-              from the use of our services. Users are responsible for how they apply the knowledge 
+              GenSto Hub is not liable for any indirect, incidental, or consequential damages arising
+              from the use of our services. Users are responsible for how they apply the knowledge
               and tools provided.
             </p>
           </div>
@@ -83,7 +83,7 @@ export default function TermsAndConditionsPage() {
           <div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">7. Amendments</h2>
             <p>
-              We may update these Terms & Conditions at any time. Continued use of our services 
+              We may update these Terms & Conditions at any time. Continued use of our services
               after changes are made means you accept the revised terms.
             </p>
           </div>
@@ -92,7 +92,7 @@ export default function TermsAndConditionsPage() {
           <div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">8. Governing Law</h2>
             <p>
-              These Terms & Conditions shall be governed by and interpreted in accordance with the 
+              These Terms & Conditions shall be governed by and interpreted in accordance with the
               laws of Nigeria (or your company’s country of registration).
             </p>
           </div>
@@ -113,8 +113,8 @@ export default function TermsAndConditionsPage() {
 
         {/*  Last Updated Date */}
         <div className="mt-10 text-center text-sm text-gray-400">
-        <p>Last updated: {new Date().getFullYear()} </p>
-      </div>
+          <p>Last updated: {new Date().getFullYear()} </p>
+        </div>
       </div>
     </section>
   );

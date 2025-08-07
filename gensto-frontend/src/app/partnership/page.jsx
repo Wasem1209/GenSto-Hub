@@ -48,7 +48,7 @@ export default function PartnershipPage() {
   };
 
   return (
-    <section className="bg-gray-50 mt-10 py-12 md:py-16 px-4 sm:px-6 md:px-10 lg:px-16">
+    <section className="bg-gray-50 mt-10 mt-8 py-12 md:py-16 px-4 sm:px-6 md:px-10 lg:px-16">
       <div className="max-w-7xl mx-auto">
 
         {/*  Hero Section */}
@@ -134,7 +134,7 @@ export default function PartnershipPage() {
             </a>
 
             <a
-              href="https://wa.me/234 7061065498"
+              href="https://wa.me/2347061065498?text=Hello! My name is   and I'm here for a partnership proposal."
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-6 py-3 bg-blue-400 text-white rounded-full hover:bg-blue-700 transition"

@@ -11,6 +11,7 @@ import Services from "./Components/Services";
 import About from "./Components/About";
 import NewsLatter from "./Components/NewsLatter";
 import School from "./Components/School";
+import Advert from "./Components/Advert";
 
 
 
@@ -66,7 +67,8 @@ export default function Hero() {
             <SolutionSection />
             <Testmonial />
             <About />
-            <School />
+              <School />
+              <Advert />
             <Services />
             <NewsLatter />
           </motion.div>

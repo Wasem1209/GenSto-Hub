@@ -12,9 +12,9 @@ export default function FAQPage() {
   const faqData = {
     EdTech: [
       {
-        question: "What kind of EdTech courses does GenSto Hub offer?",
+        question: "What kind of EdTech schools does GenSto Hub offer?",
         answer:
-          "We offer a range of courses including Computer Appreciation, Web Development, Cybersecurity, IT Infrastructure, and Software Maintenance. Each course equips students with job-ready skills.",
+          "We offer a range of schools including Computer Appreciation school, Web Development school, Cybersecurity school, IT Infrastructure school, and Software Maintenance school. Each school equips students with job-ready skills.",
       },
       {
         question: "Are GenSto Hub certificates recognized?",
@@ -70,7 +70,7 @@ export default function FAQPage() {
   };
 
   return (
-    <section className="bg-gray-50 py-20 px-6">
+    <section className="bg-gray-50 mt-8 py-20 px-6">
       <div className="max-w-6xl mx-auto">
 
         {/* Page Heading */}

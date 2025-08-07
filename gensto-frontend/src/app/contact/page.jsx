@@ -4,24 +4,24 @@ import { useState } from 'react';
 import { Mail, Phone, MapPin } from 'lucide-react';
 
 export default function ContactPage() {
-  // ✅ State for success message
+  //  State for success message
   const [success, setSuccess] = useState(false);
 
-  // ✅ Handle form submission
+  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault(); // stop page reload
     setSuccess(true);
 
-    // ✅ Hide success message after 3 seconds
+    //  Hide success message after 3 seconds
     setTimeout(() => {
       setSuccess(false);
-    }, 3000);
+    }, 2000);
   };
 
   return (
-    <section className="bg-gray-50 py-16 px-6">
+    <section className="bg-gray-50 mt-8 py-16 px-6">
       <div className="max-w-7xl mx-auto">
-        {/* ✅ Page Heading */}
+        {/*  Page Heading */}
         <div className="text-center mb-12">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-800">Contact Us</h1>
           <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
@@ -29,21 +29,21 @@ export default function ContactPage() {
           </p>
         </div>
 
-        {/* ✅ Show Success Alert */}
+        {/*  Show Success Alert */}
         {success && (
           <div className="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg text-center">
-            ✅ Message sent successfully!
+            Message sent successfully!
           </div>
         )}
 
-        {/* ✅ Grid Layout */}
+        {/*  Grid Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          
-          {/* ✅ Contact Form */}
+
+          {/* Contact Form */}
           <div className="bg-white rounded-xl shadow-lg p-8">
             <h2 className="text-2xl font-semibold mb-6 text-gray-800">Send Us a Message</h2>
 
-            {/* ✅ Form */}
+            {/*  Form */}
             <form className="space-y-5" onSubmit={handleSubmit}>
               <div>
                 <label className="block text-gray-700 font-medium">Full Name</label>
@@ -93,7 +93,7 @@ export default function ContactPage() {
                 ></textarea>
               </div>
 
-              {/* ✅ Send Button */}
+              {/* Send Button */}
               <button
                 type="submit"
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors"
