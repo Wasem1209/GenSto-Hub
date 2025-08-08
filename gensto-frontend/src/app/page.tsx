@@ -8,10 +8,10 @@ import SocialProof from "./Components/SocialProof";
 import SolutionSection from "./Components/SolutionSection";
 import Testmonial from "./Components/Testmonial";
 import Services from "./Components/Services";
-import About from "./Components/About";
+import About from "./Components/About"
 import NewsLatter from "./Components/NewsLatter";
 import School from "./Components/School";
-import Advert from "./Components/Advert";
+
 
 
 
@@ -68,7 +68,7 @@ export default function Hero() {
             <Testmonial />
             <About />
               <School />
-              <Advert />
+            
             <Services />
             <NewsLatter />
           </motion.div>

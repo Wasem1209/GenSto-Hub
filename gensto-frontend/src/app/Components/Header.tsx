@@ -55,21 +55,45 @@ useEffect(() => {
                 </ul>
             </nav>
             { /* Mobile Menu button */}
-            <div className="md:hidden mr-8 ">
+            <div className="md:hidden mr-4">
                 <button onClick={toggleMenu} aria-label="Toggle menu">{isOpen ? <X className="w-6 h-6" /> : < Menu className="w-6 h-6" />}
                 </button>
             </div>
             { /* Mobile dropdown Menu */ }
-            {isOpen &&(
-                <div className="md:hidden  bg-white px-1.5 pb-4">
-                    <Link href="/" className="block py-2 text-gray-700 hover:text-blue-600">Home</Link>
-                     <Link href="/about" className="block py-2 text-gray-700">About</Link>
-                      <Link href="/service" className="block py-2 text-gray-700">Services</Link>
-                       <Link href="/contact" className="block py-2 text-gray-700">contact</Link>
-                        <Link href="faq" className="block  py-2 text-gray-700">FAQ</Link>
-                        
-                </div>
-            )}
+           {isOpen && (
+  <div className="md:hidden w-full bg-white px-4 py-4 shadow-lg">
+    <Link
+      href="/"
+      className="block py-2 text-gray-800 hover:text-blue-600 font-medium transition-all duration-200"
+    >
+      Home
+    </Link>
+    <Link
+      href="/about"
+      className="block py-2 text-gray-800 hover:text-blue-600 font-medium transition-all duration-200"
+    >
+      About
+    </Link>
+    <Link
+      href="/service"
+      className="block py-2 text-gray-800 hover:text-blue-600 font-medium transition-all duration-200"
+    >
+      Services
+    </Link>
+    <Link
+      href="/contact"
+      className="block py-2 text-gray-800 hover:text-blue-600 font-medium transition-all duration-200"
+    >
+      Contact
+    </Link>
+    <Link
+      href="/faq"
+      className="block py-2 text-gray-800 hover:text-blue-600 font-medium transition-all duration-200"
+    >
+      FAQ
+    </Link>
+  </div>
+)}
         </header>
     );
 }
