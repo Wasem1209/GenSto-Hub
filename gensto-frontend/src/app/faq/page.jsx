@@ -82,7 +82,7 @@ export default function FAQPage() {
         </p>
 
         {/*  Category Tabs */}
-        <div className="flex justify-center mb-8 space-x-4 flex-wrap">
+        <div className="flex justify-center mb-8 space-x-1 flex-row">
           {Object.keys(faqData).map((category) => (
             <button
               key={category}
