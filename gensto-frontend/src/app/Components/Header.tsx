@@ -40,7 +40,7 @@ useEffect(() => {
           
                 <div className="ml-[-25px]">
                     <h1 className="text-xl font-bold text-gray-800 px-6 pr-40">GenSto Hub</h1>
-                    <p className="text-xs text-gra-500 pl-6 mb-2">Advancing the society with Technology</p>
+                    <p className="text-xs text-gra-500 pl-6 mb-2">Advancing society via Technology</p>
                 </div>
                  </div>
                 {/* Desktop Menu */}
@@ -61,7 +61,7 @@ useEffect(() => {
             </div>
             { /* Mobile dropdown Menu */ }
            {isOpen && (
-  <div className="md:hidden w-100  bg-white px-0 py-4 ">
+  <div className="md:hidden w-full mr-5 bg-white py-4 ">
     <Link
       href="/"
       className="block py-2 text-gray-800 hover:text-blue-600 font-medium transition-all duration-200"

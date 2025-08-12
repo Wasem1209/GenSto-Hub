@@ -10,7 +10,7 @@ export default function Preloader({ onFinish }) {
     const messages = [
         "Welcome to GenSto Hub",
         "Advancing the society",
-        "with technology",
+        "via technology",
         "Enjoy your stay!!"
     ];
 

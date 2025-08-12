@@ -81,7 +81,7 @@ export default function Testimonials() {
                   alt={name}
                   width={50}
                   height={50}
-                  className="rounded-full no-repeat object-cover"
+                  className="rounded-full no-repeat w-auto h-auto object-cover"
                 />
                 <h4 className="text-lg font-semibold">{name}</h4>
               </div>
