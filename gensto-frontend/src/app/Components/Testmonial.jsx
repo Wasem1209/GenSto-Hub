@@ -4,13 +4,13 @@ import Image from 'next/image';
 
 const testimonials = [
   {
-    name: 'Mis. Joy Anih',
+    name: 'Joy Anih',
     image: '/images/Joy Anil.jpg',
     comment: 'GenSto Hub transformed my tech skills. I was able to land a remote internship in 4 months!',
   },
   {
-    name: 'Abbah Clement',
-    image: '/images/Success Agu.jpg',
+    name: 'Hauwa Mathias',
+    image: '/images/Mis.H.jpg',
     comment: 'The instructors are top-notch. I built my first web app through GenSto’s training!',
   },
   {
@@ -19,20 +19,12 @@ const testimonials = [
     comment: 'Learning here gave me clarity and confidence. I highly recommend it to any serious student.',
   },
   {
-    name: 'Michael Bassey',
-    image: '/images/Otor Paul.jpg',
+    name: 'Maxwell Ohemu',
+    image: '/images/Dr. MO.jpg',
     comment: 'I got certified in just a few weeks. The content is practical and straight to the point.',
   },
-  {
-    name: 'Grace Ayuba',
-    image: '/images/Joy Anil.jpg',
-    comment: 'Thanks to GenSto Hub, I launched my freelance career and I’m earning already.',
-  },
-  {
-    name: 'Emeka Obi',
-    image: '/images/Official-philip.png',
-    comment: 'I’ve attended different programs but this one is different — truly impactful.',
-  },
+
+
 ];
 
 export default function Testimonials() {
