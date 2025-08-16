@@ -61,20 +61,20 @@ export default function Testimonials() {
 
   return (
     <div className="py-12 px-4 md:px-16 bg-white">
-      <h2 className="text-3xl font-bold text-center mb-10">What Our Students Say</h2>
+      <h2 className="text-3xl font-bold text-center mb-10"><span className="text-gray-900">Com</span><span className="text-blue-900">ment</span>s</h2>
       <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {visibleIndexes.map((index) => {
           const { name, image, comment } = testimonials[index];
           return (
             <div key={index} className="bg-gray-100 p-6 rounded-2xl hover:scale-105 shadow-md transition-opacity duration-500 ease-in-out">
               <div className="flex items-center gap-4 mb-4">
-                <Image
-                  src={image}
-                  alt={name}
-                  width={50}
-                  height={50}
-                  className="rounded-full no-repeat w-auto h-auto object-cover"
-                />
+                <div className="relative w-15 h-8 sm:w-12 sm:-h-12 md:w-14 md:h-14 lg:w-16 h-16 ">
+                  <Image
+                    src={image}
+                    alt={name}
+                    fill
+                    className="rounded-full" />
+                </div>
                 <h4 className="text-lg font-semibold">{name}</h4>
               </div>
               <p className="text-gray-700 italic">“{comment}”</p>
