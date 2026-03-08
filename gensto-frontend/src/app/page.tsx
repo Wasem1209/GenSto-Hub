@@ -47,7 +47,7 @@ export default function Hero() {
                   Create Your Future!
                 </h1>
                 <p className="text-lg text-white/80 mb-6">
-                  We provide hands-on training programs and build scalable, custom tech products for clients across sectors.
+                  Inanst provides hands-on training programs and build scalable, custom tech products for clients across sectors.
                 </p>
                 <Link href="/course" passHref>
                   <button className="bg-gray-800 hover:bg-blue-700 text-white px-6 py-3 rounded-md mb-2 transition duration-300">
