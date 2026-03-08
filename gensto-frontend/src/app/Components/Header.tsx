@@ -36,7 +36,7 @@ export default function Header() {
       {/* Logo */}
       <div className="flex items-center space-x-3 ml-2 sm:ml-4 md:ml-6">
         <Image
-          src="/images/GenSto Hub Logo.jpg"
+          src="/images/ina.jpeg"
           alt="GenSto Hub Logo"
           width={37}
           height={37}
