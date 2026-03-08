@@ -33,16 +33,15 @@ export default function Header() {
       {/* Coded Logo as Brand Name */}
       <Link href="/" className="flex flex-col items-start group">
         <div className="flex items-center">
-          <span className="text-2xl font-black tracking-tighter text-gray-900">IN</span>
+          <span className="text-xl md:text-2xl font-black tracking-tighter text-gray-900">IN</span>
           
-          {/* The Sky Blue Delta Symbol - Adjusted margins to pull text closer */}
           <svg 
-            width="24" 
-            height="20" 
+            width="22" 
+            height="18" 
             viewBox="0 0 24 24" 
             fill="none" 
             xmlns="http://www.w3.org/2000/svg"
-            className="mx-[-2px] mt-1" 
+            className="mx-[-1px] md:mx-[-2px] mt-1" 
           >
             <path 
               d="M12 2L2 20H22L12 2Z" 
@@ -54,11 +53,12 @@ export default function Header() {
             />
           </svg>
 
-          <span className="text-2xl font-black tracking-tighter text-gray-900 ml-[-2px]">NST</span>
+          <span className="text-xl md:text-2xl font-black tracking-tighter text-gray-900 ml-[-1px] md:ml-[-2px]">NST</span>
         </div>
         
-        <p className="text-[8px] md:text-[9px] tracking-[0.15em] text-gray-500 mt-0.5 hidden sm:block font-bold">
-          INNOVATION • ANALYTICS • SOCIETAL TRANSFORMATION
+        {/* Paragraph now visible on ALL screens */}
+        <p className="text-[7px] md:text-[9px] tracking-[0.1em] md:tracking-[0.15em] text-gray-500 mt-0.5 font-bold uppercase">
+          Innovation • Analytics • Societal Transformation
         </p>
       </Link>
 
