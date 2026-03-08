@@ -10,10 +10,10 @@ export default function SponsorshipPage() {
         {/* Intro Section */}
         <div className="text-center mb-12 px-4 py-3">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-800">
-            Sponsor GenSto Hub Initiatives
+            Sponsor Inanst Initiatives
           </h1>
           <p className="mt-4 text-gray-600 max-w-3xl mx-auto text-sm sm:text-base md:text-lg">
-            Sponsorship with GenSto Hub means empowering innovation, education, and technology.
+            Sponsorship with Inanst means empowering innovation, education, and technology.
             Your support helps us deliver training programs, create scalable solutions, and
             impact communities for a better future.
           </p>

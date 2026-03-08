@@ -66,7 +66,7 @@ export default function Footer() {
 
       {/* Copyright */}
       <div className="mt-10 text-center text-sm text-gray-400">
-        &copy; {new Date().getFullYear()} GenSto Hub. All rights reserved.
+        &copy; {new Date().getFullYear()} Inanst. All rights reserved.
       </div>
     </footer>
   );

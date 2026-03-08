@@ -11,7 +11,7 @@ export default function TermsAndConditionsPage() {
             Terms & Conditions
           </h1>
           <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
-            Welcome to <strong>GenSto Hub</strong>. By accessing or using our services, you agree
+            Welcome to <strong>Inanst</strong>. By accessing or using our services, you agree
             to the following Terms & Conditions. Please read them carefully before using our
             website, products, and services.
           </p>
@@ -34,7 +34,7 @@ export default function TermsAndConditionsPage() {
           <div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">2. Services Provided</h2>
             <p>
-              GenSto Hub provides training programs, consultancy, digital solutions, and other
+              Inanst provides training programs, consultancy, digital solutions, and other
               technology-based services. We reserve the right to modify or discontinue services at
               any time without notice.
             </p>
@@ -73,7 +73,7 @@ export default function TermsAndConditionsPage() {
           <div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">6. Limitation of Liability</h2>
             <p>
-              GenSto Hub is not liable for any indirect, incidental, or consequential damages arising
+              Inanst is not liable for any indirect, incidental, or consequential damages arising
               from the use of our services. Users are responsible for how they apply the knowledge
               and tools provided.
             </p>

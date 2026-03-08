@@ -41,7 +41,7 @@ export default function ServicesPage() {
           Our Services
         </h1>
         <p className="text-gray-600 mb-12 max-w-2xl mx-auto">
-          At GenSto Hub, we deliver cutting-edge tech solutions, training, and consultation to help individuals, teams, and organizations grow with technology.
+          At Inanst, we deliver cutting-edge tech solutions, training, and consultation to help individuals, teams, and organizations grow with technology.
         </p>
 
         {/* Grid for services */}

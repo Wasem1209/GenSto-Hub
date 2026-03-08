@@ -11,7 +11,7 @@ export default function PrivacyPolicyPage() {
             Privacy Policy
           </h1>
           <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
-            At <strong>GenSto Hub</strong>, we respect your privacy and are committed to
+            At <strong>Inanst</strong>, we respect your privacy and are committed to
             protecting your personal information. This Privacy Policy explains how we
             collect, use, and safeguard your data.
           </p>

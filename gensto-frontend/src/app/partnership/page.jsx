@@ -54,7 +54,7 @@ export default function PartnershipPage() {
         {/*  Hero Section */}
         <div className="text-center mb-12 px-4">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-800">
-            Partner with GenSto Hub
+            Partner with Inanst
           </h1>
           <p className="mt-4 text-gray-600 max-w-3xl mx-auto text-sm sm:text-base md:text-lg">
             At GenSto Hub, we believe in the power of collaboration. We work with forward-thinking organizations,

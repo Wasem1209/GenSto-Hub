@@ -6,7 +6,7 @@ import Footer from "./Components/Footer";
 
 
 export const metadata = {
-  title: 'GenSto Hub',
+  title: 'Inanst',
   description: 'Advance the society with tech'
 }
 

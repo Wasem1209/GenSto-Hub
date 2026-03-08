@@ -8,9 +8,10 @@ export default function Preloader({ onFinish }) {
     const [isVisible, setIsVisible] = useState(true);
 
     const messages = [
-        "GenSto Hub",
-        "Advancing the society",
-        "Via technology",
+        "Welcome to",
+        "Innovation",
+        "Analytics And",
+        "Societal Transformation",
     ];
 
     useEffect(() => {

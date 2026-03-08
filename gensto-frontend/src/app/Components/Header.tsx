@@ -43,8 +43,8 @@ export default function Header() {
           priority
         />
         <div className="ml-[-25px]">
-          <h1 className="text-xl font-semibold text-gray-800 px-6 pr-30">GenSto Hub</h1>
-          <p className="text-xs text-gray-500 pl-6 mb-2">Advancing society via technology</p>
+          <h1 className="text-xl font-semibold text-gray-800 px-6 pr-30">INANST</h1>
+          <p className="text-xs text-gray-500 pl-6 mb-2">Innovation, Analytics And Societal Transformation</p>
         </div>
       </div>
 
