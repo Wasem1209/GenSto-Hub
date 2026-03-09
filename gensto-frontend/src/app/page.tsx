@@ -44,7 +44,7 @@ export default function Hero() {
             <div className="relative max-w-7xl mx-auto flex flex-col-reverse md:flex-row items-center justify-between mt-4 w-full">
               <div className="md:w-1/2 md:px-12 text-left md:pt-20">
                 <h1 className="text-3xl md:text-5xl font-bold text-white mb-4 pt-10">
-                  Create Your Future!
+                  INANST, The Future!
                 </h1>
                 <p className="text-lg text-white/80 mb-6">
                   Inanst provides hands-on training programs and build scalable, custom tech products for clients across sectors.

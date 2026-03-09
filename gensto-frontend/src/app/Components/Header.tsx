@@ -33,11 +33,29 @@ export default function Header() {
       {/* Coded Logo as Brand Name */}
       <Link href="/" className="flex flex-col items-start group">
         <div className="flex items-center">
-          <span className="text-xl md:text-2xl font-black tracking-tighter text-gray-900">IN</span>
-          
+          {/* The Sky Blue Ring - Negative margin pulls the "IN" inside the gap */}
           <svg 
-            width="22" 
-            height="18" 
+            width="32" 
+            height="32" 
+            viewBox="0 0 40 40" 
+            fill="none" 
+            xmlns="http://www.w3.org/2000/svg"
+            className="mr-[-3px] md:mr-[-5px] z-10"
+          >
+            <path 
+              d="M32 10C29.5 7.5 26 6 22 6C14.268 6 8 12.268 8 20C8 27.732 14.268 34 22 34C26 34 29.5 32.5 32 30" 
+              stroke="#38bdf8" 
+              strokeWidth="4" 
+              strokeLinecap="round" 
+            />
+          </svg>
+
+          <span className="text-xl md:text-2xl font-black tracking-tighter text-gray-700 relative z-0">IN</span>
+          
+          {/* The Sky Blue Delta Symbol as the letter 'A' */}
+          <svg 
+            width="24" 
+            height="20" 
             viewBox="0 0 24 24" 
             fill="none" 
             xmlns="http://www.w3.org/2000/svg"
@@ -45,18 +63,18 @@ export default function Header() {
           >
             <path 
               d="M12 2L2 20H22L12 2Z" 
-              className="fill-sky-500" 
+              className="fill-sky-400" 
             />
             <path 
-              d="M12 6L5 18H19L12 6Z" 
-              className="fill-sky-400 opacity-50" 
+              d="M12 6L7 17H17L12 6Z" 
+              className="fill-sky-500" 
             />
           </svg>
 
-          <span className="text-xl md:text-2xl font-black tracking-tighter text-gray-900 ml-[-1px] md:ml-[-2px]">NST</span>
+          <span className="text-xl md:text-2xl font-black tracking-tighter text-gray-700 ml-[-1px] md:ml-[-2px]">NST</span>
         </div>
         
-        <p className="text-[7px] md:text-[9px] tracking-[0.1em] md:tracking-[0.15em] text-gray-500 mt-0.5 font-bold uppercase">
+        <p className="text-[7px] md:text-[9px] tracking-[0.1em] md:tracking-[0.15em] text-gray-400 mt-0.5 font-bold uppercase">
           Innovation • Analytics • Societal Transformation
         </p>
       </Link>
