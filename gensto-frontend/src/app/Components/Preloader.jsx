@@ -10,24 +10,34 @@ export default function Preloader({ onFinish }) {
     const messages = [
         "Welcome to",
         "Innovation",
-        "Analytics And",
+        "Analytics",
         "Societal Transformation",
     ];
 
     useEffect(() => {
+        // Step-by-step message sequence
         const timers = [
-            setTimeout(() => setCurrentMessage(1), 3000),
-            setTimeout(() => setCurrentMessage(2), 6000),
-            setTimeout(() => setIsVisible(false), 13000)
+            setTimeout(() => setCurrentMessage(1), 2000), // Innovation
+            setTimeout(() => setCurrentMessage(2), 4000), // Analytics
+            setTimeout(() => setCurrentMessage(3), 6000), // Societal Transformation
+            setTimeout(() => setIsVisible(false), 9000)   // Start Exit Animation
         ];
-        return () => timers.forEach(clearTimeout);
+
+        // Lock scroll while preloading
+        document.body.style.overflow = 'hidden';
+
+        return () => {
+            timers.forEach(clearTimeout);
+            document.body.style.overflow = 'unset';
+        };
     }, []);
 
     const handleExitComplete = () => {
+        // Force scroll to top the moment the preloader is fully gone
+        window.scrollTo(0, 0);
         onFinish();
     };
 
-    // Letter animation (staggered)
     const letterAnimation = {
         hidden: { opacity: 0, y: 10 },
         visible: (i) => ({
@@ -41,17 +51,22 @@ export default function Preloader({ onFinish }) {
         <AnimatePresence onExitComplete={handleExitComplete}>
             {isVisible && (
                 <motion.div
-                    className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900 via-gray-900 to-black z-50"
+                    className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900 via-gray-900 to-black z-[9999]"
                     initial={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 1.5, ease: "easeInOut" }}
+                    transition={{ duration: 1, ease: "easeInOut" }}
                 >
-                    {/*  CENTERED TEXT CONTAINER */}
                     <div className="text-center px-4">
-                        <motion.div key={currentMessage} className="flex flex-wrap justify-center">
+                        <motion.div
+                            key={currentMessage}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="flex flex-wrap justify-center"
+                        >
                             {messages[currentMessage].split("").map((letter, i) => (
                                 <motion.span
-                                    key={i}
+                                    key={`${currentMessage}-${i}`}
                                     variants={letterAnimation}
                                     initial="hidden"
                                     animate="visible"
