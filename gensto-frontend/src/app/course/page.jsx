@@ -69,7 +69,7 @@ export default function CoursesPage() {
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-800">Our Schools</h1>
           <p className="mt-4 text-gray-600 max-w-2xl mx-auto text-sm sm:text-base md:text-lg">
             Explore our specialized schools designed to help you <strong>master IT and tech skills</strong>.
-            Click on any school to access the registration form and start your journey with <strong>GenSto Hub</strong>.
+            Click on any school to access the registration form and start your journey with <strong>Inanst</strong>.
           </p>
         </div>
 
