@@ -2,21 +2,21 @@
 
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Suspense, useState, useEffect } from 'react';
-import { 
-  CheckCircle, CreditCard, ChevronDown, GraduationCap, 
-  User, Mail, Phone, Globe, Loader2, AlertCircle, Timer 
+import {
+  CheckCircle, CreditCard, ChevronDown, GraduationCap,
+  User, Mail, Phone, Globe, Loader2, AlertCircle, Timer
 } from 'lucide-react';
 
 function RegisterForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const selectedCourse = searchParams.get('course') || '';
-  
+
   const [showSuccess, setShowSuccess] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [countdown, setCountdown] = useState(600);
-  
+
   const initialFormState = {
     fullName: '',
     email: '',
@@ -80,10 +80,10 @@ function RegisterForm() {
             body: JSON.stringify(formData)
          });
       */
-      
+
       // Simulating API call
       await new Promise(resolve => setTimeout(resolve, 2500));
-      
+
       setIsProcessing(false);
       setShowPaymentModal(false);
       setShowSuccess(true);
@@ -100,9 +100,9 @@ function RegisterForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 flex items-center justify-center relative font-sans">
+    <div className="min-h-screen bg-gray-50 py-12 px-4 flex mt-14 items-center justify-center relative font-sans">
       <div className="max-w-2xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 relative">
-        
+
         {/* Admission Status */}
         <div className="absolute top-6 right-6 z-20">
           <span className="flex items-center gap-1.5 bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest animate-pulse">
@@ -112,17 +112,17 @@ function RegisterForm() {
         </div>
 
         <div className="bg-sky-500 p-10 text-white text-center">
-          <h2 className="text-4xl font-extrabold tracking-tight">Join the Academy</h2>
-          <p className="mt-2 text-sky-100 text-lg opacity-90">Start your journey with Inansto</p>
+          <h2 className="text-4xl font-extrabold tracking-tight">Gain Admission</h2>
+          <p className="mt-2 text-sky-100 text-lg opacity-90">Start your journey with Inanst</p>
         </div>
 
         <form onSubmit={handleInitialSubmit} className="p-8 md:p-12 space-y-8">
-          
+
           <div className="space-y-6">
             <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2 border-b pb-2">
               <User className="w-5 h-5 text-sky-500" /> Personal Details
             </h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Full Name</label>
@@ -131,7 +131,7 @@ function RegisterForm() {
                   className={`w-full px-4 py-3 rounded-xl border ${errors.fullName ? 'border-red-500' : 'border-gray-200'} outline-none bg-gray-50 focus:border-sky-400 transition`}
                   placeholder="e.g. Isaac Newton"
                   value={formData.fullName}
-                  onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                 />
                 {errors.fullName && <p className="text-red-500 text-[10px] mt-1 font-bold">{errors.fullName}</p>}
               </div>
@@ -143,7 +143,7 @@ function RegisterForm() {
                   className={`w-full px-4 py-3 rounded-xl border ${errors.email ? 'border-red-500' : 'border-gray-200'} outline-none bg-gray-50 focus:border-sky-400 transition`}
                   placeholder="hello@inansto.com"
                   value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
                 {errors.email && <p className="text-red-500 text-[10px] mt-1 font-bold">{errors.email}</p>}
               </div>
@@ -155,7 +155,7 @@ function RegisterForm() {
                   className={`w-full px-4 py-3 rounded-xl border ${errors.phone ? 'border-red-500' : 'border-gray-200'} outline-none bg-gray-50 focus:border-sky-400 transition`}
                   placeholder="+234..."
                   value={formData.phone}
-                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 />
               </div>
             </div>
@@ -172,7 +172,7 @@ function RegisterForm() {
                 <select
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none bg-gray-50 focus:border-sky-400 transition"
                   value={formData.mode}
-                  onChange={(e) => setFormData({...formData, mode: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, mode: e.target.value })}
                 >
                   <option value="distance">Distance Learning</option>
                   <option value="in-person">In-Person</option>
@@ -197,10 +197,9 @@ function RegisterForm() {
                     <button
                       key={lvl}
                       type="button"
-                      onClick={() => setFormData({...formData, level: lvl})}
-                      className={`flex-1 py-2 text-[10px] font-black rounded-lg transition-all capitalize ${
-                        formData.level === lvl ? 'bg-white text-sky-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'
-                      }`}
+                      onClick={() => setFormData({ ...formData, level: lvl })}
+                      className={`flex-1 py-2 text-[10px] font-black rounded-lg transition-all capitalize ${formData.level === lvl ? 'bg-white text-sky-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'
+                        }`}
                     >
                       {lvl}
                     </button>
@@ -213,17 +212,17 @@ function RegisterForm() {
           <div className="space-y-4">
             <label className="block text-xs font-bold text-gray-400 uppercase">Payment Method</label>
             <div className="grid grid-cols-2 gap-4">
-              <button 
+              <button
                 type="button"
-                onClick={() => setFormData({...formData, paymentMethod: 'card'})}
+                onClick={() => setFormData({ ...formData, paymentMethod: 'card' })}
                 className={`p-4 border-2 rounded-2xl flex flex-col items-center gap-1 transition ${formData.paymentMethod === 'card' ? 'border-sky-500 bg-sky-50' : 'border-gray-100 hover:bg-gray-50'}`}
               >
                 <CreditCard className={`w-6 h-6 ${formData.paymentMethod === 'card' ? 'text-sky-500' : 'text-gray-300'}`} />
                 <span className="font-bold text-xs text-gray-700">Bank Card</span>
               </button>
-              <button 
+              <button
                 type="button"
-                onClick={() => setFormData({...formData, paymentMethod: 'transfer'})}
+                onClick={() => setFormData({ ...formData, paymentMethod: 'transfer' })}
                 className={`p-4 border-2 rounded-2xl flex flex-col items-center gap-1 transition ${formData.paymentMethod === 'transfer' ? 'border-sky-500 bg-sky-50' : 'border-gray-100 hover:bg-gray-50'}`}
               >
                 <Loader2 className={`w-6 h-6 ${formData.paymentMethod === 'transfer' ? 'text-sky-500' : 'text-gray-300'}`} />
@@ -257,30 +256,30 @@ function RegisterForm() {
                 <div className="space-y-4">
                   <div>
                     <label className="text-[10px] font-bold text-gray-400 uppercase">Card Number</label>
-                    <input 
-                      className="w-full px-4 py-3 border rounded-xl outline-none focus:border-sky-400" 
-                      placeholder="0000 0000 0000 0000" 
+                    <input
+                      className="w-full px-4 py-3 border rounded-xl outline-none focus:border-sky-400"
+                      placeholder="0000 0000 0000 0000"
                       value={formData.cardNumber}
-                      onChange={(e) => setFormData({...formData, cardNumber: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, cardNumber: e.target.value })}
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-[10px] font-bold text-gray-400 uppercase">Expiry</label>
-                      <input 
-                        className="w-full px-4 py-3 border rounded-xl outline-none focus:border-sky-400" 
-                        placeholder="MM/YY" 
+                      <input
+                        className="w-full px-4 py-3 border rounded-xl outline-none focus:border-sky-400"
+                        placeholder="MM/YY"
                         value={formData.expiry}
-                        onChange={(e) => setFormData({...formData, expiry: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, expiry: e.target.value })}
                       />
                     </div>
                     <div>
                       <label className="text-[10px] font-bold text-gray-400 uppercase">CVV</label>
-                      <input 
-                        className="w-full px-4 py-3 border rounded-xl outline-none focus:border-sky-400" 
-                        placeholder="123" 
+                      <input
+                        className="w-full px-4 py-3 border rounded-xl outline-none focus:border-sky-400"
+                        placeholder="123"
                         value={formData.cvv}
-                        onChange={(e) => setFormData({...formData, cvv: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, cvv: e.target.value })}
                       />
                     </div>
                   </div>
@@ -318,8 +317,8 @@ function RegisterForm() {
                 <span>CONFIRM & PAY NOW</span>
               )}
             </button>
-            
-            <button 
+
+            <button
               onClick={() => setShowPaymentModal(false)}
               className="w-full mt-2 text-gray-400 text-xs font-bold py-2 hover:text-gray-600"
             >
