@@ -36,10 +36,10 @@ const AboutPage = () => {
       <div className="px-4 py-16 mt-8 max-w-7xl mx-auto">
         {/* Intro */}
         <h1 className="text-4xl font-bold text-center text-gray-600 mb-4">
-          About GenSto Hub
+          About Inanst
         </h1>
         <p className="text-lg text-center text-gray-700 max-w-3xl mx-auto mb-10">
-          At <strong>GenSto Hub</strong>, we are committed to advancing society with technology.
+          At <strong>Inanst</strong>, we are committed to advancing society with technology.
           From EdTech solutions to real-world problem-solving software, we empower students, workers,
           and the agricultural community. Our mission is to bridge the gap between school and skills,
           agriculture and technology, society and innovation.
@@ -59,7 +59,7 @@ const AboutPage = () => {
             <h2 className="text-xl font-semibold mb-2">Our Mission</h2>
             <p className="text-gray-600">
               To empower individuals with digital and soft skills, provide EdTech, and create tech-driven solutions
-              to real-world challenges.
+              to real world challenges.
             </p>
           </div>
           <div className="bg-white rounded-xl shadow-md p-6 text-center">
