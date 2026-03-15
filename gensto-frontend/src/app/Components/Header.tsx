@@ -40,14 +40,15 @@ export default function Header() {
             IN
           </span>
           
-          {/* THE STYLIZED 'A' (SET-SQUARE GEOMETRY) */}
+          {/* THE STYLIZED 'A' (PATH UNCHANGED) */}
           <svg 
             width="34" 
             height="34" 
             viewBox="0 0 100 100" 
             fill="none" 
             xmlns="http://www.w3.org/2000/svg" 
-            className="mx-1"
+           
+            className="-mx-1 md:-mx-1.5"
           >
             <defs>
               <linearGradient id="inanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -55,10 +56,6 @@ export default function Header() {
                 <stop offset="100%" stopColor="#2563EB" />
               </linearGradient>
             </defs>
-            {/* This path creates the exact 'set-square' look:
-               Outer Triangle: (50,15), (90,85), (10,85)
-               Inner Cutout: (50,42), (65,70), (35,70)
-            */}
             <path 
               d="M50 15L90 85H10L50 15ZM50 42L65 70H35L50 42Z" 
               fill="url(#inanGradient)" 
