@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useEffect, useState, useRef } from 'react';
 
 export default function PartnershipPage() {
-  // ✅ Partner logo carousel setup
+  // Partner logo carousel setup
   const partnerLogos = [
     '/images/partners/partner1.png',
     '/images/partners/partner2.png',
@@ -57,7 +57,7 @@ export default function PartnershipPage() {
             Partner with Inanst
           </h1>
           <p className="mt-4 text-gray-600 max-w-3xl mx-auto text-sm sm:text-base md:text-lg">
-            At GenSto Hub, we believe in the power of collaboration. We work with forward-thinking organizations,
+            At Inanst, we believe in the power of collaboration. We work with forward-thinking organizations,
             institutions, and investors to create meaningful change in education, technology, and innovation.
             Together, we can advance society with tech.
           </p>
@@ -134,7 +134,7 @@ export default function PartnershipPage() {
             </a>
 
             <a
-              href="https://wa.me/2347061065498?text=Hello! My name is   and I'm here for a partnership proposal."
+              href="https://wa.me/+2349117559163?text=Hello! My name is   and I'm here for a partnership proposal."
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-6 py-3 bg-blue-400 text-white rounded-full hover:bg-blue-700 transition"

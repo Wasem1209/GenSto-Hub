@@ -11,10 +11,10 @@ export default function CollaborationPage() {
         {/* Header Section */}
         <div className="text-center mb-10">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-800">
-            Collaborate With GenSto Hub
+            Collaborate With Inanst
           </h1>
           <p className="mt-4 text-gray-600 max-w-3xl mx-auto text-sm sm:text-base md:text-lg">
-            At <strong>GenSto Hub</strong>, we believe in the power of collaboration. Whether you're an individual,
+            At <strong>Inanst</strong>, we believe in the power of collaboration. Whether you're an individual,
             an organization, or a tech innovator, there’s always an opportunity to work together.
             Let’s build meaningful partnerships that drive <strong>technology, education, and innovation forward</strong>.
           </p>
@@ -29,7 +29,7 @@ export default function CollaborationPage() {
             <Users className="w-12 h-12 mx-auto text-blue-600" />
             <h3 className="text-lg font-semibold mt-4">Community Impact</h3>
             <p className="text-gray-600 mt-2 text-sm">
-              Work with us to create programs that empower students, professionals, and innovators in tech.
+              Work with Inanst to create programs that empower students, professionals, and innovators in tech.
             </p>
           </div>
 
@@ -68,7 +68,7 @@ export default function CollaborationPage() {
               <Mail className="w-5 h-5" /> Email Us
             </a>
             <a
-              href="https://wa.me/2347061065498?text=Hello%20GenSto%20Hub!%20I%20am%20interested%20in%20collaborating%20with%20you."
+              href="https://wa.me/+2349117559163?text=Hello%20Inanst!%20I%20am%20interested%20in%20collaborating%20with%20you."
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 bg-green-200 hover:bg-green-700 text-white px-6 py-3 rounded-lg shadow-md transition duration-300"

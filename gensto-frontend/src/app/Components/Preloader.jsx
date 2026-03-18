@@ -15,15 +15,14 @@ export default function Preloader({ onFinish }) {
     ];
 
     useEffect(() => {
-        // Step-by-step message sequence
+        // Significantly reduced timers for a faster experience
         const timers = [
-            setTimeout(() => setCurrentMessage(1), 2000), // Innovation
-            setTimeout(() => setCurrentMessage(2), 4000), // Analytics
-            setTimeout(() => setCurrentMessage(3), 6000), // Societal Transformation
-            setTimeout(() => setIsVisible(false), 9000)   // Start Exit Animation
+            setTimeout(() => setCurrentMessage(1), 500),  // Innovation
+            setTimeout(() => setCurrentMessage(2), 1000), // Analytics
+            setTimeout(() => setCurrentMessage(3), 1500), // Societal Transformation
+            setTimeout(() => setIsVisible(false), 2200)   // Start Exit Animation
         ];
 
-        // Lock scroll while preloading
         document.body.style.overflow = 'hidden';
 
         return () => {
@@ -33,17 +32,16 @@ export default function Preloader({ onFinish }) {
     }, []);
 
     const handleExitComplete = () => {
-        // Force scroll to top the moment the preloader is fully gone
         window.scrollTo(0, 0);
         onFinish();
     };
 
     const letterAnimation = {
-        hidden: { opacity: 0, y: 10 },
+        hidden: { opacity: 0, y: 5 },
         visible: (i) => ({
             opacity: 1,
             y: 0,
-            transition: { delay: i * 0.05 }
+            transition: { duration: 0.3, delay: i * 0.03 }
         })
     };
 
@@ -54,7 +52,7 @@ export default function Preloader({ onFinish }) {
                     className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900 via-gray-900 to-black z-[9999]"
                     initial={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 1, ease: "easeInOut" }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
                 >
                     <div className="text-center px-4">
                         <motion.div

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Preloader from "./Components/Preloader";
@@ -13,28 +13,44 @@ import NewsLatter from "./Components/NewsLatter";
 import School from "./Components/School";
 import Invite from "./Components/Invite";
 
-
-
-
 export default function Hero() {
-  const [showPreloader, setShowPreloader] = useState(true);
+  // Initialize as false to prevent a flash of loader if already visited
+  const [showPreloader, setShowPreloader] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const hasVisited = sessionStorage.getItem("inan-visited");
+    
+    if (!hasVisited) {
+      setShowPreloader(true);
+    }
+    setIsReady(true);
+  }, []);
+
+  const handlePreloaderFinish = () => {
+    sessionStorage.setItem("inan-visited", "true");
+    setShowPreloader(false);
+  };
+
+  // Prevent rendering content until we know if we need the preloader
+  if (!isReady) return null;
 
   return (
     <>
       {showPreloader ? (
-        <Preloader onFinish={() => setShowPreloader(false)} />
+        <Preloader onFinish={handlePreloaderFinish} />
       ) : (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 1.2, ease: "easeInOut" }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
           className="w-full"
         >
-          {/* Hero Section with slight fade-in delay */}
+          {/* Hero Section */}
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 1.2, ease: "easeOut" }}
+            transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
             className="relative w-full mt-10 md:h-[768px] bg-cover bg-center bg-no-repeat flex items-center justify-center px-6 text-white text-center md:pb-40 bg-[url('/images/Team-work.jpeg')]"
           >
             {/* Overlay */}
@@ -58,11 +74,11 @@ export default function Hero() {
             </div>
           </motion.section>
 
-          {/* Rest of the sections (fade in smoothly after hero) */}
+          {/* Rest of the sections */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.5, duration: 1.2, ease: "easeOut" }}
+            transition={{ delay: 0.5, duration: 0.8, ease: "easeOut" }}
           >
             <SocialProof />
             <SolutionSection />

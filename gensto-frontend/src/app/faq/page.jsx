@@ -12,29 +12,29 @@ export default function FAQPage() {
   const faqData = {
     EdTech: [
       {
-        question: "What kind of EdTech schools does GenSto Hub offer?",
+        question: "What kind of EdTech schools does Inanst offer?",
         answer:
           "We offer a range of schools including Computer Appreciation school, Web Development school, Cybersecurity school, IT Infrastructure school, and Software Maintenance school. Each school equips students with job-ready skills.",
       },
       {
-        question: "Are GenSto Hub certificates recognized?",
+        question: "Are Inanst certificates recognized?",
         answer:
           "Yes! Our certificates are recognized by industry professionals and companies, validating that you’ve gained hands-on experience and relevant knowledge.",
       },
       {
-        question: "Who are the instructors at GenSto Hub?",
+        question: "Who are the instructors at Inanst?",
         answer:
           "Our instructors are certified experts with years of industry experience, delivering real-world insights and mentorship to students.",
       },
     ],
     Services: [
       {
-        question: "Does GenSto Hub offer services beyond training?",
+        question: "Does Inanst offer services beyond training?",
         answer:
           "Yes, we provide services like website & app development, cybersecurity, product design, software maintenance, and tech consultation.",
       },
       {
-        question: "Can I hire GenSto Hub for a custom software project?",
+        question: "Can I hire Inanst for a custom software project?",
         answer:
           "Absolutely! We build scalable websites, apps, and enterprise solutions tailored to client needs.",
       },
@@ -46,7 +46,7 @@ export default function FAQPage() {
           "Yes! We provide structured internship programs for students and fresh graduates to gain real-world experience.",
       },
       {
-        question: "How can I apply for an internship at GenSto Hub?",
+        question: "How can I apply for an internship at Inanst?",
         answer:
           "Internship openings are posted on our website and social media platforms. You can also contact us directly to express interest.",
       },
@@ -58,9 +58,9 @@ export default function FAQPage() {
           "We welcome partnerships for training, tech product development, sponsorships, and collaborative research. Contact us to start a conversation.",
       },
       {
-        question: "Does GenSto Hub accept sponsorships?",
+        question: "Does Inanst accept sponsorships?",
         answer:
-          "Yes! Organizations and individuals can sponsor students, projects, and community tech initiatives through GenSto Hub.",
+          "Yes! Organizations and individuals can sponsor students, projects, and community tech initiatives through Inanst.",
       },
     ],
   };

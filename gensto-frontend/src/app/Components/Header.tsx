@@ -42,13 +42,11 @@ export default function Header() {
           
           {/* THE STYLIZED 'A' (PATH UNCHANGED) */}
           <svg 
-            width="34" 
-            height="34" 
+            
+            className="-mx-1 md:-mx-1.5 h-7 md:h-[34px] w-auto" 
             viewBox="0 0 100 100" 
             fill="none" 
-            xmlns="http://www.w3.org/2000/svg" 
-           
-            className="-mx-1 md:-mx-1.5"
+            xmlns="http://www.w3.org/2000/svg"
           >
             <defs>
               <linearGradient id="inanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -82,7 +80,8 @@ export default function Header() {
           <li><Link href="/about" className="text-sm font-bold text-[#43464d] hover:text-blue-600 transition-colors">About</Link></li>
           <li><Link href="/services" className="text-sm font-bold text-[#43464d] hover:text-blue-600 transition-colors">Services</Link></li>
           <li><Link href="/contact" className="text-sm font-bold text-[#43464d] hover:text-blue-600 transition-colors">Contact</Link></li>
-          <li><Link href="/signin" className="text-sm font-bold text-[#43464d] hover:text-blue-600 transition-colors">SignIn</Link></li>
+          {/* Updated to Get Started */}
+          <li><Link href="/signup" className="text-sm font-bold text-[#43464d] hover:text-blue-600 transition-colors">Get Started</Link></li>
         </ul>
       </nav>
 
@@ -104,7 +103,8 @@ export default function Header() {
             <Link href="/about" onClick={closeMenu} className="block py-3 px-6 text-gray-800 hover:bg-gray-50 font-semibold border-b border-gray-100">About</Link>
             <Link href="/services" onClick={closeMenu} className="block py-3 px-6 text-gray-800 hover:bg-gray-50 font-semibold border-b border-gray-100">Services</Link>
             <Link href="/contact" onClick={closeMenu} className="block py-3 px-6 text-gray-800 hover:bg-gray-50 font-semibold border-b border-gray-100">Contact</Link>
-            <Link href="/signin" onClick={closeMenu} className="block py-3 px-6 text-blue-600 font-bold">SignIn</Link>
+            {/* Updated to Get Started */}
+            <Link href="/signup" onClick={closeMenu} className="block py-3 px-6 text-blue-600 font-bold">Get Started</Link>
           </div>
         </div>
       )}
