@@ -15,14 +15,14 @@ export default function SignIn() {
         e.preventDefault();
         setLoading(true);
 
-        // API INTEGRATION POINT
-        // const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, { ... });
-
+        // Mocking the API response to match your User type requirements
         setTimeout(() => {
             login({
+                id: 'user_' + Math.random().toString(36).substr(2, 9), // Required by your User type
                 name: 'User Name',
                 email: formData.email,
-                role: 'student',
+                role: 'regular',
+                emailVerified: true, // Required by your User type
                 avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix'
             });
             setLoading(false);
