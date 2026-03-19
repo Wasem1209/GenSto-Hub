@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { User, Mail, Lock, Loader2, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
