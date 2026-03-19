@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { User, Mail, Lock, Loader2, ArrowRight } from 'lucide-react';
+import { User as UserIcon, Mail, Lock, Loader2, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 export default function SignUp() {
@@ -11,18 +11,18 @@ export default function SignUp() {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({ fullName: '', email: '', password: '' });
 
-  const handleSubmit = async (e: { preventDefault: () => void; }) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    // REST API CALL:
-    // const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup`, { ... });
-
+    // Mocking the delay for the API call
     setTimeout(() => {
       login({ 
+        id: 'user_' + Math.random().toString(36).substr(2, 9), // Added required id
         name: formData.fullName, 
         email: formData.email, 
-        role: 'student', 
+        role: 'regular',
+        emailVerified: true, // Added required emailVerified status
         avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${formData.fullName}` 
       });
       setLoading(false);
@@ -31,7 +31,6 @@ export default function SignUp() {
   };
 
   const handleSocialSignUp = (platform: string) => {
-    // This will redirect to your Node.js backend social auth route
     window.location.href = `http://localhost:5000/api/auth/${platform}`;
   };
 
@@ -73,7 +72,7 @@ export default function SignUp() {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="relative">
-            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input required className="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 transition" placeholder="Full Name" onChange={(e) => setFormData({...formData, fullName: e.target.value})} />
           </div>
           <div className="relative">
