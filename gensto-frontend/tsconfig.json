@@ -34,7 +34,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "src/app/(public)/register/page.jsx"
+    "src/app/(dashboards)/regular/register/page.jsx",
+    "src/app/(dashboards)/regular/my-school/page.jsx"
   ],
   "exclude": [
     "node_modules"
