@@ -27,8 +27,8 @@ interface DashboardSidebarProps {
 const roleLinks: Record<UserRole, NavLink[]> = {
   regular: [
     { name: 'Dashboard', href: '/regular', icon: LayoutDashboard },
-    { name: 'My School', href: '/regular/school', icon: School },
-    { name: 'My Class', href: '/regular/class', icon: Users },
+    { name: 'My School', href: '/regular/my-school', icon: School },
+    { name: 'My Class', href: '/regular/my-class', icon: Users },
     { name: 'Assignment', href: '/regular/assignments', icon: FileText },
     { name: 'Tasks', href: '/regular/tasks', icon: CheckSquare },
     { name: 'Chat', href: '/regular/chat', icon: MessageSquare },

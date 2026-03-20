@@ -86,7 +86,7 @@ export default function RegularPage() {
       title: 'Learning Progress',
       description: 'Track your curriculum completion, grades, and skill development milestones.',
       icon: TrendingUp,
-      href: '/regular/class',
+      href: '/regular/classes',
       color: 'bg-amber-600',
     },
     {
@@ -107,21 +107,21 @@ export default function RegularPage() {
       title: 'Certificate Exams',
       description: 'Schedule and take your professional certification assessments.',
       icon: Award,
-      href: '/regular/exams',
+      href: '/regular/exam',
       color: 'bg-purple-600',
     },
     {
       title: 'Terms & Conditions',
       description: 'Review the legal framework and operational guidelines of our platform.',
       icon: FileText,
-      href: '/regular/legal/terms',
+      href: '/regular/legal-terms',
       color: 'bg-slate-600',
     },
     {
       title: 'Privacy Policy',
       description: 'Learn how we protect your data and manage your digital privacy.',
       icon: ShieldCheck,
-      href: '/regular/legal/privacy',
+      href: '/regular/legal-policy',
       color: 'bg-gray-800',
     },
   ];
