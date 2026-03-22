@@ -30,8 +30,6 @@ const roleLinks: Record<UserRole, NavLink[]> = {
     { name: 'My School', href: '/regular/my-school', icon: School },
     { name: 'My Class', href: '/regular/my-class', icon: Users },
     { name: 'Assignment', href: '/regular/assignments', icon: FileText },
-    { name: 'Tasks', href: '/regular/tasks', icon: CheckSquare },
-    { name: 'Chat', href: '/regular/chat', icon: MessageSquare },
     { name: 'Settings', href: '/regular/settings', icon: Settings },
     { name: 'Support', href: '/regular/support', icon: LifeBuoy },
     { name: 'Report', href: '/regular/report', icon: BarChart3 },
