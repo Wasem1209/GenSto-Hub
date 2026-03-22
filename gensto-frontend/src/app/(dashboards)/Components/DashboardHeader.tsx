@@ -95,7 +95,7 @@ export default function DashboardHeader({ onMenuClick, _role }) {
             <div className="mt-4 space-y-2">
               <div className="flex items-center gap-2 text-blue-500">
                 <FileText size={14} />
-                <span className="text-[9px] font-black uppercase tracking-widest">About / Bio</span>
+                <span className="text-[9px] font-black uppercase tracking-widest">Bio</span>
               </div>
               <div className="bg-[#0F1113] border border-slate-800/50 rounded-xl p-3">
                 <p className="text-[11px] text-slate-400 leading-relaxed italic">
