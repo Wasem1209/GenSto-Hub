@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { 
   LayoutDashboard, School, FileText, CheckSquare, 
-  MessageSquare, Settings, LifeBuoy, BarChart3, Palette, 
+  MessageSquare, Settings, LifeBuoy, Palette, 
   LogOut, Users, Bell, ClipboardList, Activity, Eye,
   LucideIcon, Briefcase, X
 } from 'lucide-react';
@@ -32,8 +32,7 @@ const roleLinks: Record<UserRole, NavLink[]> = {
     { name: 'Assignment', href: '/regular/assignments', icon: FileText },
     { name: 'Settings', href: '/regular/settings', icon: Settings },
     { name: 'Support', href: '/regular/support', icon: LifeBuoy },
-    { name: 'Report', href: '/regular/report', icon: BarChart3 },
-    { name: 'Theme', href: '/regular/theme', icon: Palette },
+    
   ],
   worker: [
     { name: 'Dashboard', href: '/worker', icon: LayoutDashboard },
