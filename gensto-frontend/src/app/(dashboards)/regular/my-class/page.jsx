@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
     Video, PlayCircle, Calendar, Clock,
     ArrowRight, Monitor, Loader2, X,
-    Wifi, ShieldCheck, User, KeyRound
+    Wifi, ShieldCheck, User, KeyRound, Lock
 } from 'lucide-react';
 
 // --- SUB-COMPONENT: COUNTDOWN TIMER ---
@@ -41,8 +41,12 @@ export default function MyClassPage() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [selectedVideo, setSelectedVideo] = useState(null);
-    const [verifyingClass, setVerifyingClass] = useState(null); // Course ID Gate
+    const [verifyingClass, setVerifyingClass] = useState(null);
     const [courseId, setCourseId] = useState('');
+
+    // --- ACCESS CONTROL STATE ---
+    const [schoolId, setSchoolId] = useState('');
+    const [isAuthorized, setIsAuthorized] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -81,11 +85,51 @@ export default function MyClassPage() {
         fetchData();
     }, []);
 
+    const handleVerifySchool = (e) => {
+        e.preventDefault();
+        if (schoolId.trim().length >= 4) {
+            setIsAuthorized(true);
+        }
+    };
+
     if (loading) return (
         <div className="flex h-[60vh] items-center justify-center">
             <Loader2 className="w-8 h-8 animate-spin text-slate-300" />
         </div>
     );
+
+    // --- GATEKEEPER: SCHOOL ID LOCK SCREEN ---
+    if (!isAuthorized) {
+        return (
+            <div className="h-[70vh] flex items-center justify-center p-4">
+                <div className="bg-white border border-slate-100 p-10 rounded-[3rem] max-w-md w-full text-center space-y-8 shadow-2xl animate-in zoom-in-95 duration-500">
+                    <div className="w-20 h-20 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto shadow-xl">
+                        <Lock size={32} />
+                    </div>
+                    <div className="space-y-2">
+                        <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tight">Classroom Access</h2>
+                        <p className="text-slate-500 text-xs">Verification required. Please provide your student credentials.</p>
+                    </div>
+                    <form onSubmit={handleVerifySchool} className="space-y-4">
+                        <div className="relative">
+                            <KeyRound className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                            <input
+                                type="text"
+                                required
+                                placeholder="Enter School ID"
+                                value={schoolId}
+                                onChange={(e) => setSchoolId(e.target.value)}
+                                className="w-full bg-slate-50 border-2 border-slate-50 rounded-2xl p-4 pl-14 text-gray-900 font-bold focus:border-slate-900 focus:bg-white outline-none transition-all"
+                            />
+                        </div>
+                        <button className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-blue-600 transition-all shadow-lg shadow-slate-200">
+                            Verify & Enter
+                        </button>
+                    </form>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 space-y-12 animate-in fade-in duration-700">
@@ -98,6 +142,10 @@ export default function MyClassPage() {
                         <span className="text-[10px] font-black uppercase tracking-tighter">Live Operations</span>
                     </div>
                     <h1 className="text-3xl font-black text-gray-900 tracking-tight">My Classes</h1>
+                </div>
+                <div className="px-4 py-2 bg-slate-100 rounded-xl border border-slate-200 flex items-center gap-3">
+                    <ShieldCheck size={16} className="text-blue-600" />
+                    <span className="text-[10px] font-black uppercase text-slate-600">ID: {schoolId}</span>
                 </div>
             </div>
 
@@ -176,6 +224,15 @@ export default function MyClassPage() {
                 </div>
             </section>
 
+            {/* Verified Footer */}
+            <div className="bg-slate-900 rounded-[2rem] p-6 flex flex-col md:flex-row items-center justify-between gap-4 text-white">
+                <div className="flex items-center gap-3">
+                    <ShieldCheck size={20} className="text-blue-400" />
+                    <p className="text-[10px] uppercase tracking-widest font-bold">Session authorized for student ID: {schoolId}</p>
+                </div>
+                <p className="text-[10px] text-slate-500 font-black tracking-tighter uppercase italic">Protected by Inanst Security</p>
+            </div>
+
             {/* --- COURSE ID VERIFICATION MODAL --- */}
             {verifyingClass && (
                 <div className="fixed inset-0 z-[110] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
@@ -188,7 +245,7 @@ export default function MyClassPage() {
                                 <KeyRound size={32} />
                             </div>
                             <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight">Enrollment Required</h3>
-                            <p className="text-sm text-gray-500">Please enter your <b>Course ID</b> to join the live session for {verifyingClass.title}.</p>
+                            <p className="text-sm text-gray-500">Please enter your <b>Course ID</b> for {verifyingClass.title}.</p>
                         </div>
                         <div className="space-y-4">
                             <input
@@ -199,7 +256,7 @@ export default function MyClassPage() {
                                 className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-blue-600 focus:bg-white outline-none transition-all font-bold text-center"
                             />
                             <Link
-                                href={`/regular/learning-room/${verifyingClass.id}?course_id=${courseId}`}
+                                href={`/regular/learning-room/${verifyingClass.id}?course_id=${courseId}&student_id=${schoolId}`}
                                 className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-4 rounded-2xl font-black hover:bg-slate-900 transition-all"
                             >
                                 Verify & Join Room
@@ -236,25 +293,10 @@ export default function MyClassPage() {
                             <h2 className="text-2xl sm:text-3xl font-black text-gray-900 mt-4 leading-tight">
                                 {selectedVideo.title}
                             </h2>
-                            <div className="flex items-center gap-4 mt-6 text-gray-400">
-                                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-tighter">
-                                    <ShieldCheck size={16} className="text-blue-500" />
-                                    Inanst ID: IN-2026-AUTH
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
             )}
-
-            {/* Verified Footer */}
-            <div className="bg-slate-900 rounded-[2rem] p-6 flex flex-col md:flex-row items-center justify-between gap-4 text-white">
-                <div className="flex items-center gap-3">
-                    <ShieldCheck size={20} className="text-blue-400" />
-                    <p className="text-[10px] uppercase tracking-widest font-bold">Authorized Session Access Only</p>
-                </div>
-                <p className="text-[10px] text-slate-500 font-black tracking-tighter uppercase italic">Protected by Inanst Security</p>
-            </div>
         </div>
     );
 }
