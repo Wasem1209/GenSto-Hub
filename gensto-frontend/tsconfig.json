@@ -32,10 +32,9 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "src/app/(dashboards)/regular/register/page.jsx",
-    "src/app/(dashboards)/regular/my-school/page.jsx"
+    "**/*.js",
+    "**/*.jsx",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

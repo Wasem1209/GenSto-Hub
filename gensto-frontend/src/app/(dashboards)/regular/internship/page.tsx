@@ -158,7 +158,7 @@ export default function InternshipPage() {
         </div>
         <h1 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tight">Open Internships</h1>
         <p className="text-gray-500 max-w-xl text-sm md:text-base leading-relaxed">
-          Select a track below to apply. Our internships focus on real-world projects 
+          Select a track below to apply. INANST internships focus on real-world projects 
           within the <span className="text-gray-800 font-bold">INANST</span> ecosystem.
         </p>
       </div>
