@@ -1,7 +1,7 @@
 ///index.ts
 
 export const REST_API = (() => {
-    let url = process.env.NEXT_PUBLIC_REST_API || "http://localhost:5000/api";
+    let url = process.env.NEXT_PUBLIC_REST_API || "https://inanst-b.onrender.com";
     url = url.replace(/\/$/, "");
     if (!url.endsWith("/api")) {
         url = `${url}/api`;
