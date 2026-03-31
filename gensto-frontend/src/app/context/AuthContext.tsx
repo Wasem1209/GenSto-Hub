@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 
 // Define what a User looks like in INANST
 interface User {
+  fullName: string;
   id: string;
   name: string;
   email: string;
