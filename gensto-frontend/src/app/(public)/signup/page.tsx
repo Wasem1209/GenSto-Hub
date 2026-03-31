@@ -34,7 +34,7 @@ export default function SignUp() {
     if (!formData.country) return setError("Please select your country");
     if (!formData.phoneNumber) return setError("Phone number is required");
     
-    // Password standard validation (Uppercase, Lowercase, Number, Special Char, 8+ Length)
+    // Password standard validation
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     
     if (!passwordRegex.test(formData.password)) {
@@ -51,12 +51,14 @@ export default function SignUp() {
 
     const fullPhone = `${formData.phoneCode}${formData.phoneNumber}`;
     
+    // UPDATED: Now sending confirmPassword so the backend validation passes
     const submissionData = {
         fullName: formData.fullName,
         email: formData.email,
         phone: fullPhone,
         country: formData.country,
-        password: formData.password
+        password: formData.password,
+        confirmPassword: formData.confirmPassword 
     };
 
     try {
