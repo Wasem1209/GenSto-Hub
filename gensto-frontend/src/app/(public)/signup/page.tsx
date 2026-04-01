@@ -120,7 +120,7 @@ export default function SignUp() {
       const data = await res.json();
       if (res.ok) {
         login(data.user);
-        router.push('/');
+        router.push('/dashboard/regular');
       } else {
         setError(data.msg || 'Invalid Code');
       }
