@@ -2,7 +2,7 @@
 import { useState, FormEvent, useEffect, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { User as UserIcon, Mail, Lock, Loader2, ArrowRight, Phone, Globe, X } from 'lucide-react';
+import { User as UserIcon, Mail, Lock, Loader2, ArrowRight, Phone, Globe, X, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { REST_API, countryCode } from '../../constant';
 
@@ -23,6 +23,8 @@ export default function SignUp() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [resendTimer, setResendTimer] = useState(0);
@@ -235,12 +237,39 @@ export default function SignUp() {
 
           <div className="relative">
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input required type="password" title="At least 8 chars, 1 uppercase, 1 number, 1 special" className="w-full pl-12 pr-4 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 transition text-sm sm:text-base" placeholder="Password" onChange={(e) => setFormData({...formData, password: e.target.value})} />
+            <input 
+              required 
+              type={showPassword ? "text" : "password"} 
+              title="At least 8 chars, 1 uppercase, 1 number, 1 special" 
+              className="w-full pl-12 pr-12 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 transition text-sm sm:text-base" 
+              placeholder="Password" 
+              onChange={(e) => setFormData({...formData, password: e.target.value})} 
+            />
+            <button 
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+            >
+              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            </button>
           </div>
           
           <div className="relative">
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input required type="password" className="w-full pl-12 pr-4 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 transition text-sm sm:text-base" placeholder="Confirm Password" onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})} />
+            <input 
+              required 
+              type={showConfirmPassword ? "text" : "password"} 
+              className="w-full pl-12 pr-12 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 transition text-sm sm:text-base" 
+              placeholder="Confirm Password" 
+              onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})} 
+            />
+            <button 
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+            >
+              {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            </button>
           </div>
 
           {/* Password Live Requirements Tracker */}
