@@ -18,6 +18,7 @@ export const API_ROUTES = {
     VERIFY_OTP: `${REST_API}/auth/verify-code`,
     GOOGLE_AUTH: `${REST_API}/auth/google`,
     FACEBOOK_AUTH: `${REST_API}/auth/facebook`,
+    RESEND_OTP: `${REST_API}/auth/resend-otp`,
 };
 
 
