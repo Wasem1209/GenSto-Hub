@@ -25,13 +25,26 @@ export default function SignIn() {
                 body: JSON.stringify(formData),
             });
 
-            const data = await res.json();
-            if (res.ok) {
-                login(data.user);
-                router.push('/dashboard/regular');
-            } else {
-                setError(data.msg || 'Login failed');
-            }
+            // ... inside handleSubmit function
+const data = await res.json();
+if (res.ok) {
+    login(data.user);
+    
+    // Redirect logic based on role
+    const role = data.user.role;
+    if (role === 'admin') {
+        router.push('/admin');
+    } else if (role === 'worker') {
+        router.push('/worker');
+    } else if (role === 'instructor') {
+        router.push('/instructor');
+    } else {
+        // Redirect to: gensto-frontend/src/app/(dashboards)/regular
+        router.push('/regular'); 
+    }
+} else {
+    setError(data.msg || 'Login failed');
+}
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
             setError('Connection error');

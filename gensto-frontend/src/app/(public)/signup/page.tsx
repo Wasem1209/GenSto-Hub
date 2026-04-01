@@ -118,12 +118,19 @@ export default function SignUp() {
         body: JSON.stringify({ email: formData.email, code: otp }),
       });
       const data = await res.json();
-      if (res.ok) {
-        login(data.user);
-        router.push('/dashboard/regular');
-      } else {
-        setError(data.msg || 'Invalid Code');
-      }
+if (res.ok) {
+    login(data.user);
+    
+    // New users are 'regular' by default
+    const role = data.user.role;
+    if (role && role !== 'regular') {
+        router.push(`/${role}`);
+    } else {
+        router.push('/regular');
+    }
+} else {
+    setError(data.msg || 'Invalid Code');
+}
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setError('Verification failed');
