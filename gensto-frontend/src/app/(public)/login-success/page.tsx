@@ -1,34 +1,58 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 
-export default function LoginSuccess() {
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const { login } = useAuth();
+function LoginSuccessContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { login } = useAuth();
 
-    useEffect(() => {
-        const token = searchParams.get('token');
-        const userString = searchParams.get('user');
+  useEffect(() => {
+    const token = searchParams.get('token');
+    const userString = searchParams.get('user');
 
-        if (token && userString) {
-            const user = JSON.parse(decodeURIComponent(userString));
-            
-            // Save to your AuthContext/localStorage
-            login(user); 
+    if (token && userString) {
+      try {
+        const user = JSON.parse(decodeURIComponent(userString));
+        
+        // Save to your AuthContext/localStorage
+        login(user); 
 
-            // Handle the same redirect logic as your manual Sign In
-            if (user.role === 'admin') router.push('/admin');
-            else if (user.role === 'worker') router.push('/worker');
-            else if (user.role === 'instructor') router.push('/instructor');
-            else router.push('/regular');
+        // Redirect logic based on role
+        if (user.role === 'admin') {
+          router.push('/admin');
+        } else if (user.role === 'worker') {
+          router.push('/worker');
+        } else if (user.role === 'instructor') {
+          router.push('/instructor');
+        } else {
+          router.push('/regular');
         }
-    }, [searchParams, login, router]);
+      } catch (err) {
+        console.error("Failed to parse user data:", err);
+        router.push('/signin');
+      }
+    }
+  }, [searchParams, login, router]);
 
-    return (
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <p className="font-bold animate-pulse">Completing login...</p>
+    </div>
+  );
+}
+
+export default function LoginSuccess() {
+  return (
+    <Suspense 
+      fallback={
         <div className="min-h-screen flex items-center justify-center">
-            <p className="font-bold animate-pulse">Completing login...</p>
+          <p className="font-bold animate-pulse">Loading...</p>
         </div>
-    );
+      }
+    >
+      <LoginSuccessContent />
+    </Suspense>
+  );
 }
