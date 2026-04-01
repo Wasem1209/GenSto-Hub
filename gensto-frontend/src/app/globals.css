@@ -26,3 +26,16 @@ html {
   background-size: 400% 400%;
   animation: gradientShift 12s ease infinite;
 }
+
+
+@keyframes blink {
+  50% {
+    border-color: transparent;
+  }
+}
+
+.typewriter-cursor {
+  border-right: 3px solid #202321;
+
+  animation: blink 0.7s step-end infinite;
+}
