@@ -1,32 +1,110 @@
-import { Code, Users, Briefcase, Globe, Rpokecket, Rocket } from "lucide-react"
+'use client';
 
+import { motion } from "framer-motion";
+import { Code, Users, Briefcase, Rocket, Globe, Database } from "lucide-react";
 
-export default function Solutionsection() {
+export default function SolutionSection() {
+    const services = [
+        {
+            title: 'Innovative Training',
+            icon: <Code className="w-12 h-12 text-blue-600" />,
+            description: 'Hands-on technical programs designed to bridge the gap between academic theory and industry-standard skills.',
+        },
+        {
+            title: 'Custom Software',
+            icon: <Briefcase className="w-12 h-12 text-blue-600" />,
+            description: 'Engineering scalable, robust software products tailored for startups, NGOs, and growing organizations.',
+        },
+        {
+            title: 'Mentorship & Support',
+            icon: <Users className="w-12 h-12 text-blue-600" />,
+            description: 'Personalized guidance from certified mentors to navigate project roadblocks and career transitions.',
+        },
+        {
+            title: 'Career Empowerment',
+            icon: <Rocket className="w-12 h-12 text-blue-600" />,
+            description: 'Equipping students and professionals with the tools and network needed to launch successful tech careers.',
+        },
+        {
+            title: 'Scalable Tech Hub',
+            icon: <Globe className="w-12 h-12 text-blue-600" />,
+            description: 'A digital ecosystem designed for modular management and collaborative product development.',
+        },
+        {
+            title: 'Data-Driven Insights',
+            icon: <Database className="w-12 h-12 text-blue-600" />,
+            description: 'Leveraging modern stacks to build data-centric solutions that power informed business decisions.',
+        }
+    ];
+
+    // Animation
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: { staggerChildren: 0.2 }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { y: 20, opacity: 0 },
+        visible: {
+            y: 0,
+            opacity: 1,
+            transition: { duration: 0.5, ease: "easeOut" }
+        }
+    };
+
     return (
-        <section className="by-white py-6 px-8 md:px-20">
-            <h2 className="text-center text-3xl md:text-4xl mb-12 font-bold text-gray-800 ">Our Services & Solutions</h2>
-            <div className="grid grid-col-1 md:grid-col-2 lg:grid-col-3 gap-8">
-                <div className="bg-gray-50 rounded-lg shadow-md py-6 text-center hover:scale-105 transition-all">
-                    <Code className="mx-auto mb-4 h-12  text-blue-600 w-12" />
-                    <h3 className="mb-2 text-xl font-bold">Innovative Training</h3>
-                    <p className="text-gray-600">We provide hands-on tech training to bridge the gap between school and skills </p>
-                </div>
-                <div className="bg-gray-50 rounded-lg shadow-md py-6 text-center hover:scale-105 transition-all">
-                    <Briefcase className="mx-auto mb-4 h-12 w-12 text-blue-600" />
-                    <h3 className="mb-2 text-xl font-bold">Custom Softwares</h3>
-                    <p className="text-gray-600">We build scalable software products for startups, NGOs and organizations.</p>
-                </div>
-                <div className="bg-gray-50 rounded-lg shadow-md py-6 text-center hover:scale-105 transition-all">
-                    <Users className="mx-auto mb-4 h-12 w-12 text-blue-600" />
-                    <h3 className="mb-2 text-xl font-bold">Mentorship & Support</h3>
-                    <p className="text-gray-600">Access to certifield mentors for project guidance and careere support.</p>
-                </div>
-                <div className="bg-gray-50 rounded-lg shadow-md py-6 text-center hover:scale-105 transition-all">
-                    <Rocket className="mx-auto mb-4 h-12 w-12 text-blue-600" />
-                    <h3 className="mb-2 text-xl font-bold">Career Empowerment</h3>
-                    <p className="text-gray-600">Empowering students and workers to launch career in tech</p>
-                </div>
+        <section className="bg-white py-20 px-6 sm:px-12 lg:px-24">
+            <div className="max-w-7xl mx-auto">
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="text-center mb-16"
+                >
+                    <h2 className="text-gray-800 font-bold tracking-widest uppercase text-sm mb-3">What we offer</h2>
+
+                    <motion.div
+                        initial={{ width: 0, opacity: 0 }}
+                        whileInView={{ width: "5rem", opacity: 1 }}
+
+                        viewport={{ once: false, amount: 0.5 }}
+                        transition={{
+                            duration: 0.8,
+                            ease: "easeOut",
+                            delay: 0.1
+                        }}
+                        className="h-1.5 bg-blue-600 mx-auto mt-6 rounded-full"
+                    />
+                </motion.div>
+
+                <motion.div
+                    variants={containerVariants}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: false, amount: 0.2 }}
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"
+                >
+                    {services.map((service, index) => (
+                        <motion.div
+                            key={index}
+                            variants={itemVariants}
+                            whileHover={{ scale: 1.03 }}
+                            className="group p-8 bg-gray-50 rounded-3xl border border-transparent hover:border-blue-100 hover:bg-white hover:shadow-2xl transition-all duration-300"
+                        >
+                            <div className="bg-white group-hover:bg-blue-50 w-20 h-20 rounded-2xl flex items-center justify-center mb-6 shadow-sm group-hover:shadow-md transition-all">
+                                {service.icon}
+                            </div>
+                            <h3 className="text-2xl font-bold text-gray-800 mb-4">{service.title}</h3>
+                            <p className="text-gray-600 leading-relaxed text-base">
+                                {service.description}
+                            </p>
+                        </motion.div>
+                    ))}
+                </motion.div>
             </div>
         </section>
-    )
+    );
 }
