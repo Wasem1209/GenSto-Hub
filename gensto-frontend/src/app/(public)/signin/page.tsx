@@ -28,7 +28,7 @@ export default function SignIn() {
             const data = await res.json();
             if (res.ok) {
                 login(data.user);
-                router.push('/regular');
+                router.push('/');
             } else {
                 setError(data.msg || 'Login failed');
             }
