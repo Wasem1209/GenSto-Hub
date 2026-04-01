@@ -1,10 +1,22 @@
 'use client';
-import { useState, FormEvent, useEffect } from 'react';
+import { useState, FormEvent, useEffect, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { User as UserIcon, Mail, Lock, Loader2, ArrowRight, Phone, Globe, X } from 'lucide-react';
 import Link from 'next/link';
 import { REST_API, countryCode } from '../../constant';
+
+// Sub-component for live feedback
+function RequirementItem({ label, met }: { label: string; met: boolean }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <div className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${met ? 'bg-green-500' : 'bg-gray-300'}`} />
+      <span className={`text-[8px] uppercase font-bold tracking-tight transition-colors duration-300 ${met ? 'text-green-600' : 'text-gray-400'}`}>
+        {label}
+      </span>
+    </div>
+  );
+}
 
 export default function SignUp() {
   const { login } = useAuth();
@@ -25,6 +37,14 @@ export default function SignUp() {
     confirmPassword: '' 
   });
 
+  // Track password strength in real-time
+  const passwordRequirements = useMemo(() => ({
+    length: formData.password.length >= 8,
+    uppercase: /[A-Z]/.test(formData.password),
+    number: /\d/.test(formData.password),
+    special: /[@$!%*?&]/.test(formData.password),
+  }), [formData.password]);
+
   useEffect(() => {
     if (resendTimer > 0) {
       const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
@@ -43,7 +63,7 @@ export default function SignUp() {
     
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     if (!passwordRegex.test(formData.password)) {
-      setError("Password needs: 8+ chars, Uppercase, Lowercase, Number, & Special Char (@$!%*?&)");
+      setError("Password requirements not met");
       return;
     }
     if (formData.password !== formData.confirmPassword) {
@@ -118,19 +138,17 @@ export default function SignUp() {
         body: JSON.stringify({ email: formData.email, code: otp }),
       });
       const data = await res.json();
-if (res.ok) {
-    login(data.user);
-    
-    // New users are 'regular' by default
-    const role = data.user.role;
-    if (role && role !== 'regular') {
-        router.push(`/${role}`);
-    } else {
-        router.push('/regular');
-    }
-} else {
-    setError(data.msg || 'Invalid Code');
-}
+      if (res.ok) {
+        login(data.user);
+        const role = data.user.role;
+        if (role && role !== 'regular') {
+            router.push(`/${role}`);
+        } else {
+            router.push('/regular');
+        }
+      } else {
+        setError(data.msg || 'Invalid Code');
+      }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setError('Verification failed');
@@ -179,12 +197,12 @@ if (res.ok) {
             <input required type="email" className="w-full pl-12 pr-4 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 transition text-sm sm:text-base" placeholder="Email Address" onChange={(e) => setFormData({...formData, email: e.target.value})} />
           </div>
 
-          <div className="flex gap-2">
-            <div className="relative w-[90px] sm:w-[110px]">
-              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 z-10" />
+          <div className="flex items-center bg-gray-50 border border-gray-100 rounded-xl sm:rounded-2xl overflow-hidden focus-within:border-blue-500 transition">
+            <div className="relative flex items-center border-r border-gray-200">
+              <Phone className="absolute left-3 text-gray-400 w-4 h-4 z-10" />
               <select 
                 value={formData.phoneCode}
-                className="w-full pl-8 pr-2 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 transition text-[10px] sm:text-xs appearance-none" 
+                className="pl-8 pr-2 py-3 sm:py-4 bg-transparent outline-none text-[10px] sm:text-xs appearance-none font-bold" 
                 onChange={(e) => setFormData({...formData, phoneCode: e.target.value})}
               >
                 {countryCode.map((c) => (
@@ -195,8 +213,8 @@ if (res.ok) {
             <input 
               required 
               type="tel" 
-              placeholder="Number" 
-              className="flex-1 px-4 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 transition text-sm sm:text-base" 
+              placeholder="Phone Number" 
+              className="flex-1 px-4 py-3 sm:py-4 bg-transparent outline-none text-sm sm:text-base" 
               onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})} 
             />
           </div>
@@ -217,12 +235,20 @@ if (res.ok) {
 
           <div className="relative">
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input required type="password" className="w-full pl-12 pr-4 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 transition text-sm sm:text-base" placeholder="Password (A@1abc...)" onChange={(e) => setFormData({...formData, password: e.target.value})} />
+            <input required type="password" title="At least 8 chars, 1 uppercase, 1 number, 1 special" className="w-full pl-12 pr-4 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 transition text-sm sm:text-base" placeholder="Password" onChange={(e) => setFormData({...formData, password: e.target.value})} />
           </div>
           
           <div className="relative">
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input required type="password" className="w-full pl-12 pr-4 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 transition text-sm sm:text-base" placeholder="Confirm Password" onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})} />
+          </div>
+
+          {/* Password Live Requirements Tracker */}
+          <div className="px-2 grid grid-cols-2 gap-y-1.5 gap-x-4">
+            <RequirementItem label="8+ Characters" met={passwordRequirements.length} />
+            <RequirementItem label="An Uppercase" met={passwordRequirements.uppercase} />
+            <RequirementItem label="A Number" met={passwordRequirements.number} />
+            <RequirementItem label="A Symbol (@$!)" met={passwordRequirements.special} />
           </div>
 
           <button disabled={loading} className="w-full bg-blue-600 text-white font-black py-4 sm:py-5 rounded-xl sm:rounded-2xl shadow-lg shadow-blue-100 flex items-center justify-center gap-2 hover:bg-blue-700 transition active:scale-95 disabled:opacity-50 uppercase tracking-widest text-xs sm:text-sm">
