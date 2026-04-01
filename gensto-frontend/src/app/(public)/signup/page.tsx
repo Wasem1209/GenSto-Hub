@@ -120,7 +120,7 @@ export default function SignUp() {
       const data = await res.json();
       if (res.ok) {
         login(data.user);
-        router.push('/dashboard');
+        router.push('/regular');
       } else {
         setError(data.msg || 'Invalid Code');
       }
@@ -137,7 +137,7 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 sm:p-6 md:p-8 pt-24 font-sans text-gray-900">
+    <div className="min-h-screen mt-14 bg-gray-50 flex items-center justify-center p-4 sm:p-6 md:p-8 pt-24 font-sans text-gray-900">
       <div className="w-full max-w-md bg-white rounded-[1.5rem] sm:rounded-[2.5rem] shadow-xl p-6 sm:p-10 border border-gray-100">
         <div className="text-center mb-8">
           <h1 className="text-2xl sm:text-3xl font-black italic tracking-tighter text-gray-900">Create Account</h1>
