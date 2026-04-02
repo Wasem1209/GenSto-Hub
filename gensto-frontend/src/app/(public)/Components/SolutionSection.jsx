@@ -84,13 +84,15 @@ export default function SolutionSection() {
                     variants={containerVariants}
                     initial="hidden"
                     whileInView="visible"
-                    viewport={{ once: false, amount: 0.2 }}
+                    // Change: once to true, and lower the amount for a more responsive trigger
+                    viewport={{ once: true, amount: 0.1 }}
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"
                 >
                     {services.map((service, index) => (
                         <motion.div
                             key={index}
                             variants={itemVariants}
+                            // whileHover still works perfectly with staggered entry
                             whileHover={{ scale: 1.03 }}
                             className="group p-8 bg-gray-50 rounded-3xl border border-transparent hover:border-blue-100 hover:bg-white hover:shadow-2xl transition-all duration-300"
                         >

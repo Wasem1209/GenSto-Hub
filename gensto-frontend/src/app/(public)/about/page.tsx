@@ -34,7 +34,7 @@ const AboutPage = () => {
       image: "/images/terse.jpg",
     },
     {
-      name: "Engr Oluwapamilerin Akintade",
+      name: "Engr Oluwapamilerin Akintade Favour",
       title: "Co-Founder/COO",
       image: "/images/IMG-20260401-WA0006.jpg (1).png",
     },
