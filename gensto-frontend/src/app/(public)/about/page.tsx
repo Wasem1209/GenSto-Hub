@@ -24,7 +24,7 @@ interface Pillar {
 const AboutPage = () => {
   const teamMembers: TeamMember[] = [
     {
-      name: "Dev. Philip Terfa Wasem",
+      name: "Philip Terfa Wasem",
       title: "Founder/CEO",
       image: "/images/IMG-20260315-WA0365_2.png",
     },
@@ -34,14 +34,14 @@ const AboutPage = () => {
       image: "/images/terse.jpg",
     },
     {
+      name: "Engr Oluwapamilerin Akintade",
+      title: "Co-Founder/COO",
+      image: "/images/IMG-20260401-WA0006.jpg (1).png",
+    },
+    {
       name: "Engr. Success Agu",
       title: "Co-Founder/CTO",
       image: "/images/Success Agu.jpg",
-    },
-    {
-      name: "Dev",
-      title: "Co-Founder/COO",
-      image: "/",
     },
     {
       name: "Engr. Yohana Gambo",
@@ -49,7 +49,7 @@ const AboutPage = () => {
       image: "/images/Yohanna.jpg",
     },
     {
-      name: "BoluwaTife Ima",
+      name: "Asokere Success Boluwatife",
       title: "Co-Founder/Growth Lead",
       image: "/images/emmanuelah.jpg",
     },
