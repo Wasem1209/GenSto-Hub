@@ -23,11 +23,13 @@ export default function SignUp() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [resendTimer, setResendTimer] = useState(0);
+  
+  // Visibility states
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const [formData, setFormData] = useState({ 
     fullName: '', 
@@ -240,14 +242,13 @@ export default function SignUp() {
             <input 
               required 
               type={showPassword ? "text" : "password"} 
-              title="At least 8 chars, 1 uppercase, 1 number, 1 special" 
               className="w-full pl-12 pr-12 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 transition text-sm sm:text-base" 
               placeholder="Password" 
               onChange={(e) => setFormData({...formData, password: e.target.value})} 
             />
             <button 
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
+              type="button" 
+              onClick={() => setShowPassword(!showPassword)} 
               className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
             >
               {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -264,8 +265,8 @@ export default function SignUp() {
               onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})} 
             />
             <button 
-              type="button"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              type="button" 
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)} 
               className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
             >
               {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
