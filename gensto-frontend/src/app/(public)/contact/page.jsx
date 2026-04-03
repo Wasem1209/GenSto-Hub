@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Mail, Phone, MapPin, Loader2 } from 'lucide-react';
+import { Mail, Phone, MapPin, Loader2, CheckCircle2, X } from 'lucide-react';
 import { REST_API } from '../../constant';
 
 export default function ContactPage() {
-  const [success, setSuccess] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
@@ -27,9 +27,8 @@ export default function ContactPage() {
       });
 
       if (res.ok) {
-        setSuccess(true);
+        setShowModal(true);
         setFormData({ fullName: '', email: '', phoneNumber: '', title: '', message: '' });
-        setTimeout(() => setSuccess(false), 3000);
       }
     } catch (err) {
       console.error("Failed to send message");
@@ -39,7 +38,7 @@ export default function ContactPage() {
   };
 
   return (
-    <section className="bg-gray-50 mt-8 py-16 px-6">
+    <section className="bg-gray-50 mt-8 py-16 px-6 relative">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-800">Contact Us</h1>
@@ -47,12 +46,6 @@ export default function ContactPage() {
             Have questions or want to work with us? Get in touch using the form below.
           </p>
         </div>
-
-        {success && (
-          <div className="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg text-center font-bold">
-            Message sent successfully!
-          </div>
-        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <div className="bg-white rounded-xl shadow-lg p-8">
@@ -135,11 +128,42 @@ export default function ContactPage() {
           </div>
         </div>
       </div>
+
+      {/* Success Modal Overlay */}
+      {showModal && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center relative animate-in zoom-in-95 duration-300">
+            <button
+              onClick={() => setShowModal(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="flex justify-center mb-4">
+              <div className="bg-green-100 p-3 rounded-full">
+                <CheckCircle2 size={48} className="text-green-600" />
+              </div>
+            </div>
+
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">Message Sent!</h3>
+            <p className="text-gray-600 mb-6">
+              Thank you for reaching out. We have received your message and will get back to you shortly.
+            </p>
+
+            <button
+              onClick={() => setShowModal(false)}
+              className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
 
-// Helper component for the right-side info
 function ContactInfo({ Icon, title, detail, color }) {
   const colors = {
     blue: "bg-blue-100 text-blue-600",

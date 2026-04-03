@@ -3,7 +3,8 @@ import { useState, FormEvent, useEffect, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { User as UserIcon, Mail, Lock, Loader2, ArrowRight, Phone, Globe, X, Eye, EyeOff } from 'lucide-react';
-import Link from 'next/link';
+// CORRECTED IMPORT BELOW
+import Link from 'next/link'; 
 import { REST_API, countryCode } from '../../constant';
 
 // Sub-component for live feedback
@@ -27,7 +28,6 @@ export default function SignUp() {
   const [error, setError] = useState('');
   const [resendTimer, setResendTimer] = useState(0);
   
-  // Visibility states
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
@@ -41,7 +41,6 @@ export default function SignUp() {
     confirmPassword: '' 
   });
 
-  // Track password strength in real-time
   const passwordRequirements = useMemo(() => ({
     length: formData.password.length >= 8,
     uppercase: /[A-Z]/.test(formData.password),
@@ -181,12 +180,9 @@ export default function SignUp() {
           </p>
         )}
 
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-8">
-          <button type="button" onClick={() => handleSocialSignUp('google')} className="flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl sm:rounded-2xl hover:bg-gray-50 transition font-bold text-[9px] sm:text-[10px] text-gray-600 tracking-widest uppercase">
-            <img src="https://www.svgrepo.com/show/355037/google.svg" className="w-4 h-4" alt="Google" /> GOOGLE
-          </button>
-          <button type="button" onClick={() => handleSocialSignUp('facebook')} className="flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl sm:rounded-2xl hover:bg-gray-50 transition font-bold text-[9px] sm:text-[10px] text-gray-600 tracking-widest uppercase">
-            <img src="https://www.svgrepo.com/show/475647/facebook-color.svg" className="w-4 h-4" alt="Facebook" /> FACEBOOK
+        <div className="mb-8">
+          <button type="button" onClick={() => handleSocialSignUp('google')} className="w-full flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl sm:rounded-2xl hover:bg-gray-50 transition font-bold text-[9px] sm:text-[10px] text-gray-600 tracking-widest uppercase">
+            <img src="https://www.svgrepo.com/show/355037/google.svg" className="w-4 h-4" alt="Google" /> CONTINUE WITH GOOGLE
           </button>
         </div>
 
@@ -273,7 +269,6 @@ export default function SignUp() {
             </button>
           </div>
 
-          {/* Password Live Requirements Tracker */}
           <div className="px-2 grid grid-cols-2 gap-y-1.5 gap-x-4">
             <RequirementItem label="8+ Characters" met={passwordRequirements.length} />
             <RequirementItem label="An Uppercase" met={passwordRequirements.uppercase} />
