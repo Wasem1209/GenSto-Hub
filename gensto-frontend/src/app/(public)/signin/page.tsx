@@ -30,7 +30,6 @@ export default function SignIn() {
             if (res.ok) {
                 login(data.user);
                 
-                // Redirect logic based on role
                 const role = data.user.role;
                 if (role === 'admin') {
                     router.push('/admin');
@@ -39,7 +38,6 @@ export default function SignIn() {
                 } else if (role === 'instructor') {
                     router.push('/instructor');
                 } else {
-                    // Redirect to: gensto-frontend/src/app/(dashboards)/regular
                     router.push('/regular'); 
                 }
             } else {
@@ -67,12 +65,9 @@ export default function SignIn() {
 
                 {error && <p className="text-red-500 text-[10px] font-black mb-4 text-center bg-red-50 py-2 rounded-lg tracking-widest uppercase">{error}</p>}
 
-                <div className="grid grid-cols-2 gap-4 mb-8">
-                    <button type="button" onClick={() => handleSocialLogin('google')} className="flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-2xl hover:bg-gray-50 transition font-bold text-[10px] text-gray-600 tracking-widest uppercase">
-                        <img src="https://www.svgrepo.com/show/355037/google.svg" className="w-4 h-4" alt="Google" /> GOOGLE
-                    </button>
-                    <button type="button" onClick={() => handleSocialLogin('facebook')} className="flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-2xl hover:bg-gray-50 transition font-bold text-[10px] text-gray-600 tracking-widest uppercase">
-                        <img src="https://www.svgrepo.com/show/506499/facebook.svg" className="w-4 h-4" alt="Facebook" /> FACEBOOK
+                <div className="mb-8">
+                    <button type="button" onClick={() => handleSocialLogin('google')} className="w-full flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-2xl hover:bg-gray-50 transition font-bold text-[10px] text-gray-600 tracking-widest uppercase">
+                        <img src="https://www.svgrepo.com/show/355037/google.svg" className="w-4 h-4" alt="Google" /> CONTINUE WITH GOOGLE
                     </button>
                 </div>
 

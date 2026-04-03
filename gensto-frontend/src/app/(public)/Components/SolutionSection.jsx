@@ -37,21 +37,25 @@ export default function SolutionSection() {
         }
     ];
 
-    // Animation
+    // Parent container variants: Controls the staggering of children
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
-            transition: { staggerChildren: 0.2 }
+            transition: {
+                staggerChildren: 0.15,
+                delayChildren: 0.2
+            }
         }
     };
 
+    // Individual card variants
     const itemVariants = {
-        hidden: { y: 20, opacity: 0 },
+        hidden: { y: 40, opacity: 0 },
         visible: {
             y: 0,
             opacity: 1,
-            transition: { duration: 0.5, ease: "easeOut" }
+            transition: { duration: 0.6, ease: "easeOut" }
         }
     };
 
@@ -69,8 +73,7 @@ export default function SolutionSection() {
                     <motion.div
                         initial={{ width: 0, opacity: 0 }}
                         whileInView={{ width: "5rem", opacity: 1 }}
-
-                        viewport={{ once: false, amount: 0.5 }}
+                        viewport={{ once: true }}
                         transition={{
                             duration: 0.8,
                             ease: "easeOut",
@@ -80,11 +83,12 @@ export default function SolutionSection() {
                     />
                 </motion.div>
 
+                {/* This acts as the parent and triggers the whileInView for all items */}
                 <motion.div
                     variants={containerVariants}
                     initial="hidden"
                     whileInView="visible"
-                    // Change: once to true, and lower the amount for a more responsive trigger
+                    // amount: 0.1 means the animation starts when 10% of the grid is visible
                     viewport={{ once: true, amount: 0.1 }}
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"
                 >
@@ -92,8 +96,10 @@ export default function SolutionSection() {
                         <motion.div
                             key={index}
                             variants={itemVariants}
-                            // whileHover still works perfectly with staggered entry
-                            whileHover={{ scale: 1.03 }}
+                            whileHover={{
+                                scale: 1.03,
+                                transition: { duration: 0.2 }
+                            }}
                             className="group p-8 bg-gray-50 rounded-3xl border border-transparent hover:border-blue-100 hover:bg-white hover:shadow-2xl transition-all duration-300"
                         >
                             <div className="bg-white group-hover:bg-blue-50 w-20 h-20 rounded-2xl flex items-center justify-center mb-6 shadow-sm group-hover:shadow-md transition-all">
