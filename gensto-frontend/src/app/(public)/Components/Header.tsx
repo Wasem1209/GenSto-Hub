@@ -40,7 +40,7 @@ export default function Header() {
             IN
           </span>
           
-          {/* THE STYLIZED 'A' (PATH UNCHANGED) */}
+          {/* THE STYLIZED 'A'  */}
           <svg 
             
             className="-mx-1 md:-mx-1.5 h-7 md:h-[34px] w-auto" 
