@@ -19,6 +19,10 @@ export const API_ROUTES = {
     GOOGLE_AUTH: `${REST_API}/auth/google`,
     FACEBOOK_AUTH: `${REST_API}/auth/facebook`,
     RESEND_OTP: `${REST_API}/auth/resend-otp`,
+    PROFILE: `${REST_API}/profile`,
+    NEWSLETTER: `${REST_API}/newsletter/subscribe`,
+    CONTACT: `${REST_API}/contact`,
+
 };
 
 
