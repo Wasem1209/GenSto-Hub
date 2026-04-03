@@ -5,7 +5,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { UserCircle, Menu, Mail, FileText, ShieldCheck, Loader2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { REST_API } from '../../constant'; // Importing your API constant
+import { API_ROUTES } from '../../constant'; 
 
 export default function DashboardHeader({ onMenuClick, role }) {
   const { user: authUser } = useAuth();
@@ -19,10 +19,10 @@ export default function DashboardHeader({ onMenuClick, role }) {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem('token'); // Get your JWT
-        const res = await fetch(`${REST_API}/profile`, {
+        const token = localStorage.getItem('token'); 
+        const res = await fetch(API_ROUTES.PROFILE, {
           headers: {
-            'Authorization': `Bearer ${token}`,
+            'x-auth-token': token, // Matches your auth.js middleware
             'Content-Type': 'application/json'
           }
         });
@@ -72,12 +72,13 @@ export default function DashboardHeader({ onMenuClick, role }) {
       <div className="absolute left-1/2 transform -translate-x-1/2 text-center pointer-events-none whitespace-nowrap">
         <h1 className="text-sm md:text-base font-medium tracking-tight">
           {greeting || 'Welcome'}, <span className="font-bold text-blue-400">
-            {profile?.name?.split(' ')[0] || authUser?.name?.split(' ')[0] || 'User'}
+            {profile?.fullName?.split(' ')[0] || authUser?.name?.split(' ')[0] || 'User'}
           </span>
         </h1>
       </div>
 
       <div className="flex-1 flex justify-end relative" ref={dropdownRef}>
+        {/* Notification icon removed from here */}
         <button 
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           className="group relative flex items-center justify-center p-1 rounded-full hover:bg-gray-800 transition-all outline-none"
@@ -106,7 +107,7 @@ export default function DashboardHeader({ onMenuClick, role }) {
               
               <div>
                 <h2 className="text-lg font-black text-white uppercase tracking-tighter leading-tight">
-                  {profile?.name || authUser?.name || 'Inanst User'}
+                  {profile?.fullName || authUser?.name || 'Inanst User'}
                 </h2>
                 {role && (
                    <p className="text-[10px] text-blue-400 font-bold uppercase mt-1 tracking-widest">{role}</p>

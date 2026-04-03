@@ -92,7 +92,7 @@ export default function SocialProof() {
 
                     />
                 </div>
-                »
+
                 {/* Cards */}
                 <div className="relative flex justify-center gap-6 min-h-[180px]">
                     <AnimatePresence mode="wait">
