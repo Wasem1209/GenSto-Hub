@@ -82,7 +82,7 @@ export default function DashboardSidebar({ role = 'regular', isOpen, setIsOpen }
     <>
       {/* Mobile Overlay */}
       <div 
-        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300 md:hidden ${
+        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-50 transition-opacity duration-300 md:hidden ${
           isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         onClick={() => setIsOpen(false)}
@@ -125,7 +125,7 @@ export default function DashboardSidebar({ role = 'regular', isOpen, setIsOpen }
             </span>
           </Link>
           
-          {/* Close Button: Tablet & Mobile only */}
+          {/* Tablet & Mobile only */}
           <button 
             onClick={() => setIsOpen(false)}
             className="md:hidden p-1 text-gray-400 hover:text-white transition-colors"

@@ -12,7 +12,6 @@ export default function DashboardHeader({ onMenuClick, role }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Fix Hydration mismatch by setting greeting on mount
   useEffect(() => {
     const hour = new Date().getHours();
     if (hour < 12) setGreeting('Good morning');
@@ -20,7 +19,6 @@ export default function DashboardHeader({ onMenuClick, role }) {
     else setGreeting('Good evening');
   }, []);
 
-  // Handle clicking outside to close dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -32,9 +30,9 @@ export default function DashboardHeader({ onMenuClick, role }) {
   }, []);
 
   return (
-    <header className="h-16 bg-[#1f2937] border-b border-gray-700 flex items-center px-4 md:px-8 shrink-0 text-white relative z-[100]">
+    // Lowered z-index to z-40 so Sidebar (z-50) can go over it
+    <header className="h-16  bg-black/60 border-b border-gray-700 flex items-center px-4 md:px-8 shrink-0 text-white relative z-40">
       
-      {/*  Mobile Menu Button Only */}
       <div className="flex-1 flex items-center">
         <button 
           onClick={onMenuClick}
@@ -44,14 +42,12 @@ export default function DashboardHeader({ onMenuClick, role }) {
         </button>
       </div>
 
-      {/* Greeting Message */}
       <div className="absolute left-1/2 transform -translate-x-1/2 text-center pointer-events-none whitespace-nowrap">
         <h1 className="text-sm md:text-base font-medium tracking-tight">
           {greeting || 'Welcome'}, <span className="font-bold text-blue-400">{user?.name?.split(' ')[0] || 'User'}</span>
         </h1>
       </div>
 
-      {/* Profile Icon Trigger */}
       <div className="flex-1 flex justify-end relative" ref={dropdownRef}>
         <button 
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -66,11 +62,9 @@ export default function DashboardHeader({ onMenuClick, role }) {
           </div>
         </button>
 
-        {/* PROFILE DROPDOWN*/}
         {isDropdownOpen && (
           <div className="absolute top-full right-0 mt-3 w-72 md:w-80 bg-[#1A1D21] border border-slate-800 rounded-[2rem] shadow-2xl p-6 animate-in fade-in slide-in-from-top-2 duration-200">
             
-            {/* User Identity Section */}
             <div className="flex flex-col items-center text-center space-y-3 pb-4 border-b border-slate-800/50">
               <div className="relative">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 p-0.5">
@@ -90,20 +84,19 @@ export default function DashboardHeader({ onMenuClick, role }) {
                 )}
                 <div className="flex items-center justify-center gap-1.5 mt-1 text-slate-500">
                   <Mail size={12} />
-                  {/* Fetches Email directly from the user state */}
-                  <span className="text-[10px] font-medium truncate max-w-[180px]">{user?.email || 'No email provided'}</span>
+                  {/* Dynamic Email from DB/Context */}
+                  <span className="text-[10px] font-medium truncate max-w-[180px]">{user?.email || 'Loading email...'}</span>
                 </div>
               </div>
             </div>
 
-            {/* Bio Section */}
             <div className="mt-4 space-y-2">
               <div className="flex items-center gap-2 text-blue-500">
                 <FileText size={14} />
                 <span className="text-[9px] font-black uppercase tracking-widest">Bio Data</span>
               </div>
               <div className="bg-[#0F1113] border border-slate-800/50 rounded-xl p-3">
-                {/* Fetches Bio directly from the user state */}
+                {/* Dynamic Bio from DB/Context */}
                 <p className="text-[11px] text-slate-400 leading-relaxed italic">
                   {user?.bio || "Professional Hub Member. No bio provided yet."}
                 </p>
