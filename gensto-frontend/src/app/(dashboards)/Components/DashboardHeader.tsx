@@ -34,7 +34,7 @@ export default function DashboardHeader({ onMenuClick, role }) {
   return (
     <header className="h-16 bg-[#1f2937] border-b border-gray-700 flex items-center px-4 md:px-8 shrink-0 text-white relative z-[100]">
       
-      {/* 1. LEFT: Mobile Menu Button Only */}
+      {/*  Mobile Menu Button Only */}
       <div className="flex-1 flex items-center">
         <button 
           onClick={onMenuClick}
@@ -44,14 +44,14 @@ export default function DashboardHeader({ onMenuClick, role }) {
         </button>
       </div>
 
-      {/* 2. CENTER: Greeting Message (REPLACES "Regular Console") */}
+      {/* Greeting Message */}
       <div className="absolute left-1/2 transform -translate-x-1/2 text-center pointer-events-none whitespace-nowrap">
         <h1 className="text-sm md:text-base font-medium tracking-tight">
           {greeting || 'Welcome'}, <span className="font-bold text-blue-400">{user?.name?.split(' ')[0] || 'User'}</span>
         </h1>
       </div>
 
-      {/* 3. RIGHT: Profile Icon Only (Notification and Name REMOVED) */}
+      {/* Profile Icon Trigger */}
       <div className="flex-1 flex justify-end relative" ref={dropdownRef}>
         <button 
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -66,7 +66,7 @@ export default function DashboardHeader({ onMenuClick, role }) {
           </div>
         </button>
 
-        {/* PROFILE DROPDOWN: Displays Name, Email, and Bio */}
+        {/* PROFILE DROPDOWN*/}
         {isDropdownOpen && (
           <div className="absolute top-full right-0 mt-3 w-72 md:w-80 bg-[#1A1D21] border border-slate-800 rounded-[2rem] shadow-2xl p-6 animate-in fade-in slide-in-from-top-2 duration-200">
             
@@ -90,7 +90,8 @@ export default function DashboardHeader({ onMenuClick, role }) {
                 )}
                 <div className="flex items-center justify-center gap-1.5 mt-1 text-slate-500">
                   <Mail size={12} />
-                  <span className="text-[10px] font-medium truncate max-w-[180px]">{user?.email}</span>
+                  {/* Fetches Email directly from the user state */}
+                  <span className="text-[10px] font-medium truncate max-w-[180px]">{user?.email || 'No email provided'}</span>
                 </div>
               </div>
             </div>
@@ -102,6 +103,7 @@ export default function DashboardHeader({ onMenuClick, role }) {
                 <span className="text-[9px] font-black uppercase tracking-widest">Bio Data</span>
               </div>
               <div className="bg-[#0F1113] border border-slate-800/50 rounded-xl p-3">
+                {/* Fetches Bio directly from the user state */}
                 <p className="text-[11px] text-slate-400 leading-relaxed italic">
                   {user?.bio || "Professional Hub Member. No bio provided yet."}
                 </p>
