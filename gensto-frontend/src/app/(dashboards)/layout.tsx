@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useLayoutEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { UserCircle, Bell, Menu, X, Loader2 } from 'lucide-react';
+import { UserCircle, Menu, X, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import DashboardSidebar from './Components/DashboardSidebar';
 import { useAuth } from '../context/AuthContext';
@@ -13,17 +13,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // useLayoutEffect handles the redirect BEFORE the browser paints the UI
+  
   useLayoutEffect(() => {
     if (!loading) {
-      // 1. No user? Bounce to signin
       if (!user) {
         router.replace('/signin');
         return;
       }
 
-      // 2. User exists but path is wrong? Bounce to signin 
-      // (This prevents users from seeing dashboards they shouldn't)
       const rolePath = `/${user.role}`;
       if (!pathname.startsWith(rolePath)) {
         router.replace('/signin'); 
@@ -35,12 +32,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     setIsSidebarOpen(false);
   }, [pathname]);
 
-  /** * STRICT SECURITY GUARD:
-   * Returns a black screen immediately if:
-   * - Data is still loading
-   * - No user object exists
-   * - The URL doesn't match the user's role (e.g. /student or /admin when they are /regular)
-   */
   const isAuthorized = user && pathname.startsWith(`/${user.role}`);
 
   if (loading || !isAuthorized) {
@@ -68,25 +59,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             >
               {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
+            
+            
             <div className="font-bold text-gray-800 capitalize flex items-center gap-2">
-              <span className="hidden md:inline-block w-2 h-2 bg-blue-600 rounded-full"></span>
-              {user.role} <span className="text-gray-400 font-normal hidden sm:inline">Console</span>
+              <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
+              {user.role}
             </div>
           </div>
 
           <div className="flex items-center space-x-3 md:space-x-5">
-            <button className="relative p-2 text-gray-400 hover:text-blue-600 transition-colors">
-              <Bell size={20} />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-            </button>
-
+          
             <Link href={`/${user.role}/profile`} className="flex items-center space-x-3 group">
-              <div className="text-right hidden sm:block">
-                <p className="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-                  {user.fullName || user.name}
-                </p>
-                <p className="text-[10px] uppercase tracking-tighter text-gray-500">{user.email}</p>
-              </div>
+             
               <UserCircle size={32} className="text-gray-300 group-hover:text-blue-600 transition-colors" />
             </Link>
           </div>
