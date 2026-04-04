@@ -1,152 +1,165 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { School, ArrowRight, AlertCircle, Loader2, PlusCircle } from 'lucide-react';
+import Link from "next/link";
+import { motion, Variants } from "framer-motion";
+import {
+  Monitor, Server, Layout, Code2, Layers,
+  Shield, Database, BarChart3, Smartphone, 
+  Cpu, Globe, Lock, PenTool, Terminal
+} from 'lucide-react';
 
-interface EnrolledSchool {
-  id: string;
-  schoolName: string;
-  description: string;
-  enrollmentDate: string;
-  status: 'active' | 'completed' | 'pending';
-}
+export default function SchoolEnrollmentsPage() {
+  const schools = [
+    {
+      title: 'Computer Fundamentals School',
+      icon: <Monitor className="w-10 h-10 text-blue-600" />,
+      description: 'Learn the basics of computer literacy, operations, and applications.',
+    },
+    {
+      title: 'IT Infrastructure School',
+      icon: <Server className="w-10 h-10 text-indigo-600" />,
+      description: 'Master the foundations of IT systems, networking, and infrastructure.',
+    },
+    {
+      title: 'Frontend Web Development School',
+      icon: <Layout className="w-10 h-10 text-green-600" />,
+      description: 'Build engaging, responsive, and modern web interfaces.',
+    },
+    {
+      title: 'Backend Web Development School',
+      icon: <Code2 className="w-10 h-10 text-purple-600" />,
+      description: 'Learn server-side programming and API development.',
+    },
+    {
+      title: 'Full-stack Web Development School',
+      icon: <Layers className="w-10 h-10 text-orange-600" />,
+      description: 'Combine frontend and backend skills to build complete web apps.',
+    },
+    {
+      title: 'Software Development School',
+      icon: <Terminal className="w-10 h-10 text-red-600" />,
+      description: 'Learn how to design, develop, and maintain software applications.',
+    },
+    {
+      title: 'Cyber Security School',
+      icon: <Shield className="w-10 h-10 text-teal-600" />,
+      description: 'Understand security fundamentals to protect digital systems.',
+    },
+    {
+      title: 'Database Management School',
+      icon: <Database className="w-10 h-10 text-pink-600" />,
+      description: 'Learn how to manage, query, and maintain enterprise databases.',
+    },
+    {
+      title: 'Data Analytics School',
+      icon: <BarChart3 className="w-10 h-10 text-yellow-600" />,
+      description: 'Gain skills to analyze and interpret data for business decisions.',
+    },
+    {
+      title: 'Mobile App Development School',
+      icon: <Smartphone className="w-10 h-10 text-cyan-600" />,
+      description: 'Create native and cross-platform mobile applications for iOS and Android.',
+    },
+    {
+      title: 'Embedded Systems School',
+      icon: <Cpu className="w-10 h-10 text-emerald-600" />,
+      description: 'Learn hardware programming, microcontrollers, and firmware development.',
+    },
+    {
+      title: 'Cloud Computing School',
+      icon: <Globe className="w-10 h-10 text-sky-600" />,
+      description: 'Master AWS, Azure, and cloud architecture for scalable systems.',
+    },
+    {
+      title: 'UI/UX Design School',
+      icon: <PenTool className="w-10 h-10 text-rose-600" />,
+      description: 'Design intuitive user experiences and beautiful digital interfaces.',
+    },
+    {
+      title: 'Ethical Hacking School',
+      icon: <Lock className="w-10 h-10 text-slate-700" />,
+      description: 'Advanced penetration testing and vulnerability assessment skills.',
+    },
+  ];
 
-export default function MySchoolPage() {
-  const [schools, setSchools] = useState<EnrolledSchool[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchMySchools = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/schools`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Connection Issue. Please check your internet or try again later.');
-      }
-
-      const data = await response.json();
-      setSchools(data.enrolledSchools || []);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred.';
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
+  // Explicitly typing variants to resolve the TS error
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
   };
 
-  useEffect(() => {
-    fetchMySchools();
-  }, []);
+  const cardVariants: Variants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.5, ease: "easeOut" }
+    },
+  };
 
-  // 1. Loading State - Displayed while the API is working
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4 animate-pulse">
-        <div className="relative">
-          <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
-          <div className="absolute inset-0 bg-blue-400 blur-xl opacity-20 animate-pulse"></div>
-        </div>
-        <p className="text-gray-500 font-bold tracking-tight">Accessing Inanst Schools...</p>
-      </div>
-    );
-  }
-
-  // 2. Error State
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] p-6 text-center">
-        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-          <AlertCircle className="text-red-600" size={32} />
-        </div>
-        <h2 className="text-xl font-bold text-gray-900">Connection Issue</h2>
-        <p className="text-gray-500 mt-2 max-w-xs">{error}</p>
-        <button 
-          onClick={() => fetchMySchools()}
-          className="mt-6 px-8 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 active:scale-95"
-        >
-          Try Again
-        </button>
-      </div>
-    );
-  }
-
-  // 3. Empty State
-  if (schools.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] p-8 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 text-center">
-        <div className="w-20 h-20 bg-white shadow-sm border border-gray-100 rounded-2xl flex items-center justify-center mb-6">
-          <School className="text-blue-600" size={40} />
-        </div>
-        <h2 className="text-2xl font-black text-gray-900 tracking-tight">No available enrolled School</h2>
-        <p className="text-gray-500 mt-2 mb-8 max-w-sm text-sm">
-          No current school enrolled for this account. Start your learning journey today with Inanst.
-        </p>
-        <Link 
-          href="/regular/school-enrollments"
-          className="flex items-center space-x-2 bg-blue-600 text-white px-10 py-4 rounded-2xl font-black hover:bg-blue-700 transition-all shadow-xl shadow-blue-200 group"
-        >
-          <PlusCircle size={20} />
-          <span>Enroll Now</span>
-          <ArrowRight size={18} className="ml-1 group-hover:translate-x-1 transition-transform" />
-        </Link>
-      </div>
-    );
-  }
-
-  // 4. Success State
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
-      <div className="flex items-center justify-between border-b border-gray-100 pb-5">
-        <div>
-          <h1 className="text-2xl font-black text-gray-900 tracking-tight">My Schools</h1>
-          <p className="text-sm text-gray-500 mt-1">Access your active learning environments.</p>
+    <section className="relative bg-gray-50 pt-24 pb-16 px-4 sm:px-6 lg:px-16 min-h-screen font-sans">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <motion.h1 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-4xl sm:text-5xl font-black text-gray-900 tracking-tight"
+          >
+            School Enrollments
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="mt-4 text-gray-500 max-w-2xl mx-auto text-base sm:text-lg font-medium"
+          >
+            Choose your path to excellence. Explore our specialized tech schools and start your journey with <span className="text-blue-600 font-bold">INANST</span>.
+          </motion.p>
         </div>
-        <Link 
-          href="/regular/school-enrollments" 
-          className="flex items-center space-x-1 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors"
-        >
-          <span>Enroll in another</span>
-          <PlusCircle size={16} />
-        </Link>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {schools.map((school) => (
-          <div key={school.id} className="group bg-white border border-gray-200 rounded-3xl p-6 hover:border-blue-300 hover:shadow-xl hover:shadow-blue-50/50 transition-all duration-300 flex flex-col">
-            <div className="flex justify-between items-start mb-6">
-              <div className="p-4 bg-blue-50 rounded-2xl group-hover:scale-110 transition-transform duration-300">
-                <School className="text-blue-600" size={24} />
-              </div>
-              <span className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                school.status === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-50 text-gray-500'
-              }`}>
-                {school.status}
-              </span>
-            </div>
-            
-            <div className="flex-grow">
-              <h3 className="font-bold text-xl text-gray-900 group-hover:text-blue-600 transition-colors">{school.schoolName}</h3>
-              <p className="text-sm text-gray-500 mt-3 line-clamp-2 leading-relaxed">{school.description}</p>
-            </div>
-            
-            <Link 
-              href={`/regular/school/${school.id}`}
-              className="mt-8 w-full flex items-center justify-center space-x-2 py-4 bg-gray-50 text-gray-900 rounded-2xl font-black group-hover:bg-blue-600 group-hover:text-white transition-all duration-300"
-            >
-              <span>Enter School</span>
-              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
-        ))}
+        {/* Schools Grid */}
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
+          {schools.map((school, index) => (
+            <motion.div key={index} variants={cardVariants}>
+              <Link
+                href="/regular/register"
+                className="group h-full bg-white rounded-[2.5rem] shadow-sm hover:shadow-2xl p-10 flex flex-col items-center text-center transition-all duration-500 border border-gray-100 hover:border-blue-100"
+              >
+                <div className="bg-gray-50 rounded-3xl p-6 mb-8 group-hover:bg-blue-50 group-hover:rotate-6 transition-all duration-300">
+                  {school.icon}
+                </div>
+                
+                <h3 className="text-xl font-black text-gray-800 mb-4 tracking-tight">
+                  {school.title}
+                </h3>
+                
+                <p className="text-gray-500 text-sm leading-relaxed font-medium mb-8">
+                  {school.description}
+                </p>
+
+                <div className="mt-auto pt-4 w-full border-t border-gray-50 group-hover:border-blue-50">
+                   <span className="inline-flex items-center text-blue-600 font-black text-[10px] tracking-widest uppercase group-hover:gap-3 transition-all duration-300">
+                    Enroll in School <span className="ml-2">→</span>
+                  </span>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
-    </div>
+    </section>
   );
 }
