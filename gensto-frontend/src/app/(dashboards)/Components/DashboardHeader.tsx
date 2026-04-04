@@ -31,7 +31,7 @@ export default function DashboardHeader({ onMenuClick, role }) {
 
   return (
     // Lowered z-index to z-40 so Sidebar (z-50) can go over it
-    <header className="h-16  bg-black/60 border-b border-gray-700 flex items-center px-4 md:px-8 shrink-0 text-white relative z-40">
+    <header className="h-16 bg-[#1a1c23] border-b border-gray-700 flex items-center px-4 md:px-8 shrink-0 text-white relative z-40">
       
       <div className="flex-1 flex items-center">
         <button 
