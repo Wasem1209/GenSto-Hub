@@ -34,7 +34,7 @@ export default function DashboardHeader({ onMenuClick, role }) {
   return (
     <header className="h-16 bg-[#1f2937] border-b border-gray-700 flex items-center px-4 md:px-8 shrink-0 text-white relative z-[100]">
       
-      {/* Mobile Toggle */}
+      {/* 1. Left Section: Mobile Toggle Only */}
       <div className="flex-1 flex items-center">
         <button 
           onClick={onMenuClick}
@@ -44,14 +44,14 @@ export default function DashboardHeader({ onMenuClick, role }) {
         </button>
       </div>
 
-      {/* Greeting */}
+      {/* 2. Center Section: Greeting Message (Replaces Regular Console) */}
       <div className="absolute left-1/2 transform -translate-x-1/2 text-center pointer-events-none whitespace-nowrap">
-        <h1 className="text-sm md:text-base font-medium tracking-tight">
+        <h1 className="text-base md:text-lg font-medium tracking-tight">
           {greeting || 'Welcome'}, <span className="font-bold text-blue-400">{user?.name?.split(' ')[0] || 'User'}</span>
         </h1>
       </div>
 
-      {/* Profile Identity View */}
+      {/* 3. Right Section: Profile Icon Only (No name/notifications) */}
       <div className="flex-1 flex justify-end relative" ref={dropdownRef}>
         <button 
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -66,7 +66,7 @@ export default function DashboardHeader({ onMenuClick, role }) {
           </div>
         </button>
 
-        {/* The Merged Profile Card Dropdown */}
+        {/* Profile Card Dropdown */}
         {isDropdownOpen && (
           <div className="absolute top-full right-0 mt-3 w-72 md:w-80 bg-[#1A1D21] border border-slate-800 rounded-[2rem] shadow-2xl p-6 animate-in fade-in slide-in-from-top-2 duration-200">
             
@@ -85,7 +85,7 @@ export default function DashboardHeader({ onMenuClick, role }) {
                 <h2 className="text-lg font-black text-white uppercase tracking-tighter leading-tight">
                   {user?.name || 'Inanst User'}
                 </h2>
-                {/* We use 'role' here to display it and satisfy ESLint */}
+                {/* role is passed as a prop to avoid ReferenceError */}
                 {role && (
                    <p className="text-[10px] text-blue-400 font-bold uppercase mt-1 tracking-widest">{role}</p>
                 )}
@@ -122,4 +122,3 @@ export default function DashboardHeader({ onMenuClick, role }) {
     </header>
   );
 }
-

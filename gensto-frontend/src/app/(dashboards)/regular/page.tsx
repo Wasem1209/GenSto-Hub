@@ -72,7 +72,7 @@ export default function RegularPage() {
       title: 'Services',
       description: 'Request branding, photography, or custom software development services.',
       icon: Briefcase,
-      href: '/regular/services',
+      href: '/regular/service',
       color: 'bg-violet-600',
     },
     {
