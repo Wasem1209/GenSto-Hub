@@ -8,7 +8,7 @@ import {
     Wifi, ShieldCheck, User, KeyRound, Lock
 } from 'lucide-react';
 
-// --- SUB-COMPONENT: COUNTDOWN TIMER ---
+// COUNTDOWN TIMER
 const CountdownTimer = ({ targetDate }) => {
     const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
 
@@ -44,7 +44,7 @@ export default function MyClassPage() {
     const [verifyingClass, setVerifyingClass] = useState(null);
     const [courseId, setCourseId] = useState('');
 
-    // --- ACCESS CONTROL STATE ---
+    //  ACCESS CONTROL STATE
     const [schoolId, setSchoolId] = useState('');
     const [isAuthorized, setIsAuthorized] = useState(false);
 
@@ -98,7 +98,7 @@ export default function MyClassPage() {
         </div>
     );
 
-    // --- GATEKEEPER: SCHOOL ID LOCK SCREEN ---
+    // SCHOOL ID LOCK SCREEN 
     if (!isAuthorized) {
         return (
             <div className="h-[70vh] flex items-center justify-center p-4">
@@ -233,7 +233,7 @@ export default function MyClassPage() {
                 <p className="text-[10px] text-slate-500 font-black tracking-tighter uppercase italic">Protected by Inanst Security</p>
             </div>
 
-            {/* --- COURSE ID VERIFICATION MODAL --- */}
+            {/* COURSE ID VERIFICATION MODAL */}
             {verifyingClass && (
                 <div className="fixed inset-0 z-[110] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
                     <div className="bg-white w-full max-w-md rounded-[2.5rem] p-8 space-y-6 shadow-2xl relative animate-in zoom-in-95 duration-200">
