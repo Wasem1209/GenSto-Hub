@@ -40,17 +40,17 @@ export default function AssignmentsPage() {
         }
     ];
 
-    // Gatekeeper: Validate School ID
+    //  Validate School ID
     const handleVerifyAccess = (e) => {
         e.preventDefault();
-        if (schoolId.length >= 5) { // Simple validation logic
+        if (schoolId.length >= 5) {
             setIsAuthorized(true);
         }
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Logic to send data to Inanst Tech Hub Backend
+        // Logic to send data 
         console.log("Submitting:", { answer, repoUrl, studentId: schoolId });
         setSelectedAssignment(null);
         setShowSuccess(true);
@@ -58,11 +58,11 @@ export default function AssignmentsPage() {
         setRepoUrl('');
     };
 
-    // --- ACCESS DENIED STATE (LOCK SCREEN) ---
+    // ACCESS DENIED STATE
     if (!isAuthorized) {
         return (
             <div className="h-[80vh] flex items-center justify-center p-6">
-                <div className="bg-[#1A1D21] border border-slate-800 p-10 rounded-[2.5rem] max-w-md w-full text-center space-y-6 shadow-2xl animate-in zoom-in-95 duration-500">
+                <div className=" bg-slate-950/80 border border-slate-800 p-10 rounded-[2.5rem] max-w-md w-full text-center space-y-6 shadow-2xl animate-in zoom-in-95 duration-500">
                     <div className="w-20 h-20 bg-blue-500/10 text-blue-500 rounded-full flex items-center justify-center mx-auto border border-blue-500/20">
                         <Lock size={32} />
                     </div>

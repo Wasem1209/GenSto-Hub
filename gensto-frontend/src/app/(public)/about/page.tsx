@@ -89,7 +89,8 @@ const AboutPage = () => {
   };
 
   return (
-    <div className="bg-white">
+    // Added overflow-x-hidden to the root wrapper to prevent horizontal bounce
+    <div className="bg-white overflow-x-hidden w-full">
       <div className="px-4 py-16 mt-8 max-w-7xl mx-auto">
         {/* Intro Section */}
         <motion.div 
@@ -97,10 +98,11 @@ const AboutPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-5xl font-extrabold text-center text-gray-900 mb-6 tracking-tight">
+          {/* Reduced font size on mobile (text-3xl) to prevent overflow */}
+          <h1 className="text-3xl md:text-5xl font-extrabold text-center text-gray-900 mb-6 tracking-tight">
             About <span className="text-blue-600">INANST</span>
           </h1>
-          <p className="text-xl text-center text-gray-600 max-w-4xl mx-auto mb-16 leading-relaxed">
+          <p className="text-lg md:text-xl text-center text-gray-600 max-w-4xl mx-auto mb-16 leading-relaxed px-2">
             <strong>INANST</strong> (Innovation, Analytics, and Societal Transformation) is the 
             architectural response to Nigeria&apos;s &quot;Long Technology Problem.&quot; We are building the 
             infrastructure that bridges academic knowledge with industrial execution.
@@ -108,7 +110,7 @@ const AboutPage = () => {
         </motion.div>
 
         {/* Pillars Section */}
-        <div className="grid md:grid-cols-3 gap-8 mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-24">
           {pillars.map((pillar, i) => (
             <motion.div
               key={i}
@@ -117,7 +119,7 @@ const AboutPage = () => {
               viewport={{ once: true, amount: 0.3 }}
               variants={cardVariants}
               whileHover={{ scale: 1.05 }}
-              className={`bg-white rounded-2xl shadow-xl p-8 text-center border-t-8 ${pillar.color} cursor-default`}
+              className={`bg-white rounded-2xl shadow-xl p-6 md:p-8 text-center border-t-8 ${pillar.color} cursor-default`}
             >
               <div className={`text-5xl mb-4 flex justify-center ${pillar.color.replace('border', 'text')}`}>
                 {pillar.icon}
@@ -129,19 +131,19 @@ const AboutPage = () => {
         </div>
 
         {/* Vision/Mission Section */}
-        <div className="grid md:grid-cols-2 gap-12 mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mb-24">
           <motion.div 
             whileInView={{ opacity: 1, x: 0 }}
             initial={{ opacity: 0, x: -50 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
-            className="bg-blue-50 p-10 rounded-3xl"
+            className="bg-blue-50 p-6 md:p-10 rounded-3xl"
           >
             <div className="flex items-center mb-6">
-              <FaEye className="text-4xl text-blue-600 mr-4" />
-              <h2 className="text-3xl font-bold text-gray-900">Our Vision</h2>
+              <FaEye className="text-3xl md:text-4xl text-blue-600 mr-4" />
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Our Vision</h2>
             </div>
-            <p className="text-lg text-gray-700 leading-relaxed">
+            <p className="text-base md:text-lg text-gray-700 leading-relaxed">
               To be the premier technological ecosystem in Africa, where every societal challenge 
               is met with an indigenous, data-driven, and innovative solution that competes 
               on a global scale.
@@ -153,13 +155,13 @@ const AboutPage = () => {
             initial={{ opacity: 0, x: 50 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
-            className="bg-green-50 p-10 rounded-3xl"
+            className="bg-green-50 p-6 md:p-10 rounded-3xl"
           >
             <div className="flex items-center mb-6">
-              <FaBullseye className="text-4xl text-green-600 mr-4" />
-              <h2 className="text-3xl font-bold text-gray-900">Our Mission</h2>
+              <FaBullseye className="text-3xl md:text-4xl text-green-600 mr-4" />
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Our Mission</h2>
             </div>
-            <p className="text-lg text-gray-700 leading-relaxed">
+            <p className="text-base md:text-lg text-gray-700 leading-relaxed">
               To dismantle the productivity gap in Nigeria by creating a unified stack of 
               education, hardware manufacturing, and software development that empowers 
               individuals and institutions.
@@ -168,10 +170,10 @@ const AboutPage = () => {
         </div>
 
         {/* Leadership Section */}
-        <h2 className="text-4xl font-bold text-center text-gray-900 mb-12">
+        <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">
           Founding Team
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mb-32">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10 mb-32">
           {teamMembers.map((member, idx) => (
             <motion.div
               key={idx}
@@ -182,8 +184,7 @@ const AboutPage = () => {
               whileHover={{ y: -10 }}
               className="bg-white group rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all"
             >
-              {/* Increased height to h-96 and used object-top to prevent cutting faces */}
-              <div className="relative h-96 w-full overflow-hidden">
+              <div className="relative h-80 md:h-96 w-full overflow-hidden">
                 <img
                   src={member.image}
                   alt={member.name}
@@ -191,8 +192,8 @@ const AboutPage = () => {
                 />
               </div>
               <div className="p-6 text-center">
-                <h3 className="font-bold text-xl text-gray-900">{member.name}</h3>
-                <p className="text-blue-600 font-semibold uppercase tracking-wider text-sm mt-1">
+                <h3 className="font-bold text-lg md:text-xl text-gray-900">{member.name}</h3>
+                <p className="text-blue-600 font-semibold uppercase tracking-wider text-xs md:text-sm mt-1">
                   {member.title}
                 </p>
               </div>
@@ -201,40 +202,40 @@ const AboutPage = () => {
         </div>
 
         {/* Contact Section */}
-        <section className="bg-gray-900 rounded-3xl p-12 text-white shadow-2xl">
-          <div className="grid md:grid-cols-2 gap-12">
+        <section className="bg-gray-900 rounded-3xl p-6 md:p-12 text-white shadow-2xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12">
             <div>
-              <h2 className="text-4xl font-bold mb-6">Get In Touch</h2>
-              <p className="text-gray-400 mb-8 text-lg">
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">Get In Touch</h2>
+              <p className="text-gray-400 mb-8 text-base md:text-lg">
                 Whether you are an investor, a potential partner, or a student ready to join 
                 the transformation, we want to hear from you.
               </p>
               <div className="space-y-6">
                 <a 
                   href="mailto:contact@inanst.com" 
-                  className="flex items-center group w-fit"
+                  className="flex items-center group w-full sm:w-fit"
                 >
-                  <div className="bg-gray-800 p-3 rounded-lg group-hover:bg-blue-600 transition-colors mr-4">
+                  <div className="bg-gray-800 p-3 rounded-lg group-hover:bg-blue-600 transition-colors mr-4 shrink-0">
                     <FaEnvelope className="text-blue-500 group-hover:text-white text-xl" />
                   </div>
-                  <span className="group-hover:text-blue-400 transition-colors">contact@inanst.com</span>
+                  <span className="group-hover:text-blue-400 transition-colors truncate">contact@inanst.com</span>
                 </a>
                 
-                <div className="flex items-center w-fit">
-                  <div className="bg-gray-800 p-3 rounded-lg mr-4">
+                <div className="flex items-center w-full sm:w-fit">
+                  <div className="bg-gray-800 p-3 rounded-lg mr-4 shrink-0">
                     <FaMapMarkerAlt className="text-blue-500 text-xl" />
                   </div>
                   <span>Abuja, Nigeria</span>
                 </div>
 
                 <a 
-                  href="tel:+2348123456789" 
-                  className="flex items-center group w-fit"
+                  href="tel:+2347061065498" 
+                  className="flex items-center group w-full sm:w-fit"
                 >
-                  <div className="bg-gray-800 p-3 rounded-lg group-hover:bg-blue-600 transition-colors mr-4">
+                  <div className="bg-gray-800 p-3 rounded-lg group-hover:bg-blue-600 transition-colors mr-4 shrink-0">
                     <FaPhone className="text-blue-500 group-hover:text-white text-xl" />
                   </div>
-                  <span className="group-hover:text-blue-400 transition-colors">+234 7061065498</span>
+                  <span className="group-hover:text-blue-400 transition-colors">+234 706 106 5498</span>
                 </a>
               </div>
             </div>
