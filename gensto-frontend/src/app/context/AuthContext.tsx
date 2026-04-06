@@ -7,7 +7,7 @@ interface User {
   id: string;
   name: string;
   email: string;
-  role: 'regular' | 'admin' | 'instructor' | 'worker';
+  role: 'regular' | 'admins' | 'instructors' | 'workers';
   avatar?: string;
   emailVerified: boolean;
 }
