@@ -45,7 +45,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex h-screen bg-[#f8fafc] overflow-hidden">
       <DashboardSidebar 
-        role={user.role as "regular" | "admin" | "instructor" | "worker"} 
+        role={user.role as "regular" | "admins" | "instructors" | "workers"} 
         isOpen={isSidebarOpen} 
         setIsOpen={setIsSidebarOpen} 
       />

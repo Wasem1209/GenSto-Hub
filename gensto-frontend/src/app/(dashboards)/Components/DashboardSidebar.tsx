@@ -10,7 +10,8 @@ import {
   LucideIcon, Briefcase, X
 } from 'lucide-react';
 
-type UserRole = 'regular' | 'admin' | 'instructor' | 'worker';
+// Added plural versions to match your AuthContext and DB
+type UserRole = 'regular' | 'admin' | 'admins' | 'instructor' | 'instructors' | 'worker' | 'workers';
 
 interface NavLink {
   name: string;
@@ -24,7 +25,7 @@ interface DashboardSidebarProps {
   setIsOpen: (open: boolean) => void;
 }
 
-const roleLinks: Record<UserRole, NavLink[]> = {
+const roleLinks: Record<string, NavLink[]> = {
   regular: [
     { name: 'Dashboard', href: '/regular', icon: LayoutDashboard },
     { name: 'My School', href: '/regular/my-school', icon: School },
@@ -32,50 +33,56 @@ const roleLinks: Record<UserRole, NavLink[]> = {
     { name: 'Assignment', href: '/regular/assignments', icon: FileText },
     { name: 'Settings', href: '/regular/settings', icon: Settings },
     { name: 'Support', href: '/regular/support', icon: LifeBuoy },
-    
   ],
-  worker: [
-    { name: 'Dashboard', href: '/worker', icon: LayoutDashboard },
-    { name: 'Active Instructors', href: '/worker/instructors', icon: Users },
-    { name: 'Active Users', href: '/worker/users', icon: Users },
-    { name: 'Class', href: '/worker/class', icon: School },
-    { name: 'Notifications', href: '/worker/notifications', icon: Bell },
-    { name: 'Supports', href: '/worker/support', icon: LifeBuoy },
-    { name: 'Enrollments', href: '/worker/enrollments', icon: ClipboardList },
-    { name: 'Tasks', href: '/worker/tasks', icon: CheckSquare },
-    { name: 'Chats', href: '/worker/chat', icon: MessageSquare },
-    { name: 'Activities', href: '/worker/activities', icon: Activity },
-    { name: 'Monitor Users', href: '/worker/monitor', icon: Eye },
-    { name: 'Settings', href: '/worker/settings', icon: Settings },
-    { name: 'Theme', href: '/worker/theme', icon: Palette },
+  workers: [
+    { name: 'Dashboard', href: '/workers', icon: LayoutDashboard },
+    { name: 'Active Instructors', href: '/workers/instructors', icon: Users },
+    { name: 'Active Users', href: '/workers/users', icon: Users },
+    { name: 'Class', href: '/workers/class', icon: School },
+    { name: 'Notifications', href: '/workers/notifications', icon: Bell },
+    { name: 'Supports', href: '/workers/support', icon: LifeBuoy },
+    { name: 'Enrollments', href: '/workers/enrollments', icon: ClipboardList },
+    { name: 'Tasks', href: '/workers/tasks', icon: CheckSquare },
+    { name: 'Chats', href: '/workers/chat', icon: MessageSquare },
+    { name: 'Activities', href: '/workers/activities', icon: Activity },
+    { name: 'Monitor Users', href: '/workers/monitor', icon: Eye },
+    { name: 'Settings', href: '/workers/settings', icon: Settings },
+    { name: 'Theme', href: '/workers/theme', icon: Palette },
   ],
-  instructor: [
-    { name: 'Dashboard', href: '/instructor', icon: LayoutDashboard },
-    { name: 'Assignment', href: '/instructor/assignments', icon: FileText },
-    { name: 'Tasks', href: '/instructor/tasks', icon: CheckSquare },
-    { name: 'Class', href: '/instructor/class', icon: Users },
-    { name: 'Schools', href: '/instructor/schools', icon: School },
-    { name: 'Chats', href: '/instructor/chat', icon: MessageSquare },
-    { name: 'Settings', href: '/instructor/settings', icon: Settings },
-    { name: 'Theme', href: '/instructor/theme', icon: Palette },
+  instructors: [
+    { name: 'Dashboard', href: '/instructors', icon: LayoutDashboard },
+    { name: 'Assignment', href: '/instructors/assignments', icon: FileText },
+    { name: 'Tasks', href: '/instructors/tasks', icon: CheckSquare },
+    { name: 'Class', href: '/instructors/class', icon: Users },
+    { name: 'Schools', href: '/instructors/schools', icon: School },
+    { name: 'Chats', href: '/instructors/chat', icon: MessageSquare },
+    { name: 'Settings', href: '/instructors/settings', icon: Settings },
+    { name: 'Theme', href: '/instructors/theme', icon: Palette },
   ],
-  admin: [
-    { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-    { name: 'Monitor Users', href: '/admin/users', icon: Eye },
-    { name: 'Monitor Instructors', href: '/admin/instructors', icon: Users },
-    { name: 'Monitor Workers', href: '/admin/workers', icon: Briefcase },
-    { name: 'Enrollments', href: '/admin/enrollments', icon: ClipboardList },
-    { name: 'Schools', href: '/admin/schools', icon: School },
-    { name: 'Class', href: '/admin/class', icon: Users },
-    { name: 'Chats', href: '/admin/chat', icon: MessageSquare },
-    { name: 'Support', href: '/admin/support', icon: LifeBuoy },
-    { name: 'Theme', href: '/admin/theme', icon: Palette },
+  admins: [
+    { name: 'Dashboard', href: '/admins', icon: LayoutDashboard },
+    { name: 'Monitor Users', href: '/admins/users', icon: Eye },
+    { name: 'Monitor Instructors', href: '/admins/instructors', icon: Users },
+    { name: 'Monitor Workers', href: '/admins/workers', icon: Briefcase },
+    { name: 'Enrollments', href: '/admins/enrollments', icon: ClipboardList },
+    { name: 'Schools', href: '/admins/schools', icon: School },
+    { name: 'Class', href: '/admins/class', icon: Users },
+    { name: 'Chats', href: '/admins/chat', icon: MessageSquare },
+    { name: 'Support', href: '/admins/support', icon: LifeBuoy },
+    { name: 'Theme', href: '/admins/theme', icon: Palette },
   ],
 };
+
+// Aliases for singular roles to point to the plural link sets
+roleLinks.worker = roleLinks.workers;
+roleLinks.admin = roleLinks.admins;
+roleLinks.instructor = roleLinks.instructors;
 
 export default function DashboardSidebar({ role = 'regular', isOpen, setIsOpen }: DashboardSidebarProps) {
   const pathname = usePathname();
   const { logout } = useAuth();
+  
+  // Safely find the links based on the role provided
   const links = roleLinks[role] || roleLinks.regular;
 
   return (
@@ -95,7 +102,6 @@ export default function DashboardSidebar({ role = 'regular', isOpen, setIsOpen }
       `}>
         <div className="p-6 flex items-center justify-between">
           
-          {/* BRAND LOGO AREA */}
           <Link href="/" className="flex items-center group">
             <span className="text-2xl font-black tracking-tighter text-white leading-none">
               IN
@@ -125,7 +131,6 @@ export default function DashboardSidebar({ role = 'regular', isOpen, setIsOpen }
             </span>
           </Link>
           
-          {/* Tablet & Mobile only */}
           <button 
             onClick={() => setIsOpen(false)}
             className="md:hidden p-1 text-gray-400 hover:text-white transition-colors"
@@ -135,12 +140,14 @@ export default function DashboardSidebar({ role = 'regular', isOpen, setIsOpen }
         </div>
         
         <nav className="flex-1 px-4 space-y-1 mt-2 overflow-y-auto custom-scrollbar">
-          {links.map((link) => {
+          {links.map((link, index) => {
             const Icon = link.icon;
-            const isActive = pathname === link.href;
+            // Matches if current path is exactly the href or a sub-page of that href
+            const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
+            
             return (
               <Link 
-                key={link.href} 
+                key={`${link.href}-${index}`} 
                 href={link.href}
                 onClick={() => setIsOpen(false)}
                 className={`flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-all ${
