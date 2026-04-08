@@ -3,7 +3,6 @@ import GoogleProvider from "next-auth/providers/google";
 import User from "@/models/User";
 import connectDB from "@/lib/mongodb";
 
-// Fix the "any" error by extending the Session type
 declare module "next-auth" {
     interface Session {
         user: {
@@ -21,29 +20,37 @@ const handler = NextAuth({
         }),
     ],
     callbacks: {
-        // Removed unused 'account' and 'profile' to fix ESLint errors
         async signIn({ user }) {
-            await connectDB();
-            const existingUser = await User.findOne({ email: user.email });
+            try {
+                await connectDB();
+                const existingUser = await User.findOne({ email: user.email });
 
-            if (!existingUser) {
-                await User.create({
-                    name: user.name,
-                    email: user.email,
-                    image: user.image,
-                    role: "regular",
-                    isVerified: true,
-                });
+                if (!existingUser) {
+                    await User.create({
+                        name: user.name,
+                        email: user.email,
+                        image: user.image,
+                        role: "regular",
+                        isVerified: true, // Google users are pre-verified
+                    });
+                }
+                return true;
+            } catch (error) {
+                console.error("NextAuth SignIn Error:", error);
+                return false;
             }
-            return true;
         },
         async jwt({ token, user }) {
             if (user) {
-                await connectDB();
-                const dbUser = await User.findOne({ email: token.email });
-                if (dbUser) {
-                    token.role = dbUser.role; // e.g. "workers"
-                    token.id = dbUser._id.toString();
+                try {
+                    await connectDB();
+                    const dbUser = await User.findOne({ email: token.email });
+                    if (dbUser) {
+                        token.role = dbUser.role;
+                        token.id = dbUser._id.toString();
+                    }
+                } catch (error) {
+                    console.error("NextAuth JWT Error:", error);
                 }
             }
             return token;
@@ -59,6 +66,7 @@ const handler = NextAuth({
     pages: {
         signIn: '/signin',
     },
+    secret: process.env.NEXTAUTH_SECRET,
 });
 
 export { handler as GET, handler as POST };
