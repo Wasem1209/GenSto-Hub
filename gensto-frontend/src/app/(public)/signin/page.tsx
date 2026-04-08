@@ -3,6 +3,7 @@ import { useState, FormEvent } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, Loader2, LogIn } from 'lucide-react';
+import { signIn } from 'next-auth/react'; // Added this import
 import Link from 'next/link';
 import { REST_API } from '../../constant';
 
@@ -20,6 +21,7 @@ export default function SignIn() {
 
         try {
             const res = await fetch(`${REST_API}/auth/login`, {
+                // Keep existing email/password logic
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
@@ -51,8 +53,12 @@ export default function SignIn() {
         }
     };
 
-    const handleSocialLogin = (platform: string) => {
-        window.location.href = `${REST_API}/auth/${platform}`;
+    // UPDATED GOOGLE LOGIN LOGIC
+    const handleSocialLogin = async (platform: string) => {
+        if (platform === 'google') {
+            setLoading(true);
+            await signIn('google', { callbackUrl: '/' });
+        }
     };
 
     return (

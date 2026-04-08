@@ -3,7 +3,7 @@ import { useState, FormEvent, useEffect, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { User as UserIcon, Mail, Lock, Loader2, ArrowRight, Phone, Globe, X, Eye, EyeOff } from 'lucide-react';
-// CORRECTED IMPORT BELOW
+import { signIn } from 'next-auth/react'; // NEW IMPORT
 import Link from 'next/link'; 
 import { REST_API, countryCode } from '../../constant';
 
@@ -160,8 +160,12 @@ export default function SignUp() {
     }
   };
 
-  const handleSocialSignUp = (platform: string) => {
-    window.location.href = `${REST_API}/auth/${platform}`;
+  // UPDATED GOOGLE SIGN UP LOGIC
+  const handleSocialSignUp = async (platform: string) => {
+    if (platform === 'google') {
+      setLoading(true);
+      await signIn('google', { callbackUrl: '/' });
+    }
   };
 
   return (
@@ -181,7 +185,11 @@ export default function SignUp() {
         )}
 
         <div className="mb-8">
-          <button type="button" onClick={() => handleSocialSignUp('google')} className="w-full flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl sm:rounded-2xl hover:bg-gray-50 transition font-bold text-[9px] sm:text-[10px] text-gray-600 tracking-widest uppercase">
+          <button 
+            type="button" 
+            onClick={() => handleSocialSignUp('google')} 
+            className="w-full flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl sm:rounded-2xl hover:bg-gray-50 transition font-bold text-[9px] sm:text-[10px] text-gray-600 tracking-widest uppercase"
+          >
             <img src="https://www.svgrepo.com/show/355037/google.svg" className="w-4 h-4" alt="Google" /> CONTINUE WITH GOOGLE
           </button>
         </div>
