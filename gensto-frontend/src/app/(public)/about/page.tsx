@@ -41,7 +41,7 @@ const AboutPage = () => {
     {
       name: "Engr. Success Agu",
       title: "Co-Founder/CTO",
-      image: "/images/Success Agu.jpg",
+      image: "/images/IMG-20260406-WA0013.jpg",
     },
     {
       name: "Engr. Yohana Gambo",
