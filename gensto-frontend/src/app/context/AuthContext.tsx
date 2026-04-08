@@ -1,7 +1,8 @@
 'use client';
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useSession, signOut } from 'next-auth/react';
 
-// Define what a User looks like in INANST
+// Define the shape of the user in your app
 interface User {
   fullName: string;
   id: string;
@@ -10,6 +11,15 @@ interface User {
   role: 'regular' | 'admins' | 'instructors' | 'workers';
   avatar?: string;
   emailVerified: boolean;
+}
+
+// This tells TypeScript exactly what is inside the session.user object
+interface CustomSessionUser {
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+  id: string;
+  role: 'regular' | 'admins' | 'instructors' | 'workers';
 }
 
 interface AuthContextType {
@@ -22,29 +32,40 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const { data: session, status } = useSession();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('inanst_user');
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (e) {
-        console.error("Failed to parse user", e);
-      }
+    if (status === 'loading') {
+      setLoading(true);
+    } else if (status === 'authenticated' && session?.user) {
+      // Cast the session.user to our custom type safely
+      const sessionUser = session.user as CustomSessionUser;
+
+      setUser({
+        id: sessionUser.id,
+        name: sessionUser.name || '',
+        fullName: sessionUser.name || '',
+        email: sessionUser.email || '',
+        role: sessionUser.role || 'regular',
+        avatar: sessionUser.image || '',
+        emailVerified: true,
+      });
+      setLoading(false);
+    } else {
+      setUser(null);
+      setLoading(false);
     }
-    setLoading(false);
-  }, []);
+  }, [session, status]);
 
   const login = (userData: User) => {
     setUser(userData);
-    localStorage.setItem('inanst_user', JSON.stringify(userData));
   };
 
-  const logout = () => {
+  const logout = async () => {
     setUser(null);
-    localStorage.removeItem('inanst_user');
+    await signOut({ callbackUrl: '/signin' });
   };
 
   return (
