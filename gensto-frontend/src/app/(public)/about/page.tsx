@@ -51,7 +51,7 @@ const AboutPage = () => {
     {
       name: "Asokere Success Boluwatife",
       title: "Co-Founder/Growth Lead",
-      image: "/images/emmanuelah.jpg",
+      image: "/images/WhatsApp Image 2026-04-08 at 10.31.30 PM.jpeg",
     },
   ];
 
