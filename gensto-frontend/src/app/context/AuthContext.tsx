@@ -1,25 +1,23 @@
+// gensto-frontend/src/app/context/AuthContext.tsx
 'use client';
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 
-// Define the shape of the user in your app
 interface User {
-  fullName: string;
   id: string;
   name: string;
   email: string;
-  role: 'regular' | 'admins' | 'instructors' | 'workers';
+  role: 'regular' | 'instructor' | 'worker' | 'admin';
   avatar?: string;
   emailVerified: boolean;
 }
 
-// This tells TypeScript exactly what is inside the session.user object
 interface CustomSessionUser {
   name?: string | null;
   email?: string | null;
   image?: string | null;
   id: string;
-  role: 'regular' | 'admins' | 'instructors' | 'workers';
+  role: 'regular' | 'instructor' | 'worker' | 'admin';
 }
 
 interface AuthContextType {
@@ -40,13 +38,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (status === 'loading') {
       setLoading(true);
     } else if (status === 'authenticated' && session?.user) {
-      // Cast the session.user to our custom type safely
       const sessionUser = session.user as CustomSessionUser;
 
       setUser({
         id: sessionUser.id,
         name: sessionUser.name || '',
-        fullName: sessionUser.name || '',
         email: sessionUser.email || '',
         role: sessionUser.role || 'regular',
         avatar: sessionUser.image || '',

@@ -1,9 +1,10 @@
+// gensto-frontend/src/app/(public)/signin/page.tsx
 'use client';
 import { useState, FormEvent } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, Loader2, LogIn } from 'lucide-react';
-import { signIn } from 'next-auth/react'; // Added this import
+import { signIn } from 'next-auth/react'; 
 import Link from 'next/link';
 import { REST_API } from '../../constant';
 
@@ -21,7 +22,6 @@ export default function SignIn() {
 
         try {
             const res = await fetch(`${REST_API}/auth/login`, {
-                // Keep existing email/password logic
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
@@ -31,17 +31,7 @@ export default function SignIn() {
 
             if (res.ok) {
                 login(data.user);
-                
-                const role = data.user.role;
-                if (role === 'admin') {
-                    router.push('/admin');
-                } else if (role === 'worker') {
-                    router.push('/worker');
-                } else if (role === 'instructor') {
-                    router.push('/instructor');
-                } else {
-                    router.push('/regular'); 
-                }
+                router.push(data.user.role === 'regular' ? '/regular' : `/${data.user.role}`);
             } else {
                 setError(data.msg || 'Login failed');
             }
@@ -53,26 +43,18 @@ export default function SignIn() {
         }
     };
 
-    // UPDATED GOOGLE LOGIN LOGIC
-    const handleSocialLogin = async (platform: string) => {
-        if (platform === 'google') {
-            setLoading(true);
-            await signIn('google', { callbackUrl: '/' });
-        }
-    };
-
     return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6 pt-24 font-sans text-gray-900">
             <div className="max-w-md w-full bg-white rounded-[2.5rem] shadow-xl p-10 border border-gray-100">
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-black">Welcome Back</h1>
+                    <h1 className="text-3xl font-black italic tracking-tighter">Welcome Back</h1>
                     <p className="text-gray-500 mt-2 font-medium tracking-tight">Log in to your <span className="text-blue-600 font-bold">INANST</span> dashboard.</p>
                 </div>
 
                 {error && <p className="text-red-500 text-[10px] font-black mb-4 text-center bg-red-50 py-2 rounded-lg tracking-widest uppercase">{error}</p>}
 
                 <div className="mb-8">
-                    <button type="button" onClick={() => handleSocialLogin('google')} className="w-full flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-2xl hover:bg-gray-50 transition font-bold text-[10px] text-gray-600 tracking-widest uppercase">
+                    <button type="button" onClick={() => signIn('google', { callbackUrl: '/' })} className="w-full flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-2xl hover:bg-gray-50 transition font-bold text-[10px] text-gray-600 tracking-widest uppercase">
                         <img src="https://www.svgrepo.com/show/355037/google.svg" className="w-4 h-4" alt="Google" /> CONTINUE WITH GOOGLE
                     </button>
                 </div>
@@ -87,7 +69,7 @@ export default function SignIn() {
                         <input required type="password" title="Password" className="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 transition" placeholder="Password" onChange={(e) => setFormData({ ...formData, password: e.target.value })} />
                     </div>
 
-                    <button disabled={loading} className="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-lg shadow-blue-100 flex items-center justify-center gap-2 hover:bg-blue-700 transition active:scale-95 disabled:opacity-50 uppercase tracking-widest text-sm">
+                    <button disabled={loading} className="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition active:scale-95 disabled:opacity-50 uppercase tracking-widest text-sm">
                         {loading ? <Loader2 className="animate-spin" /> : <>SIGN IN <LogIn className="w-4 h-4" /></>}
                     </button>
                 </form>
