@@ -139,10 +139,11 @@ export default function DashboardSidebar({ role = 'regular', isOpen, setIsOpen }
           </button>
         </div>
         
-        <nav className="flex-1 px-4 space-y-1 mt-2 overflow-y-auto custom-scrollbar">
+        {/* Added scrollbar-hide  */}
+        <nav className="flex-1 px-4 space-y-1 mt-2 overflow-y-auto scrollbar-hide">
           {links.map((link, index) => {
             const Icon = link.icon;
-            // Matches if current path is exactly the href or a sub-page of that href
+          
             const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
             
             return (
