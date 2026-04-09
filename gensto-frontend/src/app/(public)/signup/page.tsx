@@ -3,7 +3,7 @@ import { useState, FormEvent, useEffect, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { User as UserIcon, Mail, Lock, Loader2, ArrowRight, Phone, Globe, X, Eye, EyeOff } from 'lucide-react';
-import { signIn } from 'next-auth/react'; // NEW IMPORT
+import { signIn } from 'next-auth/react'; 
 import Link from 'next/link'; 
 import { REST_API, countryCode } from '../../constant';
 
@@ -24,6 +24,7 @@ export default function SignUp() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [resendTimer, setResendTimer] = useState(0);
@@ -98,10 +99,12 @@ export default function SignUp() {
         setResendTimer(60);
       } else {
         setError(data.msg || 'Registration failed');
+        setShowErrorModal(true);
       }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setError('Connection to server failed');
+      setShowErrorModal(true);
     } finally {
       setLoading(false);
     }
@@ -160,7 +163,6 @@ export default function SignUp() {
     }
   };
 
-  // UPDATED GOOGLE SIGN UP LOGIC
   const handleSocialSignUp = async (platform: string) => {
     if (platform === 'google') {
       setLoading(true);
@@ -178,7 +180,7 @@ export default function SignUp() {
           </p>
         </div>
 
-        {error && (
+        {error && !showErrorModal && (
           <p className="text-red-500 text-[9px] font-black mb-4 text-center bg-red-50 py-2 px-4 rounded-lg tracking-widest uppercase animate-pulse leading-tight">
             {error}
           </p>
@@ -316,6 +318,35 @@ export default function SignUp() {
                     <button type="button" onClick={handleResendOtp} className="text-blue-600 hover:underline ml-1">Resend Now</button>
                   )}
                 </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showErrorModal && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6">
+          <div className="bg-white max-w-sm w-full rounded-[1.5rem] sm:rounded-[2rem] p-6 sm:p-10 relative animate-in zoom-in duration-200 shadow-2xl">
+            <div className="text-center">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <X className="text-red-600 w-6 h-6" />
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black tracking-tight text-gray-900">Registration Issue</h2>
+              <p className="text-gray-500 text-xs sm:text-sm mt-2 font-medium uppercase tracking-wider">{error}</p>
+              
+              <div className="mt-8 flex flex-col gap-3">
+                <button 
+                  onClick={() => setShowErrorModal(false)}
+                  className="w-full bg-gray-900 text-white font-black py-3 sm:py-4 rounded-xl shadow-lg hover:bg-black transition uppercase tracking-widest text-[10px] sm:text-xs"
+                >
+                  Try Again
+                </button>
+                <Link 
+                  href="/signin"
+                  className="w-full bg-blue-600 text-white font-black py-3 sm:py-4 rounded-xl shadow-lg hover:bg-blue-700 transition text-center uppercase tracking-widest text-[10px] sm:text-xs"
+                >
+                  Sign In
+                </Link>
               </div>
             </div>
           </div>
