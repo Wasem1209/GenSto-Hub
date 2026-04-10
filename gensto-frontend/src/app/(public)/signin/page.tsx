@@ -1,19 +1,49 @@
-// gensto-frontend/src/app/(public)/signin/page.tsx
 'use client';
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, Loader2, LogIn } from 'lucide-react';
-import { signIn } from 'next-auth/react'; 
+import { signIn, useSession } from 'next-auth/react'; 
 import Link from 'next/link';
 import { REST_API } from '../../constant';
+
+// Define a local interface to handle the Google session data safely
+interface GoogleUser {
+    id: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    role?: string;
+}
 
 export default function SignIn() {
     const { login } = useAuth();
     const router = useRouter();
+    const { data: session, status } = useSession();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [formData, setFormData] = useState({ email: '', password: '' });
+
+    useEffect(() => {
+        if (status === 'authenticated' && session?.user) {
+            // Cast the session user to our local interface
+            const googleUser = session.user as GoogleUser;
+            
+            
+            const userToLogin = {
+                ...googleUser,
+                id: googleUser.id,
+                role: googleUser.role || 'regular',
+                emailVerified: true 
+            };
+
+            // @ts-expect-error - Ignore if AuthContext User type still has minor mismatches
+            login(userToLogin);
+            
+            const targetRole = googleUser.role || 'regular';
+            router.push(targetRole === 'regular' ? '/regular' : `/${targetRole}`);
+        }
+    }, [status, session, login, router]);
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -54,9 +84,26 @@ export default function SignIn() {
                 {error && <p className="text-red-500 text-[10px] font-black mb-4 text-center bg-red-50 py-2 rounded-lg tracking-widest uppercase">{error}</p>}
 
                 <div className="mb-8">
-                    <button type="button" onClick={() => signIn('google', { callbackUrl: '/' })} className="w-full flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-2xl hover:bg-gray-50 transition font-bold text-[10px] text-gray-600 tracking-widest uppercase">
-                        <img src="https://www.svgrepo.com/show/355037/google.svg" className="w-4 h-4" alt="Google" /> CONTINUE WITH GOOGLE
+                    <button 
+                        type="button" 
+                        disabled={status === 'loading'}
+                        onClick={() => signIn('google')} 
+                        className="w-full flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-2xl hover:bg-gray-50 transition font-bold text-[10px] text-gray-600 tracking-widest uppercase disabled:opacity-50"
+                    >
+                        {status === 'loading' ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                            <>
+                                <img src="https://www.svgrepo.com/show/355037/google.svg" className="w-4 h-4" alt="Google" /> 
+                                CONTINUE WITH GOOGLE
+                            </>
+                        )}
                     </button>
+                </div>
+
+                <div className="relative mb-8 text-center">
+                    <hr className="border-gray-100" />
+                    <span className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-4 text-[10px] font-bold text-gray-300 uppercase tracking-widest">Or login with email</span>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -69,7 +116,7 @@ export default function SignIn() {
                         <input required type="password" title="Password" className="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 transition" placeholder="Password" onChange={(e) => setFormData({ ...formData, password: e.target.value })} />
                     </div>
 
-                    <button disabled={loading} className="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition active:scale-95 disabled:opacity-50 uppercase tracking-widest text-sm">
+                    <button disabled={loading || status === 'loading'} className="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition active:scale-95 disabled:opacity-50 uppercase tracking-widest text-sm">
                         {loading ? <Loader2 className="animate-spin" /> : <>SIGN IN <LogIn className="w-4 h-4" /></>}
                     </button>
                 </form>
