@@ -1,75 +1,87 @@
-// gensto-frontend/src/app/context/AuthContext.tsx
 'use client';
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useSession, signOut } from 'next-auth/react';
+
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { REST_API } from '../constant';
 
 interface User {
   id: string;
   name: string;
   email: string;
-  role: 'regular' | 'instructor' | 'worker' | 'admin';
-  avatar?: string;
-  emailVerified: boolean;
-}
-
-interface CustomSessionUser {
-  name?: string | null;
-  email?: string | null;
-  image?: string | null;
-  id: string;
-  role: 'regular' | 'instructor' | 'worker' | 'admin';
+  role: "regular" | "admins" | "instructors" | "workers";
+  isVerified: boolean; 
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (userData: User) => void;
-  logout: () => void;
+  token: string | null;
   loading: boolean;
+  login: (token: string, user: User) => void;
+  logout: () => void;
+  checkAuth: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const { data: session, status } = useSession();
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (status === 'loading') {
-      setLoading(true);
-    } else if (status === 'authenticated' && session?.user) {
-      const sessionUser = session.user as CustomSessionUser;
+  const logout = useCallback(() => {
+    localStorage.removeItem('token');
+    setToken(null);
+    setUser(null);
+    setLoading(false);
+  }, []);
 
-      setUser({
-        id: sessionUser.id,
-        name: sessionUser.name || '',
-        email: sessionUser.email || '',
-        role: sessionUser.role || 'regular',
-        avatar: sessionUser.image || '',
-        emailVerified: true,
-      });
+  const checkAuth = useCallback(async () => {
+    const storedToken = localStorage.getItem('token');
+    
+    // If no token, we aren't logged in via email/password
+    if (!storedToken) {
       setLoading(false);
-    } else {
-      setUser(null);
+      return;
+    }
+
+    try {
+      const res = await fetch(`${REST_API}/auth/me`, {
+        headers: { Authorization: `Bearer ${storedToken}` },
+      });
+
+      if (res.ok) {
+        const userData = await res.json();
+        setToken(storedToken);
+        setUser({
+          ...userData,
+          id: userData._id || userData.id,
+        });
+      } else {
+        logout();
+      }
+    } catch (err) {
+      console.error("Auth verification failed", err);
+      logout();
+    } finally {
       setLoading(false);
     }
-  }, [session, status]);
+  }, [logout]);
 
-  const login = (userData: User) => {
-    setUser(userData);
-  };
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
-  const logout = async () => {
-    setUser(null);
-    await signOut({ callbackUrl: '/signin' });
+  const login = (newToken: string, newUser: User) => {
+    localStorage.setItem('token', newToken);
+    setToken(newToken);
+    setUser(newUser);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, token, loading, login, logout, checkAuth }}>
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

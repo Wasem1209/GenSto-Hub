@@ -61,6 +61,7 @@ export default function SignUp() {
 
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
+      setShowErrorModal(true);
       return;
     }
 
@@ -80,10 +81,15 @@ export default function SignUp() {
           confirmPassword: formData.confirmPassword 
         }),
       });
+      
       const data = await res.json();
+      
       if (res.ok) {
-        setShowOtpModal(true);
-        setResendTimer(60);
+        // Log the user in immediately so they can see the dashboard (even if unverified)
+        login(data.token, data.user);
+        
+        // Redirect to dashboard immediately 
+        router.push(data.user.role === 'regular' ? '/regular' : `/${data.user.role}`);
       } else {
         setError(data.msg || 'Registration failed');
         setShowErrorModal(true);
@@ -132,7 +138,7 @@ export default function SignUp() {
       });
       const data = await res.json();
       if (res.ok) {
-        login(data.user);
+        login(data.token, data.user);
         router.push(data.user.role === 'regular' ? '/regular' : `/${data.user.role}`);
       } else {
         setError(data.msg || 'Invalid Code');

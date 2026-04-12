@@ -2,24 +2,38 @@
 
 import { useEffect, useState, useLayoutEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
+import { Loader2, MailCheck, Send, ShieldAlert } from 'lucide-react';
 import DashboardSidebar from './Components/DashboardSidebar';
 import DashboardHeader from './Components/DashboardHeader'; 
 import { useAuth } from '../context/AuthContext';
+import { REST_API } from '../constant';
 
-// This prevents the build error you saw earlier by ensuring 
-// the dashboard is always rendered on the client/runtime.
+
+interface AuthenticatedUser {
+  id: string;
+  email: string;
+  role: "regular" | "admins" | "instructors" | "workers";
+  isVerified: boolean;
+  name?: string;
+}
+
 export const dynamic = 'force-dynamic';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user: authUser, loading } = useAuth();
+  
+  
+  const user = authUser as unknown as AuthenticatedUser;
+  
   const router = useRouter();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [resending, setResending] = useState(false);
 
+  
   useLayoutEffect(() => {
     if (!loading) {
-      // If no user is logged in, send to signin
+      
       if (!user) {
         router.replace('/signin');
         return;
@@ -27,58 +41,121 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       
       const rolePath = `/${user.role}`;
-      
       if (!pathname.startsWith(rolePath)) {
         console.warn(`Unauthorized access: ${pathname} for role ${user.role}`);
-        
-        
         router.replace(rolePath);
       }
+      
     }
   }, [user, loading, pathname, router]);
 
+  
   useEffect(() => {
     setIsSidebarOpen(false);
   }, [pathname]);
 
-  // Authorization check for the UI render
+  
+  const handleResend = async () => {
+    if (!user?.email) return;
+    
+    setResending(true);
+    try {
+      const response = await fetch(`${REST_API}/auth/resend-verification`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user.email }),
+      });
+      
+      if (response.ok) {
+        alert("A new verification link has been sent to your email!");
+      } else {
+        alert("We couldn't send the email. Please try again in a moment.");
+      }
+    } catch (err) {
+      console.error("Resend Error:", err);
+      alert("Connection failed. Please check your network.");
+    } finally {
+      setResending(false);
+    }
+  };
+
   const isAuthorized = user && pathname.startsWith(`/${user.role}`);
 
-  // Show loader while checking auth or if the user is on the wrong path
+  
   if (loading || !isAuthorized) {
     return (
       <div className="h-screen w-full bg-[#000000] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="text-blue-500 animate-spin w-10 h-10" />
-          <p className="text-gray-500 text-sm animate-pulse">Verifying Access...</p>
+          <p className="text-gray-400 text-sm animate-pulse tracking-widest uppercase font-bold">
+            Verifying Access...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-[#f8fafc] overflow-hidden">
-      <DashboardSidebar 
-        role={user.role as "regular" | "admins" | "instructors" | "workers"} 
-        isOpen={isSidebarOpen} 
-        setIsOpen={setIsSidebarOpen} 
-      />
-
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <DashboardHeader 
-          onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} 
+    <div className="relative flex h-screen bg-[#f8fafc] overflow-hidden">
+      
+      
+      <div className={`flex flex-1 h-full overflow-hidden transition-all duration-700 
+        ${!user.isVerified ? "blur-2xl grayscale pointer-events-none select-none opacity-40 scale-[0.98]" : ""}`}>
+        
+        <DashboardSidebar 
           role={user.role} 
+          isOpen={isSidebarOpen} 
+          setIsOpen={setIsSidebarOpen} 
         />
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-10">
-          <div className="max-w-6xl mx-auto">
-            {children}
-          </div>
-        </main>
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <DashboardHeader 
+            onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} 
+            role={user.role} 
+          />
+
+          <main className="flex-1 overflow-y-auto p-4 md:p-10">
+            <div className="max-w-6xl mx-auto">
+              {children}
+            </div>
+          </main>
+        </div>
       </div>
 
-      {/* Mobile Overlay */}
-      {isSidebarOpen && (
+      
+      {!user.isVerified && (
+        <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-[4px] flex items-center justify-center p-6">
+          <div className="max-w-md w-full bg-white rounded-[3.5rem] shadow-2xl p-10 border border-gray-100 text-center animate-in fade-in zoom-in duration-500">
+            <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
+              <MailCheck className="w-12 h-12 text-blue-600" />
+            </div>
+            
+            <h2 className="text-3xl font-black tracking-tighter italic mb-4 text-gray-900">Final Step!</h2>
+            <p className="text-gray-500 font-medium mb-10 leading-relaxed">
+              Verify your email to unlock your dashboard and start using <span className="text-blue-600 font-bold uppercase">Inanst</span>. <br/>
+              <span className="text-gray-900 font-bold break-all underline decoration-blue-200">{user.email}</span>
+            </p>
+
+            <div className="space-y-4">
+              <button 
+                onClick={handleResend}
+                disabled={resending}
+                className="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-lg flex items-center justify-center gap-3 hover:bg-blue-700 transition active:scale-95 disabled:opacity-50 uppercase tracking-widest text-[10px]"
+              >
+                {resending ? <Loader2 className="animate-spin w-5 h-5" /> : <>Send me a new link <Send className="w-4 h-4" /></>}
+              </button>
+              
+              <div className="flex items-center justify-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest pt-4">
+                <ShieldAlert className="w-3 h-3 text-yellow-500" />
+                Feature access restricted
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      
+      {isSidebarOpen && user.isVerified && (
         <div 
           className="fixed inset-0 bg-black/40 z-[40] md:hidden backdrop-blur-sm"
           onClick={() => setIsSidebarOpen(false)}
