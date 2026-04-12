@@ -8,6 +8,7 @@ declare module "next-auth" {
         user: {
             id: string;
             role: string;
+            isVerified: boolean;
         } & DefaultSession["user"]
     }
 }
@@ -19,20 +20,19 @@ const handler = NextAuth({
             clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
         }),
     ],
+    session: {
+        strategy: "jwt",
+    },
     callbacks: {
-        // Removed 'account' and 'profile' since they weren't being used
         async signIn({ user }) {
             try {
                 await connectDB();
-
-                if (!user?.email) {
-                    console.error("SignIn Error: No email provided by Google");
-                    return false;
-                }
+                if (!user?.email) return false;
 
                 const existingUser = await User.findOne({ email: user.email });
 
                 if (!existingUser) {
+                    // Create new Google user as already verified
                     await User.create({
                         name: user.name,
                         email: user.email,
@@ -40,31 +40,32 @@ const handler = NextAuth({
                         role: "regular",
                         isVerified: true,
                     });
-                    console.log(`New user created: ${user.email}`);
-                } else {
-                    console.log(`Existing user logged in: ${user.email}`);
+                } else if (!existingUser.isVerified) {
+                    // If they previously signed up via email but didn't verify, 
+                    // logging in via Google verifies them automatically.
+                    existingUser.isVerified = true;
+                    await existingUser.save();
                 }
-
                 return true;
             } catch (error) {
-                console.error("NextAuth SignIn Callback Error:", error);
+                console.error("NextAuth SignIn Error:", error);
                 return false;
             }
         },
 
-        // Removed 'trigger' and 'session' from the parameters here
-        async jwt({ token, user }) {
+        async jwt({ token, user, trigger, session }) {
             if (user) {
-                try {
-                    await connectDB();
-                    const dbUser = await User.findOne({ email: user.email });
-                    if (dbUser) {
-                        token.role = dbUser.role;
-                        token.id = dbUser._id.toString();
-                    }
-                } catch (error) {
-                    console.error("JWT Callback Error:", error);
+                await connectDB();
+                const dbUser = await User.findOne({ email: user.email });
+                if (dbUser) {
+                    token.role = dbUser.role;
+                    token.id = dbUser._id.toString();
+                    token.isVerified = dbUser.isVerified;
                 }
+            }
+            // Allows manual session updates if needed
+            if (trigger === "update" && session?.user) {
+                return { ...token, ...session.user };
             }
             return token;
         },
@@ -73,16 +74,15 @@ const handler = NextAuth({
             if (session.user) {
                 session.user.role = token.role as string;
                 session.user.id = token.id as string;
+                session.user.isVerified = token.isVerified as boolean;
             }
             return session;
         },
     },
     pages: {
         signIn: '/signin',
-        error: '/auth/error',
     },
     secret: process.env.NEXTAUTH_SECRET,
-    debug: process.env.NODE_ENV === 'development',
 });
 
 export { handler as GET, handler as POST };

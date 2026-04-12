@@ -13,7 +13,7 @@ interface GoogleUser {
     name?: string | null;
     email?: string | null;
     image?: string | null;
-    role?: string;
+    role?: "regular" | "admins" | "instructors" | "workers";
 }
 
 export default function SignIn() {
@@ -26,19 +26,21 @@ export default function SignIn() {
 
     useEffect(() => {
         if (status === 'authenticated' && session?.user) {
-            // Cast the session user to our local interface
             const googleUser = session.user as GoogleUser;
             
-            
+            // For Social Login, we assume verification and provide a dummy token 
+            // or use the session token if your backend supports it.
             const userToLogin = {
-                ...googleUser,
                 id: googleUser.id,
+                name: googleUser.name || '',
+                email: googleUser.email || '',
                 role: googleUser.role || 'regular',
-                emailVerified: true 
+                isVerified: true 
             };
 
-            // @ts-expect-error - Ignore if AuthContext User type still has minor mismatches
-            login(userToLogin);
+            // Assuming Google login provides a token in the session or handled via next-auth
+            // If you have a custom backend token for Google, replace 'google-session'
+            login('google-session', userToLogin);
             
             const targetRole = googleUser.role || 'regular';
             router.push(targetRole === 'regular' ? '/regular' : `/${targetRole}`);
@@ -60,7 +62,8 @@ export default function SignIn() {
             const data = await res.json();
 
             if (res.ok) {
-                login(data.user);
+                // Pass both token and user to the updated AuthContext login function
+                login(data.token, data.user);
                 router.push(data.user.role === 'regular' ? '/regular' : `/${data.user.role}`);
             } else {
                 setError(data.msg || 'Login failed');
@@ -109,11 +112,11 @@ export default function SignIn() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="relative">
                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                        <input required type="email" className="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 transition" placeholder="Email Address" onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+                        <input required type="email" className="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 transition text-sm" placeholder="Email Address" onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
                     </div>
                     <div className="relative">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                        <input required type="password" title="Password" className="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 transition" placeholder="Password" onChange={(e) => setFormData({ ...formData, password: e.target.value })} />
+                        <input required type="password" title="Password" className="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 transition text-sm" placeholder="Password" onChange={(e) => setFormData({ ...formData, password: e.target.value })} />
                     </div>
 
                     <button disabled={loading || status === 'loading'} className="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition active:scale-95 disabled:opacity-50 uppercase tracking-widest text-sm">
