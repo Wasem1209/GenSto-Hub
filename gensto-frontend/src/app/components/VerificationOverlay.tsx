@@ -5,14 +5,13 @@ import { useAuth } from '@/app/context/AuthContext';
 import { REST_API } from '../constant';
 
 export default function VerificationOverlay() {
-  const { user, login } = useAuth(); // Assuming login updates the user state in context
+  const { user, login } = useAuth();
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
 
-  // 1. Handle the OTP Verification
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     if (code.length < 6) return setError("Please enter the full 6-digit code");
@@ -30,8 +29,7 @@ export default function VerificationOverlay() {
       const data = await res.json();
 
       if (res.ok) {
-        // This updates the local AuthContext. 
-        // Once user.isVerified becomes true, this overlay will unmount automatically.
+        // This updates the local AuthContext and unmounts the overlay
         login(data.token, data.user); 
       } else {
         setError(data.msg || "Invalid verification code");
@@ -81,23 +79,23 @@ export default function VerificationOverlay() {
         <p className="text-gray-500 text-lg">Enter the 6-digit code sent to:</p>
         <p className="font-bold text-gray-900 mb-6">{user?.email}</p>
 
-        {/* --- NEW CODE INPUT SECTION --- */}
+        {/* --- OTP INPUT FORM --- */}
         <form onSubmit={handleVerify} className="mb-6">
           <input 
             type="text"
             maxLength={6}
             placeholder="000000"
             value={code}
-            onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} // Only allow numbers
-            className="w-full text-center text-3xl tracking-[10px] font-mono py-4 border-2 border-gray-100 rounded-2xl focus:border-blue-500 focus:outline-none mb-4"
+            onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} 
+            className="w-full text-center text-4xl tracking-[12px] font-mono py-5 border-2 border-gray-100 rounded-2xl focus:border-blue-500 focus:ring-4 focus:ring-blue-50/50 focus:outline-none mb-4 transition-all"
           />
           
-          {error && <p className="text-red-500 text-sm mb-4 font-medium">{error}</p>}
+          {error && <p className="text-red-500 text-sm mb-4 font-bold">{error}</p>}
 
           <button 
             type="submit"
             disabled={verifying || code.length < 6}
-            className="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-2xl transition-all active:scale-95 disabled:opacity-50"
+            className="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-2xl transition-all active:scale-95 disabled:opacity-50 shadow-lg shadow-gray-200"
           >
             {verifying ? "VERIFYING..." : "VERIFY ACCOUNT"}
           </button>
@@ -119,10 +117,10 @@ export default function VerificationOverlay() {
         </p>
       </div>
 
-      {/* SUCCESS MODAL (for resend confirmation) */}
+      {/* SUCCESS MODAL FOR RESEND */}
       {showModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+          <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl animate-in fade-in zoom-in duration-300">
             <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-10 h-10">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
