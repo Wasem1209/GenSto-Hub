@@ -133,9 +133,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <h2 className="text-4xl font-extrabold tracking-tight mb-4 text-gray-900">Final Step!</h2>
             <p className="text-gray-500 font-medium mb-10 leading-relaxed text-lg">
               Verify your email to unlock your dashboard and start using <span className="text-blue-600 font-bold uppercase">Inanst</span>. <br/>
-              <span className="text-gray-900 font-bold break-all underline decoration-blue-200 uppercase tracking-tighter">
-                {maskedEmail}
-              </span>
+              <span className="text-gray-900 font-bold break-all underline decoration-blue-200 tracking-tight">
+  {maskedEmail}
+</span>
             </p>
 
             <div className="space-y-4">
