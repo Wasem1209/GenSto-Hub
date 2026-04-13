@@ -2,12 +2,11 @@
 
 import { useEffect, useState, useLayoutEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Loader2, MailCheck, Send, ShieldAlert } from 'lucide-react';
+import { Loader2, MailCheck, Send, ShieldAlert, CheckCircle2 } from 'lucide-react';
 import DashboardSidebar from './Components/DashboardSidebar';
 import DashboardHeader from './Components/DashboardHeader'; 
 import { useAuth } from '../context/AuthContext';
 import { REST_API } from '../constant';
-
 
 interface AuthenticatedUser {
   id: string;
@@ -21,40 +20,43 @@ export const dynamic = 'force-dynamic';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user: authUser, loading } = useAuth();
-  
-  
   const user = authUser as unknown as AuthenticatedUser;
   
   const router = useRouter();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [resending, setResending] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  
+  // Email Masking Helper: converts "example@gmail.com" to "ex*****@gmail.com"
+  const maskEmail = (email: string) => {
+    if (!email) return "";
+    const [userPart, domain] = email.split("@");
+    if (userPart.length <= 2) return `${userPart}***@${domain}`;
+    return `${userPart.substring(0, 2)}*****@${domain}`;
+  };
+
+  const maskedEmail = user?.email ? maskEmail(user.email) : "";
+
   useLayoutEffect(() => {
     if (!loading) {
-      
       if (!user) {
         router.replace('/signin');
         return;
       }
 
-      
       const rolePath = `/${user.role}`;
       if (!pathname.startsWith(rolePath)) {
         console.warn(`Unauthorized access: ${pathname} for role ${user.role}`);
         router.replace(rolePath);
       }
-      
     }
   }, [user, loading, pathname, router]);
 
-  
   useEffect(() => {
     setIsSidebarOpen(false);
   }, [pathname]);
 
-  
   const handleResend = async () => {
     if (!user?.email) return;
     
@@ -67,13 +69,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       });
       
       if (response.ok) {
-        alert("A new verification link has been sent to your email!");
+        setShowSuccessModal(true);
       } else {
-        alert("We couldn't send the email. Please try again in a moment.");
+        console.error("Failed to send verification email");
       }
     } catch (err) {
       console.error("Resend Error:", err);
-      alert("Connection failed. Please check your network.");
     } finally {
       setResending(false);
     }
@@ -81,7 +82,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const isAuthorized = user && pathname.startsWith(`/${user.role}`);
 
-  
   if (loading || !isAuthorized) {
     return (
       <div className="h-screen w-full bg-[#000000] flex items-center justify-center">
@@ -98,7 +98,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="relative flex h-screen bg-[#f8fafc] overflow-hidden">
       
-      
+      {/* BLURRED BACKGROUND CONTENT */}
       <div className={`flex flex-1 h-full overflow-hidden transition-all duration-700 
         ${!user.isVerified ? "blur-2xl grayscale pointer-events-none select-none opacity-40 scale-[0.98]" : ""}`}>
         
@@ -122,7 +122,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </div>
 
-      
+      {/* FINAL STEP OVERLAY CARD */}
       {!user.isVerified && (
         <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-[4px] flex items-center justify-center p-6">
           <div className="max-w-md w-full bg-white rounded-[3.5rem] shadow-2xl p-10 border border-gray-100 text-center animate-in fade-in zoom-in duration-500">
@@ -130,19 +130,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <MailCheck className="w-12 h-12 text-blue-600" />
             </div>
             
-            <h2 className="text-3xl font-black tracking-tighter italic mb-4 text-gray-900">Final Step!</h2>
-            <p className="text-gray-500 font-medium mb-10 leading-relaxed">
+            <h2 className="text-4xl font-extrabold tracking-tight mb-4 text-gray-900">Final Step!</h2>
+            <p className="text-gray-500 font-medium mb-10 leading-relaxed text-lg">
               Verify your email to unlock your dashboard and start using <span className="text-blue-600 font-bold uppercase">Inanst</span>. <br/>
-              <span className="text-gray-900 font-bold break-all underline decoration-blue-200">{user.email}</span>
+              <span className="text-gray-900 font-bold break-all underline decoration-blue-200 uppercase tracking-tighter">
+                {maskedEmail}
+              </span>
             </p>
 
             <div className="space-y-4">
               <button 
                 onClick={handleResend}
                 disabled={resending}
-                className="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-lg flex items-center justify-center gap-3 hover:bg-blue-700 transition active:scale-95 disabled:opacity-50 uppercase tracking-widest text-[10px]"
+                className="w-full bg-blue-600 text-white font-bold py-5 rounded-2xl shadow-lg flex items-center justify-center gap-3 hover:bg-blue-700 transition active:scale-95 disabled:opacity-50 uppercase tracking-widest text-xs"
               >
-                {resending ? <Loader2 className="animate-spin w-5 h-5" /> : <>Send me a new link <Send className="w-4 h-4" /></>}
+                {resending ? <Loader2 className="animate-spin w-5 h-5" /> : <>Send me a new link <Send className="w-4 h-4 rotate-45" /></>}
               </button>
               
               <div className="flex items-center justify-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest pt-4">
@@ -154,7 +156,31 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       )}
 
-      
+      {/* SUCCESS MODAL */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-white rounded-[3rem] p-10 max-w-sm w-full text-center shadow-2xl animate-in fade-in zoom-in duration-300">
+            <div className="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle2 className="w-10 h-10" />
+            </div>
+            
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">Check your Inbox!</h3>
+            <p className="text-gray-500 mb-8 leading-relaxed">
+              A verification link has been sent to <br />
+              <span className="font-semibold text-gray-800 tracking-tighter uppercase">{maskedEmail}</span>
+            </p>
+
+            <button
+              onClick={() => setShowSuccessModal(false)}
+              className="w-full bg-gray-900 text-white font-bold py-4 rounded-2xl hover:bg-black transition-colors"
+            >
+              Got it, thanks!
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && user.isVerified && (
         <div 
           className="fixed inset-0 bg-black/40 z-[40] md:hidden backdrop-blur-sm"
