@@ -3,9 +3,11 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { REST_API } from '../constant';
+import { useRouter } from 'next/navigation'; // Added for dashboard redirection
 
 export default function VerificationOverlay() {
   const { user, login } = useAuth();
+  const router = useRouter(); // Initialize router
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -29,7 +31,10 @@ export default function VerificationOverlay() {
       const data = await res.json();
 
       if (res.ok) {
-        login(data.token, data.user); 
+        // Update local auth state and redirect to dashboard
+        await login(data.token, data.user); 
+        router.push('/dashboard'); 
+        router.refresh(); 
       } else {
         setError(data.msg || "Invalid verification code");
       }
@@ -74,18 +79,20 @@ export default function VerificationOverlay() {
            </svg>
         </div>
 
-        <h2 className="text-4xl font-extrabold text-gray-900 mb-2">Check your email</h2>
+        <h2 className="text-4xl font-extrabold text-gray-900 mb-2">Verify Account</h2>
         <p className="text-gray-500 text-lg mb-1">Enter the 6-digit code sent to</p>
         <p className="font-bold text-gray-900 mb-8">{user?.email}</p>
 
         <form onSubmit={handleVerify} className="mb-6">
           <input 
             type="text"
+            inputMode="numeric"
             maxLength={6}
             placeholder="000000"
             value={code}
             onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} 
             className="w-full text-center text-4xl tracking-[12px] font-mono py-5 border-2 border-gray-100 rounded-2xl focus:border-blue-600 focus:ring-4 focus:ring-blue-50 focus:outline-none mb-4 transition-all"
+            autoFocus
           />
           
           {error && <p className="text-red-500 text-sm mb-4 font-bold">{error}</p>}
