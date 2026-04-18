@@ -7,7 +7,6 @@ import DashboardSidebar from './Components/DashboardSidebar';
 import DashboardHeader from './Components/DashboardHeader'; 
 import { useAuth } from '../context/AuthContext';
 import { REST_API } from '../constant';
-// Import the verification overlay component
 import VerificationOverlay from '../components/VerificationOverlay';
 
 interface AuthenticatedUser {
@@ -28,7 +27,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [resending, setResending] = useState(false);
-  // This state now controls the visibility of the 6-digit input modal
   const [showInputModal, setShowInputModal] = useState(false);
 
   const maskEmail = (email: string) => {
@@ -41,18 +39,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const maskedEmail = user?.email ? maskEmail(user.email) : "";
 
   useLayoutEffect(() => {
-    if (!loading) {
-      if (!user) {
-        router.replace('/signin');
-        return;
-      }
+   
+    if (loading || showInputModal) return;
 
-      const rolePath = `/${user.role}`;
-      if (!pathname.startsWith(rolePath)) {
-        router.replace(rolePath);
-      }
+    if (!user) {
+      router.replace('/signin');
+      return;
     }
-  }, [user, loading, pathname, router]);
+
+    const rolePath = `/${user.role}`;
+    
+    if (user.isVerified && !pathname.startsWith(rolePath)) {
+      router.replace(rolePath);
+    }
+  }, [user, loading, pathname, router, showInputModal]);
 
   useEffect(() => {
     setIsSidebarOpen(false);
@@ -70,7 +70,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       });
       
       if (response.ok) {
-        // Show the 6-digit code input modal instead of a simple success message
         setShowInputModal(true);
       } else {
         console.error("Failed to send verification email");
@@ -82,7 +81,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   };
 
-  const isAuthorized = user && pathname.startsWith(`/${user.role}`);
+  // Simplified authorization check to prevent blocking the UI during transition
+  const isAuthorized = user || loading;
 
   if (loading || !isAuthorized) {
     return (
@@ -101,10 +101,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="relative flex h-screen bg-[#f8fafc] overflow-hidden">
       
       <div className={`flex flex-1 h-full overflow-hidden transition-all duration-700 
-        ${!user.isVerified ? "blur-2xl grayscale pointer-events-none select-none opacity-40 scale-[0.98]" : ""}`}>
+        ${!user?.isVerified ? "blur-2xl grayscale pointer-events-none select-none opacity-40 scale-[0.98]" : ""}`}>
         
         <DashboardSidebar 
-          role={user.role} 
+          role={user?.role || "regular"} 
           isOpen={isSidebarOpen} 
           setIsOpen={setIsSidebarOpen} 
         />
@@ -112,7 +112,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="flex-1 flex flex-col overflow-hidden">
           <DashboardHeader 
             onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} 
-            role={user.role} 
+            role={user?.role || "regular"} 
           />
 
           <main className="flex-1 overflow-y-auto p-4 md:p-10">
@@ -124,7 +124,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
 
       {/* FINAL STEP OVERLAY CARD */}
-      {!user.isVerified && !showInputModal && (
+      {user && !user.isVerified && !showInputModal && (
         <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-[4px] flex items-center justify-center p-6">
           <div className="max-w-md w-full bg-white rounded-[3.5rem] shadow-2xl p-10 border border-gray-100 text-center animate-in fade-in zoom-in duration-500">
             <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
@@ -157,12 +157,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       )}
 
-      {/* 6-DIGIT CODE INPUT MODAL (Replaces Success Modal) */}
+      {/* 6 digit codes */}
       {showInputModal && (
         <VerificationOverlay />
       )}
 
-      {isSidebarOpen && user.isVerified && (
+      {isSidebarOpen && user?.isVerified && (
         <div 
           className="fixed inset-0 bg-black/40 z-[40] md:hidden backdrop-blur-sm"
           onClick={() => setIsSidebarOpen(false)}
