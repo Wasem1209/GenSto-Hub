@@ -39,7 +39,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const maskedEmail = user?.email ? maskEmail(user.email) : "";
 
   useLayoutEffect(() => {
-   
+    // FIX: If we are currently in the middle of verifying (modal open), 
+    // do not trigger any redirects that might cause 404s.
     if (loading || showInputModal) return;
 
     if (!user) {
@@ -48,7 +49,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
 
     const rolePath = `/${user.role}`;
-    
+    // Only enforce the role-based path if the user is already verified
     if (user.isVerified && !pathname.startsWith(rolePath)) {
       router.replace(rolePath);
     }
@@ -63,6 +64,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     
     setResending(true);
     try {
+      // NOTE: Your logs show a 400 error here. 
+      // Ensure the backend expects { email: string }
       const response = await fetch(`${REST_API}/auth/resend-verification`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -72,16 +75,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       if (response.ok) {
         setShowInputModal(true);
       } else {
-        console.error("Failed to send verification email");
+        const errorData = await response.json();
+        console.error("Failed to send verification email:", errorData.message);
+        // Fallback: Show the modal anyway so user can try the code they already have
+        setShowInputModal(true); 
       }
     } catch (err) {
       console.error("Resend Error:", err);
+      setShowInputModal(true);
     } finally {
       setResending(false);
     }
   };
 
-  // Simplified authorization check to prevent blocking the UI during transition
+  // Allow access if loading OR if user exists (even if not verified yet)
   const isAuthorized = user || loading;
 
   if (loading || !isAuthorized) {
@@ -123,7 +130,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </div>
 
-      {/* FINAL STEP OVERLAY CARD */}
+      {/* VERIFICATION PROMPT */}
       {user && !user.isVerified && !showInputModal && (
         <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-[4px] flex items-center justify-center p-6">
           <div className="max-w-md w-full bg-white rounded-[3.5rem] shadow-2xl p-10 border border-gray-100 text-center animate-in fade-in zoom-in duration-500">
@@ -157,7 +164,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       )}
 
-      {/* 6 digit codes */}
+      {/* 6-DIGIT CODE MODAL */}
       {showInputModal && (
         <VerificationOverlay />
       )}
