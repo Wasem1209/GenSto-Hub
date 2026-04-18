@@ -2,11 +2,13 @@
 
 import { useEffect, useState, useLayoutEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Loader2, MailCheck, Send, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { Loader2, MailCheck, Send, ShieldAlert } from 'lucide-react';
 import DashboardSidebar from './Components/DashboardSidebar';
 import DashboardHeader from './Components/DashboardHeader'; 
 import { useAuth } from '../context/AuthContext';
 import { REST_API } from '../constant';
+// Import the verification overlay component
+import VerificationOverlay from '../components/VerificationOverlay';
 
 interface AuthenticatedUser {
   id: string;
@@ -26,9 +28,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [resending, setResending] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  // This state now controls the visibility of the 6-digit input modal
+  const [showInputModal, setShowInputModal] = useState(false);
 
-  // Email Masking Helper: converts "example@gmail.com" to "ex*****@gmail.com"
   const maskEmail = (email: string) => {
     if (!email) return "";
     const [userPart, domain] = email.split("@");
@@ -47,7 +49,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       const rolePath = `/${user.role}`;
       if (!pathname.startsWith(rolePath)) {
-        console.warn(`Unauthorized access: ${pathname} for role ${user.role}`);
         router.replace(rolePath);
       }
     }
@@ -69,7 +70,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       });
       
       if (response.ok) {
-        setShowSuccessModal(true);
+        // Show the 6-digit code input modal instead of a simple success message
+        setShowInputModal(true);
       } else {
         console.error("Failed to send verification email");
       }
@@ -98,7 +100,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="relative flex h-screen bg-[#f8fafc] overflow-hidden">
       
-      {/* BLURRED BACKGROUND CONTENT */}
       <div className={`flex flex-1 h-full overflow-hidden transition-all duration-700 
         ${!user.isVerified ? "blur-2xl grayscale pointer-events-none select-none opacity-40 scale-[0.98]" : ""}`}>
         
@@ -123,7 +124,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
 
       {/* FINAL STEP OVERLAY CARD */}
-      {!user.isVerified && (
+      {!user.isVerified && !showInputModal && (
         <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-[4px] flex items-center justify-center p-6">
           <div className="max-w-md w-full bg-white rounded-[3.5rem] shadow-2xl p-10 border border-gray-100 text-center animate-in fade-in zoom-in duration-500">
             <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
@@ -134,8 +135,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <p className="text-gray-500 font-medium mb-10 leading-relaxed text-lg">
               Verify your email to unlock your dashboard and start using <span className="text-blue-600 font-bold uppercase">Inanst</span>. <br/>
               <span className="text-gray-900 font-bold break-all underline decoration-blue-200 tracking-tight">
-  {maskedEmail}
-</span>
+                {maskedEmail}
+              </span>
             </p>
 
             <div className="space-y-4">
@@ -156,31 +157,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       )}
 
-      {/* SUCCESS MODAL */}
-      {showSuccessModal && (
-        <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-white rounded-[3rem] p-10 max-w-sm w-full text-center shadow-2xl animate-in fade-in zoom-in duration-300">
-            <div className="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle2 className="w-10 h-10" />
-            </div>
-            
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">Check your Inbox!</h3>
-            <p className="text-gray-500 mb-8 leading-relaxed">
-              A verification link has been sent to <br />
-              <span className="font-semibold text-gray-800 tracking-tighter uppercase">{maskedEmail}</span>
-            </p>
-
-            <button
-              onClick={() => setShowSuccessModal(false)}
-              className="w-full bg-gray-900 text-white font-bold py-4 rounded-2xl hover:bg-black transition-colors"
-            >
-              Got it, thanks!
-            </button>
-          </div>
-        </div>
+      {/* 6-DIGIT CODE INPUT MODAL (Replaces Success Modal) */}
+      {showInputModal && (
+        <VerificationOverlay />
       )}
 
-      {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && user.isVerified && (
         <div 
           className="fixed inset-0 bg-black/40 z-[40] md:hidden backdrop-blur-sm"
