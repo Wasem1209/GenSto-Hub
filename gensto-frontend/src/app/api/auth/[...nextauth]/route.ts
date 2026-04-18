@@ -32,7 +32,6 @@ const handler = NextAuth({
                 const existingUser = await User.findOne({ email: user.email });
 
                 if (!existingUser) {
-                    // Create new Google user as already verified
                     await User.create({
                         name: user.name,
                         email: user.email,
@@ -41,8 +40,7 @@ const handler = NextAuth({
                         isVerified: true,
                     });
                 } else if (!existingUser.isVerified) {
-                    // If they previously signed up via email but didn't verify, 
-                    // logging in via Google verifies them automatically.
+
                     existingUser.isVerified = true;
                     await existingUser.save();
                 }
@@ -54,6 +52,7 @@ const handler = NextAuth({
         },
 
         async jwt({ token, user, trigger, session }) {
+            // Initial sign in
             if (user) {
                 await connectDB();
                 const dbUser = await User.findOne({ email: user.email });
@@ -63,10 +62,21 @@ const handler = NextAuth({
                     token.isVerified = dbUser.isVerified;
                 }
             }
-            // Allows manual session updates if needed
+
+            // Handle manual session updates 
             if (trigger === "update" && session?.user) {
                 return { ...token, ...session.user };
             }
+
+            // Periodic database check to keep verification status fresh
+            if (token.email && !token.isVerified) {
+                await connectDB();
+                const dbUser = await User.findOne({ email: token.email });
+                if (dbUser?.isVerified) {
+                    token.isVerified = true;
+                }
+            }
+
             return token;
         },
 
@@ -81,6 +91,7 @@ const handler = NextAuth({
     },
     pages: {
         signIn: '/signin',
+        error: '/auth/error',
     },
     secret: process.env.NEXTAUTH_SECRET,
 });
