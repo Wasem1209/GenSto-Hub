@@ -1,3 +1,8 @@
+//gensto-frontend/src/app/(dashboards)/layout.tsx
+
+
+
+
 'use client';
 
 import { useEffect, useState, useLayoutEffect } from 'react';

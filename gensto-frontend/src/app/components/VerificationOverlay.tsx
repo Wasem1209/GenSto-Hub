@@ -1,8 +1,11 @@
+//gensto-frontend/src/app/components/VerificationOverlay.tsx
+
+
 'use client';
 
 import React, { useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
-import { API_ROUTES } from '../constant'; // Removed REST_API from here
+import { API_ROUTES } from '../constant'; 
 import { useRouter } from 'next/navigation';
 
 export default function VerificationOverlay() {
