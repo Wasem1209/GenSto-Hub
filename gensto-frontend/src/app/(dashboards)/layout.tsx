@@ -84,7 +84,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
           <main className="flex-1 overflow-y-auto p-4 md:p-10">
             <div className="max-w-6xl mx-auto">
-              {children}
+             
+              {user?.isVerified ? children : (
+                <div className="flex flex-col items-center justify-center h-64 gap-4">
+                  <Loader2 className="w-10 h-10 animate-spin text-blue-500/30" />
+                  <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">
+                    Activation Required
+                  </p>
+                </div>
+              )}
             </div>
           </main>
         </div>

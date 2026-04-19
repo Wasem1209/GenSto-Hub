@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { REST_API } from '../constant';
 import { useRouter } from 'next/navigation';
+import { Loader2, CheckCircle2, ShieldCheck, Mail } from 'lucide-react';
 
 export default function VerificationOverlay() {
   const { user, login } = useAuth();
@@ -18,6 +19,11 @@ export default function VerificationOverlay() {
     e.preventDefault();
     if (code.length < 6) return setError("Please enter the 6-digit code");
     
+    // Safety check to ensure email is present for the backend
+    if (!user?.email) {
+      return setError("Session error: Please sign in again.");
+    }
+
     setVerifying(true);
     setError('');
     
@@ -25,44 +31,43 @@ export default function VerificationOverlay() {
       const res = await fetch(`${REST_API}/auth/verify-code`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: user?.email, code })
+        body: JSON.stringify({ email: user.email, code })
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        // 1. Update AuthContext state immediately
+       
         await login(data.token, data.user); 
-        // 2. Refresh the server-side props/session
+        
         router.refresh();
-        // 3. Move to dashboard
-        router.push('/dashboard'); 
       } else {
         setError(data.msg || "Invalid verification code");
       }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
-      setError("Server connection failed. Please check your internet.");
+      setError("Connection failed. Please check your internet.");
     } finally {
       setVerifying(false);
     }
   };
 
   const handleResend = async () => {
+    if (!user?.email) return;
     setLoading(true);
     setError('');
     try {
       const res = await fetch(`${REST_API}/auth/resend-verification`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: user?.email })
+        body: JSON.stringify({ email: user.email })
       });
 
       if (res.ok) {
         setShowModal(true);
       } else {
         const errorData = await res.json();
-        setError(errorData.msg || "Error resending email");
+        setError(errorData.msg || "Error resending code");
       }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
@@ -73,17 +78,15 @@ export default function VerificationOverlay() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-md px-4">
+    <div className="fixed inset-0 z-[110] flex items-center justify-center bg-gray-900/60 backdrop-blur-md px-4">
       <div className="bg-white rounded-[40px] p-10 max-w-lg w-full text-center shadow-2xl border border-gray-100 animate-in fade-in zoom-in duration-300">
         <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-8">
-           <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-           </svg>
+           <Mail className="w-10 h-10" />
         </div>
 
-        <h2 className="text-4xl font-extrabold text-gray-900 mb-2">Verify Account</h2>
+        <h2 className="text-4xl font-extrabold text-gray-900 mb-2 tracking-tight">Verify Account</h2>
         <p className="text-gray-500 text-lg mb-1">Enter the 6-digit code sent to</p>
-        <p className="font-bold text-gray-900 mb-8 truncate">{user?.email}</p>
+        <p className="font-bold text-gray-900 mb-8 truncate underline decoration-blue-200 decoration-2">{user?.email}</p>
 
         <form onSubmit={handleVerify} className="mb-6">
           <input 
@@ -98,14 +101,18 @@ export default function VerificationOverlay() {
             autoFocus
           />
           
-          {error && <p className="text-red-500 text-sm mb-4 font-bold">{error}</p>}
+          {error && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-xl mb-4 text-sm font-bold animate-pulse">
+              {error}
+            </div>
+          )}
 
           <button 
             type="submit"
             disabled={verifying || code.length < 6}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all active:scale-95 disabled:opacity-50 shadow-lg shadow-blue-100"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all active:scale-95 disabled:opacity-50 shadow-lg shadow-blue-100 flex items-center justify-center gap-2"
           >
-            {verifying ? "VERIFYING..." : "ACTIVATE ACCOUNT"}
+            {verifying ? <Loader2 className="w-5 h-5 animate-spin" /> : "ACTIVATE ACCOUNT"}
           </button>
         </form>
 
@@ -114,24 +121,23 @@ export default function VerificationOverlay() {
           disabled={loading}
           className="text-blue-600 hover:text-blue-800 font-bold py-2 transition-all flex items-center justify-center gap-2 mx-auto disabled:text-gray-400"
         >
-          {loading ? "Sending..." : "Resend code"}
+          {loading ? "Sending Code..." : "Resend code"}
         </button>
 
-        <p className="mt-8 text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center justify-center gap-2">
-          <span className="text-yellow-500 text-sm">🛡️</span> SECURE VERIFICATION
+        <p className="mt-8 text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center justify-center gap-2">
+          <ShieldCheck className="w-4 h-4 text-yellow-500" /> SECURE VERIFICATION
         </p>
       </div>
 
+      {/* Success Modal for Resend */}
       {showModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl animate-in zoom-in duration-200">
             <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-8 h-8">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-              </svg>
+              <CheckCircle2 className="w-8 h-8" />
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">Check Inbox</h3>
-            <p className="text-gray-500 mb-8 text-sm">A new verification code has been sent to your email.</p>
+            <p className="text-gray-500 mb-8 text-sm leading-relaxed">A new verification code has been sent to your email address.</p>
             <button
               onClick={() => setShowModal(false)}
               className="w-full bg-gray-900 text-white font-bold py-3 rounded-xl hover:bg-gray-800 transition-colors"
