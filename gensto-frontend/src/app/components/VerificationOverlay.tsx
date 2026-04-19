@@ -14,9 +14,18 @@ export default function VerificationOverlay() {
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
 
+  // Helper to restore the masked email display
+  const maskEmail = (email: string) => {
+    if (!email) return "your email";
+    const [userPart, domain] = email.split("@");
+    if (userPart.length <= 2) return `${userPart}***@${domain}`;
+    return `${userPart.substring(0, 2)}*****@${domain}`;
+  };
+
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     if (code.length < 6) return setError("Please enter the 6-digit code");
+    if (!user?.email) return setError("Session lost. Please sign in again.");
     
     setVerifying(true);
     setError('');
@@ -25,23 +34,19 @@ export default function VerificationOverlay() {
       const res = await fetch(`${REST_API}/auth/verify-code`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: user?.email, code })
+        body: JSON.stringify({ email: user.email, code })
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        // 1. Update AuthContext state immediately
         await login(data.token, data.user); 
-        // 2. Refresh the server-side props/session
         router.refresh();
-        // 3. Move to dashboard
-        router.push('/dashboard'); 
+        router.push(`/${data.user.role}`); 
       } else {
         setError(data.msg || "Invalid verification code");
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
+    } catch {
       setError("Server connection failed. Please check your internet.");
     } finally {
       setVerifying(false);
@@ -49,13 +54,14 @@ export default function VerificationOverlay() {
   };
 
   const handleResend = async () => {
+    if (!user?.email) return setError("Identity missing. Reload page.");
     setLoading(true);
     setError('');
     try {
       const res = await fetch(`${REST_API}/auth/resend-verification`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: user?.email })
+        body: JSON.stringify({ email: user.email })
       });
 
       if (res.ok) {
@@ -64,8 +70,7 @@ export default function VerificationOverlay() {
         const errorData = await res.json();
         setError(errorData.msg || "Error resending email");
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
+    } catch {
       setError("Failed to reach server.");
     } finally {
       setLoading(false);
@@ -73,7 +78,7 @@ export default function VerificationOverlay() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-md px-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-md px-4 text-gray-900">
       <div className="bg-white rounded-[40px] p-10 max-w-lg w-full text-center shadow-2xl border border-gray-100 animate-in fade-in zoom-in duration-300">
         <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-8">
            <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,20 +86,20 @@ export default function VerificationOverlay() {
            </svg>
         </div>
 
-        <h2 className="text-4xl font-extrabold text-gray-900 mb-2">Verify Account</h2>
+        <h2 className="text-4xl font-extrabold mb-2">Verify Account</h2>
         <p className="text-gray-500 text-lg mb-1">Enter the 6-digit code sent to</p>
-        <p className="font-bold text-gray-900 mb-8 truncate">{user?.email}</p>
+        {/* Masked Email Display Restored */}
+        <p className="font-bold mb-8 truncate text-blue-600">{maskEmail(user?.email || "")}</p>
 
         <form onSubmit={handleVerify} className="mb-6">
           <input 
             type="text"
             inputMode="numeric"
-            autoComplete="one-time-code"
             maxLength={6}
             placeholder="000000"
             value={code}
             onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} 
-            className="w-full text-center text-4xl tracking-[12px] font-mono py-5 border-2 border-gray-100 rounded-2xl focus:border-blue-600 focus:ring-4 focus:ring-blue-50 focus:outline-none mb-4 transition-all"
+            className="w-full text-center text-4xl tracking-[12px] font-mono py-5 border-2 border-gray-100 rounded-2xl focus:border-blue-600 focus:outline-none mb-4"
             autoFocus
           />
           
@@ -116,10 +121,6 @@ export default function VerificationOverlay() {
         >
           {loading ? "Sending..." : "Resend code"}
         </button>
-
-        <p className="mt-8 text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center justify-center gap-2">
-          <span className="text-yellow-500 text-sm">🛡️</span> SECURE VERIFICATION
-        </p>
       </div>
 
       {showModal && (
@@ -130,7 +131,7 @@ export default function VerificationOverlay() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Check Inbox</h3>
+            <h3 className="text-xl font-bold mb-2">Check Inbox</h3>
             <p className="text-gray-500 mb-8 text-sm">A new verification code has been sent to your email.</p>
             <button
               onClick={() => setShowModal(false)}

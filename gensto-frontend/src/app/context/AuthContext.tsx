@@ -26,7 +26,7 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   loading: boolean;
-  login: (token: string, user: User) => void;
+  login: (token: string, newUser: User) => void;
   logout: () => void;
   checkAuth: () => Promise<void>;
 }
@@ -34,13 +34,13 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  // Initialize state directly from localStorage to prevent UI "flicker" or "Session Lost" on refresh
   const [user, setUser] = useState<User | null>(() => {
     if (typeof window !== 'undefined') {
       const savedUser = localStorage.getItem('user_data');
       try {
         return savedUser ? JSON.parse(savedUser) : null;
       } catch { 
-        // Omitted the variable entirely to fix ESLint 'unused-vars'
         return null;
       }
     }
@@ -94,17 +94,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(mappedUser);
         localStorage.setItem('user_data', JSON.stringify(mappedUser));
       } else {
-        if (res.status === 401) {
+        // --- CRITICAL FIX: SENSITIVE ERROR HANDLING ---
+        // If the server rejects the token (401 or 404), check if we have unverified data locally.
+        if (res.status === 401 || res.status === 404) {
           const savedUser = localStorage.getItem('user_data');
           const parsedUser = savedUser ? (JSON.parse(savedUser) as User) : null;
           
+          // Only force a logout if the user was PREVIOUSLY verified.
+          // If they are unverified, we keep the local data so the verification screen works.
           if (!parsedUser || parsedUser.isVerified) {
              logout();
           }
         }
       }
     } catch (err) {
-      console.error("Connection to Auth API failed", err);
+      console.error("Auth server unreachable, relying on persistent local state.", err);
+      // We don't logout on network error to prevent kicking users out on poor Wi-Fi
     } finally {
       setLoading(false);
     }
