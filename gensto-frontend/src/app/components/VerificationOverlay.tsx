@@ -3,11 +3,11 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { REST_API } from '../constant';
-import { useRouter } from 'next/navigation'; // Added for dashboard redirection
+import { useRouter } from 'next/navigation';
 
 export default function VerificationOverlay() {
   const { user, login } = useAuth();
-  const router = useRouter(); // Initialize router
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -31,16 +31,18 @@ export default function VerificationOverlay() {
       const data = await res.json();
 
       if (res.ok) {
-        // Update local auth state and redirect to dashboard
+        // 1. Update AuthContext state immediately
         await login(data.token, data.user); 
+        // 2. Refresh the server-side props/session
+        router.refresh();
+        // 3. Move to dashboard
         router.push('/dashboard'); 
-        router.refresh(); 
       } else {
         setError(data.msg || "Invalid verification code");
       }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
-      setError("Server connection failed. Please try again.");
+      setError("Server connection failed. Please check your internet.");
     } finally {
       setVerifying(false);
     }
@@ -81,12 +83,13 @@ export default function VerificationOverlay() {
 
         <h2 className="text-4xl font-extrabold text-gray-900 mb-2">Verify Account</h2>
         <p className="text-gray-500 text-lg mb-1">Enter the 6-digit code sent to</p>
-        <p className="font-bold text-gray-900 mb-8">{user?.email}</p>
+        <p className="font-bold text-gray-900 mb-8 truncate">{user?.email}</p>
 
         <form onSubmit={handleVerify} className="mb-6">
           <input 
             type="text"
             inputMode="numeric"
+            autoComplete="one-time-code"
             maxLength={6}
             placeholder="000000"
             value={code}
@@ -109,7 +112,7 @@ export default function VerificationOverlay() {
         <button 
           onClick={handleResend}
           disabled={loading}
-          className="text-blue-600 hover:text-blue-800 font-bold py-2 transition-all flex items-center justify-center gap-2 mx-auto"
+          className="text-blue-600 hover:text-blue-800 font-bold py-2 transition-all flex items-center justify-center gap-2 mx-auto disabled:text-gray-400"
         >
           {loading ? "Sending..." : "Resend code"}
         </button>
