@@ -9,15 +9,18 @@ export const REST_API = (() => {
     return url;
 })();
 
-
-//api routes
-
+// api routes
 export const API_ROUTES = {
     SIGNUP: `${REST_API}/auth/register`,
     SIGNIN: `${REST_API}/auth/login`,
     VERIFY_OTP: `${REST_API}/auth/verify-code`,
-    RESEND_OTP: `${REST_API}/auth/resend-otp`,
-    PROFILE: `${REST_API}/profile`,
+
+    //  'resend-verification' 
+    RESEND_OTP: `${REST_API}/auth/resend-verification`,
+
+    //  '/profile' to '
+    PROFILE: `${REST_API}/auth/me`,
+
     NEWSLETTER: `${REST_API}/newsletter/subscribe`,
     CONTACT: `${REST_API}/contact`,
 };
