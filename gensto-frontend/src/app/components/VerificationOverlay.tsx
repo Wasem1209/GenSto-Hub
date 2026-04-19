@@ -1,26 +1,39 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { REST_API } from '../constant';
 import { useRouter } from 'next/navigation';
 import { Loader2, CheckCircle2, ShieldCheck, Mail } from 'lucide-react';
 
 export default function VerificationOverlay() {
-  const { user, login } = useAuth();
+  // Pulling 'loading' from AuthContext to sync with checkAuth()
+  const { user, login, loading: authLoading } = useAuth();
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [verifying, setVerifying] = useState(false);
+  
+  const [loading, setLoading] = useState(false); // For resend button
+  const [verifying, setVerifying] = useState(false); // For submit button
   const [showModal, setShowModal] = useState(false);
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
 
+  // Automatically clear error if the user object finally loads
+  useEffect(() => {
+    if (!authLoading && user?.email) {
+      setError('');
+    }
+  }, [user, authLoading]);
+
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Safety check: Don't proceed if Context is still loading the session
+    if (authLoading) return;
+    
     if (code.length < 6) return setError("Please enter the 6-digit code");
     
-    // Safety check to ensure email is present for the backend
     if (!user?.email) {
+      console.error("Verification failed: No user email found in AuthContext.");
       return setError("Session error: Please sign in again.");
     }
 
@@ -28,6 +41,8 @@ export default function VerificationOverlay() {
     setError('');
     
     try {
+      console.log("Attempting verification for:", user.email);
+      
       const res = await fetch(`${REST_API}/auth/verify-code`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -35,17 +50,16 @@ export default function VerificationOverlay() {
       });
 
       const data = await res.json();
+      console.log("Server Response:", data);
 
       if (res.ok) {
-       
         await login(data.token, data.user); 
-        
         router.refresh();
       } else {
         setError(data.msg || "Invalid verification code");
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
+      console.error("Network/Server Error:", err);
       setError("Connection failed. Please check your internet.");
     } finally {
       setVerifying(false);
@@ -53,7 +67,7 @@ export default function VerificationOverlay() {
   };
 
   const handleResend = async () => {
-    if (!user?.email) return;
+    if (!user?.email) return setError("Cannot resend: Session lost.");
     setLoading(true);
     setError('');
     try {
@@ -77,6 +91,18 @@ export default function VerificationOverlay() {
     }
   };
 
+  // If the AuthProvider is still running checkAuth(), show a skeleton or loader
+  if (authLoading) {
+    return (
+      <div className="fixed inset-0 z-[110] flex items-center justify-center bg-gray-900/60 backdrop-blur-md">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-12 h-12 animate-spin text-white" />
+          <p className="text-white text-sm font-bold animate-pulse">RESTORING SESSION...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center bg-gray-900/60 backdrop-blur-md px-4">
       <div className="bg-white rounded-[40px] p-10 max-w-lg w-full text-center shadow-2xl border border-gray-100 animate-in fade-in zoom-in duration-300">
@@ -86,7 +112,9 @@ export default function VerificationOverlay() {
 
         <h2 className="text-4xl font-extrabold text-gray-900 mb-2 tracking-tight">Verify Account</h2>
         <p className="text-gray-500 text-lg mb-1">Enter the 6-digit code sent to</p>
-        <p className="font-bold text-gray-900 mb-8 truncate underline decoration-blue-200 decoration-2">{user?.email}</p>
+        <p className="font-bold text-gray-900 mb-8 truncate underline decoration-blue-200 decoration-2">
+          {user?.email || "your email"}
+        </p>
 
         <form onSubmit={handleVerify} className="mb-6">
           <input 
@@ -102,7 +130,7 @@ export default function VerificationOverlay() {
           />
           
           {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-xl mb-4 text-sm font-bold animate-pulse">
+            <div className="bg-red-50 text-red-600 p-3 rounded-xl mb-4 text-sm font-bold animate-shake">
               {error}
             </div>
           )}

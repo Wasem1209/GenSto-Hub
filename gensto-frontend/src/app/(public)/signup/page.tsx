@@ -1,4 +1,3 @@
-// gensto-frontend/src/app/(public)/signup/page.tsx
 'use client';
 import { useState, FormEvent, useEffect, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
@@ -41,11 +40,12 @@ export default function SignUp() {
     confirmPassword: '' 
   });
 
+  // Updated special character regex to include more symbols
   const passwordRequirements = useMemo(() => ({
     length: formData.password.length >= 8,
     uppercase: /[A-Z]/.test(formData.password),
     number: /\d/.test(formData.password),
-    special: /[@$!%*?&]/.test(formData.password),
+    special: /[!@#$%^&*(),.?":{}|<>]/.test(formData.password),
   }), [formData.password]);
 
   useEffect(() => {
@@ -61,7 +61,6 @@ export default function SignUp() {
 
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
-      setShowErrorModal(true);
       return;
     }
 
@@ -85,10 +84,7 @@ export default function SignUp() {
       const data = await res.json();
       
       if (res.ok) {
-        // Log the user in immediately so they can see the dashboard (even if unverified)
         login(data.token, data.user);
-        
-        // Redirect to dashboard immediately 
         router.push(data.user.role === 'regular' ? '/regular' : `/${data.user.role}`);
       } else {
         setError(data.msg || 'Registration failed');
@@ -227,7 +223,7 @@ export default function SignUp() {
               placeholder="Password" 
               onChange={(e) => setFormData({...formData, password: e.target.value})} 
             />
-            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 focus:outline-none">
               {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
           </div>
@@ -241,16 +237,23 @@ export default function SignUp() {
               placeholder="Confirm Password" 
               onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})} 
             />
-            <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+            <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 focus:outline-none">
               {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
           </div>
+
+          {/* Password Mismatch Error Paragraph */}
+          {formData.confirmPassword && formData.password !== formData.confirmPassword && (
+            <p className="text-[10px] text-red-500 font-bold uppercase tracking-tight px-2 animate-pulse">
+              Passwords do not match
+            </p>
+          )}
 
           <div className="px-2 grid grid-cols-2 gap-y-1.5 gap-x-4">
             <RequirementItem label="8+ Characters" met={passwordRequirements.length} />
             <RequirementItem label="An Uppercase" met={passwordRequirements.uppercase} />
             <RequirementItem label="A Number" met={passwordRequirements.number} />
-            <RequirementItem label="A Symbol (@$!)" met={passwordRequirements.special} />
+            <RequirementItem label="Special Character" met={passwordRequirements.special} />
           </div>
 
           <button disabled={loading} className="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition active:scale-95 disabled:opacity-50 uppercase tracking-widest text-xs">
