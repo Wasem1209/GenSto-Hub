@@ -40,7 +40,6 @@ export default function SignUp() {
     confirmPassword: '' 
   });
 
-  // Updated special character regex to include more symbols
   const passwordRequirements = useMemo(() => ({
     length: formData.password.length >= 8,
     uppercase: /[A-Z]/.test(formData.password),
@@ -149,6 +148,13 @@ export default function SignUp() {
 
   return (
     <div className="min-h-screen mt-14 bg-gray-50 flex items-center justify-center p-4 pt-24 font-sans text-gray-900">
+      <style jsx global>{`
+        /* Fix for double eye icon on some browsers */
+        input::-ms-reveal,
+        input::-ms-clear {
+          display: none;
+        }
+      `}</style>
       <div className="w-full max-w-md bg-white rounded-[1.5rem] shadow-xl p-6 sm:p-10 border border-gray-100">
         <div className="text-center mb-8">
           <h1 className="text-2xl sm:text-3xl font-black italic tracking-tighter text-gray-900">Create Account</h1>
@@ -163,7 +169,7 @@ export default function SignUp() {
             onClick={() => signIn('google', { callbackUrl: '/' })} 
             className="w-full flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition font-bold text-[9px] text-gray-600 tracking-widest uppercase"
           >
-            <img src="https://www.svgrepo.com/show/355037/google.svg" className="w-4 h-4" alt="Google" /> CONTINUE WITH GOOGLE
+            <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" className="w-4 h-4" alt="Google" /> CONTINUE WITH GOOGLE
           </button>
         </div>
 
@@ -219,11 +225,11 @@ export default function SignUp() {
             <input 
               required 
               type={showPassword ? "text" : "password"} 
-              className="w-full pl-12 pr-12 py-3 rounded-xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 transition text-sm" 
+              className="w-full pl-12 pr-12 py-3 rounded-xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 transition text-sm appearance-none" 
               placeholder="Password" 
               onChange={(e) => setFormData({...formData, password: e.target.value})} 
             />
-            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 focus:outline-none">
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none z-20">
               {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
           </div>
@@ -233,16 +239,15 @@ export default function SignUp() {
             <input 
               required 
               type={showConfirmPassword ? "text" : "password"} 
-              className="w-full pl-12 pr-12 py-3 rounded-xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 transition text-sm" 
+              className="w-full pl-12 pr-12 py-3 rounded-xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 transition text-sm appearance-none" 
               placeholder="Confirm Password" 
               onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})} 
             />
-            <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 focus:outline-none">
+            <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none z-20">
               {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
           </div>
 
-          {/* Password Mismatch Error Paragraph */}
           {formData.confirmPassword && formData.password !== formData.confirmPassword && (
             <p className="text-[10px] text-red-500 font-bold uppercase tracking-tight px-2 animate-pulse">
               Passwords do not match
