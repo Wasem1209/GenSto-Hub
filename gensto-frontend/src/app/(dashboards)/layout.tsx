@@ -1,9 +1,229 @@
-//gensto-frontend/src/app/(dashboards)/layout.tsx
-
-
-
 
 'use client';
+
+import { useState, useLayoutEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { Loader2, Mail, CheckCircle2 } from 'lucide-react';
+import DashboardSidebar from './Components/DashboardSidebar';
+import DashboardHeader from './Components/DashboardHeader'; 
+import { useAuth } from '../context/AuthContext';
+import { API_ROUTES } from '../constant';
+
+interface AuthenticatedUser {
+  id: string;
+  email: string;
+  role: "regular" | "admins" | "instructors" | "workers";
+  isVerified: boolean;
+  name?: string;
+}
+
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const { user: authUser, loading: authLoading, login } = useAuth();
+  const user = authUser as unknown as AuthenticatedUser;
+  const router = useRouter();
+  const pathname = usePathname();
+
+  // Component States
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [code, setCode] = useState('');
+  const [error, setError] = useState('');
+
+  const isUnverified = user && !user.isVerified;
+
+  // Mask Email Helper
+  const maskEmail = (email: string) => {
+    if (!email) return "your email";
+    const [userPart, domain] = email.split("@");
+    return userPart.length <= 2 ? `${userPart}***@${domain}` : `${userPart.substring(0, 2)}*****@${domain}`;
+  };
+
+  // 1. Redirect Logic
+  useLayoutEffect(() => {
+    if (authLoading) return;
+    
+    if (!user) {
+      router.replace('/signin');
+      return;
+    }
+
+    if (user.isVerified) {
+      const rolePath = `/${user.role}`;
+      if (!pathname.startsWith(rolePath)) {
+        router.replace(rolePath);
+      }
+    }
+  }, [user, authLoading, pathname, router]);
+
+  // 2. Verification Logic
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (code.length < 6) return setError("Enter 6-digit code");
+    
+    setVerifying(true);
+    setError('');
+    
+    try {
+      const res = await fetch(API_ROUTES.VERIFY_OTP, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user.email, code })
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        await login(data.token, data.user);
+        router.refresh();
+      } else {
+        setError(data.msg || "Invalid code");
+      }
+    } catch {
+      setError("Server error. Check connection.");
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const handleResend = async () => {
+    setResending(true);
+    setError('');
+    try {
+      const res = await fetch(API_ROUTES.RESEND_OTP, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user.email })
+      });
+      if (res.ok) {
+        setShowSuccessModal(true);
+      } else {
+        setError("Failed to resend");
+      }
+    } catch {
+      setError("Server unreachable");
+    } finally {
+      setResending(false);
+    }
+  };
+
+  // Initial Loading state
+  if (authLoading || (!user && !authLoading)) {
+    return (
+      <div className="h-screen w-full bg-black flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="text-blue-500 animate-spin w-10 h-10" />
+          <p className="text-gray-400 text-xs font-bold uppercase tracking-widest animate-pulse">
+            Authenticating...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative flex h-screen bg-[#f8fafc] overflow-hidden">
+      {/* Main Dashboard UI - Blurred if not verified */}
+      <div className={`flex flex-1 h-full overflow-hidden transition-all duration-700 
+        ${isUnverified ? "blur-2xl grayscale opacity-40 pointer-events-none select-none" : ""}`}>
+        
+        <DashboardSidebar 
+          role={user?.role} 
+          isOpen={isSidebarOpen} 
+          setIsOpen={setIsSidebarOpen} 
+        />
+        
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <DashboardHeader 
+            onMenuClick={() => setIsSidebarOpen(true)} 
+            role={user?.role} 
+          />
+          <main className="flex-1 overflow-y-auto p-4 md:p-10">
+            <div className="max-w-6xl mx-auto">
+              {children}
+            </div>
+          </main>
+        </div>
+      </div>
+
+      {/* Verification Overlay UI */}
+      {isUnverified && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-md px-4 text-gray-900">
+          <div className="bg-white rounded-[40px] p-10 max-w-lg w-full text-center shadow-2xl border border-gray-100 animate-in fade-in zoom-in duration-300">
+            <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-8">
+              <Mail className="w-10 h-10" />
+            </div>
+
+            <h2 className="text-4xl font-extrabold mb-2">Verify Account</h2>
+            <p className="text-gray-500 text-lg mb-1">Enter the 6-digit code sent to</p>
+            <p className="font-bold mb-8 truncate text-blue-600">{maskEmail(user.email)}</p>
+            
+            <form onSubmit={handleVerify} className="mb-6">
+              <input 
+                type="text" 
+                inputMode="numeric"
+                maxLength={6} 
+                value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+                className="w-full text-center text-4xl tracking-[12px] font-mono py-5 border-2 border-gray-100 rounded-2xl focus:border-blue-600 focus:outline-none mb-4"
+                placeholder="000000"
+                autoFocus
+              />
+              
+              {error && <p className="text-red-500 font-bold mb-4 text-sm">{error}</p>}
+              
+              <button 
+                type="submit"
+                disabled={verifying || code.length < 6}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all active:scale-95 disabled:opacity-50 shadow-lg shadow-blue-100"
+              >
+                {verifying ? "VERIFYING..." : "ACTIVATE ACCOUNT"}
+              </button>
+            </form>
+
+            <button 
+              onClick={handleResend} 
+              disabled={resending} 
+              className="text-blue-600 hover:text-blue-800 font-bold py-2 transition-all disabled:text-gray-400"
+            >
+              {resending ? "Sending code..." : "Resend code"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Success Modal for Resend */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl animate-in fade-in zoom-in duration-200">
+            <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle2 className="w-8 h-8" strokeWidth={3} />
+            </div>
+            <h3 className="text-xl font-bold mb-2 text-gray-900">Check Inbox</h3>
+            <p className="text-gray-500 mb-8 text-sm">A new verification code has been sent to your email.</p>
+            <button 
+              onClick={() => setShowSuccessModal(false)} 
+              className="w-full bg-gray-900 text-white font-bold py-3 rounded-xl hover:bg-gray-800 transition-colors"
+            >
+              Okay
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+
+
+
+
+
+
+
+/* 'use client';
 
 import { useEffect, useState, useLayoutEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
@@ -71,7 +291,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="relative flex h-screen bg-[#f8fafc] overflow-hidden">
       
-      {/* Dashboard Content - Blurred if not verified */}
+     
       <div className={`flex flex-1 h-full overflow-hidden transition-all duration-700 
         ${showVerification ? "blur-2xl grayscale pointer-events-none select-none opacity-40 scale-[0.98]" : ""}`}>
         
@@ -103,7 +323,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </div>
 
-      {/* SINGLE UNIFIED VERIFICATION MODAL */}
+      
       {showVerification && (
         <VerificationOverlay />
       )}
@@ -117,3 +337,4 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </div>
   );
 }
+  */
