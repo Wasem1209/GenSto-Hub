@@ -3,11 +3,22 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { API_ROUTES } from '../constant'; 
 
+// Matches your Backend UserSchema exactly
+interface BackendUser {
+  _id: string;
+  name: string;
+  email: string;
+  role: "regular" | "instructors" | "workers" | "admins";
+  isVerified: boolean;
+  phone?: string;
+  country?: string;
+}
+
 interface User {
   id: string;
   name: string;
   email: string;
-  role: "regular" | "admins" | "instructors" | "workers";
+  role: "regular" | "instructors" | "workers" | "admins";
   isVerified: boolean; 
 }
 
@@ -43,26 +54,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     try {
-      
       const res = await fetch(API_ROUTES.PROFILE, {
-        headers: { Authorization: `Bearer ${storedToken}` },
+        headers: { 
+          'Authorization': `Bearer ${storedToken}`,
+          'Content-Type': 'application/json'
+        },
       });
 
       if (res.ok) {
-        const userData = await res.json();
+        const userData: BackendUser = await res.json();
         setToken(storedToken);
+        
         setUser({
-          ...userData,
-          id: userData._id || userData.id,
+          id: userData._id,
+          name: userData.name, // Matches 'name' in your UserSchema
+          email: userData.email,
+          role: userData.role,
+          isVerified: userData.isVerified,
         });
       } else {
-        
+        // Log details to help you see if it's a 404 (Route) or 401 (Token)
+        console.warn(`Auth failed: Status ${res.status} at ${API_ROUTES.PROFILE}`);
         logout();
       }
     } catch (err) {
-      console.error("Auth verification failed:", err);
-      
-      setLoading(false);
+      const error = err as Error;
+      console.error("Connection to Auth API failed:", error.message);
+      setLoading(false); 
     } finally {
       setLoading(false);
     }
