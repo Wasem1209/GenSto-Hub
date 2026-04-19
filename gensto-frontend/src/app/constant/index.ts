@@ -1,4 +1,4 @@
-///index.ts
+//index.ts
 
 export const REST_API = (() => {
     let url = process.env.NEXT_PUBLIC_REST_API || "https://inanst-b.onrender.com";

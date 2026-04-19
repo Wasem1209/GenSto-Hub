@@ -2,22 +2,28 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
-import { REST_API } from '../constant';
+import { API_ROUTES } from '../constant'; // Using the routes constant
 import { useRouter } from 'next/navigation';
-import { Loader2, CheckCircle2, ShieldCheck, Mail } from 'lucide-react';
+import { Loader2, CheckCircle2, ShieldCheck, Mail, RefreshCcw } from 'lucide-react';
 
 export default function VerificationOverlay() {
-  // Pulling 'loading' from AuthContext to sync with checkAuth()
   const { user, login, loading: authLoading } = useAuth();
   const router = useRouter();
   
-  const [loading, setLoading] = useState(false); // For resend button
-  const [verifying, setVerifying] = useState(false); // For submit button
+  const [loading, setLoading] = useState(false); 
+  const [verifying, setVerifying] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
+  const [resendTimer, setResendTimer] = useState(0);
 
-  // Automatically clear error if the user object finally loads
+  useEffect(() => {
+    if (resendTimer > 0) {
+      const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendTimer]);
+
   useEffect(() => {
     if (!authLoading && user?.email) {
       setError('');
@@ -26,14 +32,10 @@ export default function VerificationOverlay() {
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Safety check: Don't proceed if Context is still loading the session
     if (authLoading) return;
-    
     if (code.length < 6) return setError("Please enter the 6-digit code");
     
     if (!user?.email) {
-      console.error("Verification failed: No user email found in AuthContext.");
       return setError("Session error: Please sign in again.");
     }
 
@@ -41,16 +43,13 @@ export default function VerificationOverlay() {
     setError('');
     
     try {
-      console.log("Attempting verification for:", user.email);
-      
-      const res = await fetch(`${REST_API}/auth/verify-code`, {
+      const res = await fetch(API_ROUTES.VERIFY_OTP, { // Updated to API_ROUTES
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: user.email, code })
       });
 
       const data = await res.json();
-      console.log("Server Response:", data);
 
       if (res.ok) {
         await login(data.token, data.user); 
@@ -58,8 +57,8 @@ export default function VerificationOverlay() {
       } else {
         setError(data.msg || "Invalid verification code");
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
-      console.error("Network/Server Error:", err);
       setError("Connection failed. Please check your internet.");
     } finally {
       setVerifying(false);
@@ -67,11 +66,13 @@ export default function VerificationOverlay() {
   };
 
   const handleResend = async () => {
+    if (resendTimer > 0) return;
     if (!user?.email) return setError("Cannot resend: Session lost.");
+    
     setLoading(true);
     setError('');
     try {
-      const res = await fetch(`${REST_API}/auth/resend-verification`, {
+      const res = await fetch(API_ROUTES.RESEND_OTP, { // Updated to API_ROUTES
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: user.email })
@@ -79,6 +80,7 @@ export default function VerificationOverlay() {
 
       if (res.ok) {
         setShowModal(true);
+        setResendTimer(60); 
       } else {
         const errorData = await res.json();
         setError(errorData.msg || "Error resending code");
@@ -91,13 +93,12 @@ export default function VerificationOverlay() {
     }
   };
 
-  // If the AuthProvider is still running checkAuth(), show a skeleton or loader
   if (authLoading) {
     return (
       <div className="fixed inset-0 z-[110] flex items-center justify-center bg-gray-900/60 backdrop-blur-md">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-12 h-12 animate-spin text-white" />
-          <p className="text-white text-sm font-bold animate-pulse">RESTORING SESSION...</p>
+          <p className="text-white text-[10px] font-black tracking-widest animate-pulse uppercase">Restoring Session</p>
         </div>
       </div>
     );
@@ -105,32 +106,32 @@ export default function VerificationOverlay() {
 
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center bg-gray-900/60 backdrop-blur-md px-4">
-      <div className="bg-white rounded-[40px] p-10 max-w-lg w-full text-center shadow-2xl border border-gray-100 animate-in fade-in zoom-in duration-300">
-        <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-8">
-           <Mail className="w-10 h-10" />
+      {/* Reduced size: max-w-md and smaller padding (p-6) */}
+      <div className="bg-white rounded-[32px] p-6 sm:p-8 max-w-md w-full text-center shadow-2xl border border-gray-100 animate-in fade-in zoom-in duration-300">
+        <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+           <Mail className="w-8 h-8" />
         </div>
 
-        <h2 className="text-4xl font-extrabold text-gray-900 mb-2 tracking-tight">Verify Account</h2>
-        <p className="text-gray-500 text-lg mb-1">Enter the 6-digit code sent to</p>
-        <p className="font-bold text-gray-900 mb-8 truncate underline decoration-blue-200 decoration-2">
+        <h2 className="text-2xl sm:text-3xl font-black text-gray-900 mb-1 tracking-tighter italic uppercase">Verify</h2>
+        <p className="text-gray-400 text-[10px] font-bold mb-1 uppercase tracking-[2px]">Enter the code sent to</p>
+        <p className="font-bold text-gray-900 text-xs mb-6 truncate underline decoration-blue-200 decoration-2">
           {user?.email || "your email"}
         </p>
 
-        <form onSubmit={handleVerify} className="mb-6">
+        <form onSubmit={handleVerify} className="mb-4">
           <input 
             type="text"
             inputMode="numeric"
-            autoComplete="one-time-code"
             maxLength={6}
             placeholder="000000"
             value={code}
             onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} 
-            className="w-full text-center text-4xl tracking-[12px] font-mono py-5 border-2 border-gray-100 rounded-2xl focus:border-blue-600 focus:ring-4 focus:ring-blue-50 focus:outline-none mb-4 transition-all"
+            className="w-full text-center text-3xl tracking-[8px] font-black py-4 border-2 border-gray-100 rounded-xl focus:border-blue-600 focus:ring-4 focus:ring-blue-50 focus:outline-none mb-3 transition-all bg-gray-50"
             autoFocus
           />
           
           {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-xl mb-4 text-sm font-bold animate-shake">
+            <div className="bg-red-50 text-red-600 p-2 rounded-lg mb-3 text-[9px] font-black uppercase tracking-widest">
               {error}
             </div>
           )}
@@ -138,37 +139,38 @@ export default function VerificationOverlay() {
           <button 
             type="submit"
             disabled={verifying || code.length < 6}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all active:scale-95 disabled:opacity-50 shadow-lg shadow-blue-100 flex items-center justify-center gap-2"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-3.5 rounded-xl transition-all active:scale-95 disabled:opacity-50 shadow-lg shadow-blue-100 flex items-center justify-center gap-2 uppercase tracking-widest text-[11px]"
           >
-            {verifying ? <Loader2 className="w-5 h-5 animate-spin" /> : "ACTIVATE ACCOUNT"}
+            {verifying ? <Loader2 className="w-4 h-4 animate-spin" /> : "Verify Now"}
           </button>
         </form>
 
         <button 
           onClick={handleResend}
-          disabled={loading}
-          className="text-blue-600 hover:text-blue-800 font-bold py-2 transition-all flex items-center justify-center gap-2 mx-auto disabled:text-gray-400"
+          disabled={loading || resendTimer > 0}
+          className="text-blue-600 hover:text-blue-800 font-black py-1 transition-all flex items-center justify-center gap-2 mx-auto disabled:text-gray-300 text-[9px] uppercase tracking-widest"
         >
-          {loading ? "Sending Code..." : "Resend code"}
+          {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCcw className="w-2.5 h-2.5" />}
+          {resendTimer > 0 ? `Resend in ${resendTimer}s` : "Resend code"}
         </button>
 
-        <p className="mt-8 text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center justify-center gap-2">
-          <ShieldCheck className="w-4 h-4 text-yellow-500" /> SECURE VERIFICATION
+        <p className="mt-6 text-[9px] font-black text-gray-300 uppercase tracking-widest flex items-center justify-center gap-1.5">
+          <ShieldCheck className="w-3.5 h-3.5 text-green-500" /> Secure SSL
         </p>
       </div>
 
-      {/* Success Modal for Resend */}
+      {/* Internal Success Modal is also smaller */}
       {showModal && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl animate-in zoom-in duration-200">
-            <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle2 className="w-8 h-8" />
+          <div className="bg-white rounded-[1.5rem] p-6 max-w-[280px] w-full text-center shadow-2xl animate-in zoom-in duration-200">
+            <div className="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Check Inbox</h3>
-            <p className="text-gray-500 mb-8 text-sm leading-relaxed">A new verification code has been sent to your email address.</p>
+            <h3 className="text-lg font-black text-gray-900 mb-1 uppercase tracking-tighter">Sent!</h3>
+            <p className="text-gray-400 mb-6 text-[10px] font-bold uppercase">Check your inbox.</p>
             <button
               onClick={() => setShowModal(false)}
-              className="w-full bg-gray-900 text-white font-bold py-3 rounded-xl hover:bg-gray-800 transition-colors"
+              className="w-full bg-gray-900 text-white font-black py-2.5 rounded-lg hover:bg-gray-800 transition-colors uppercase tracking-widest text-[9px]"
             >
               Okay
             </button>

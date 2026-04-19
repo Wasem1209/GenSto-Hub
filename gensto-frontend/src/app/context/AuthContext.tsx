@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { REST_API } from '../constant';
+import { API_ROUTES } from '../constant'; 
 
 interface User {
   id: string;
@@ -37,14 +37,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const checkAuth = useCallback(async () => {
     const storedToken = localStorage.getItem('token');
     
-    // If no token, we aren't logged in via email/password
     if (!storedToken) {
       setLoading(false);
       return;
     }
 
     try {
-      const res = await fetch(`${REST_API}/auth/me`, {
+      
+      const res = await fetch(API_ROUTES.PROFILE, {
         headers: { Authorization: `Bearer ${storedToken}` },
       });
 
@@ -56,11 +56,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           id: userData._id || userData.id,
         });
       } else {
+        
         logout();
       }
     } catch (err) {
-      console.error("Auth verification failed", err);
-      logout();
+      console.error("Auth verification failed:", err);
+      
+      setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -70,11 +72,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     checkAuth();
   }, [checkAuth]);
 
-  const login = (newToken: string, newUser: User) => {
+  const login = useCallback((newToken: string, newUser: User) => {
     localStorage.setItem('token', newToken);
     setToken(newToken);
     setUser(newUser);
-  };
+    setLoading(false); 
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, token, loading, login, logout, checkAuth }}>
