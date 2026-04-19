@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
-import { REST_API } from '../constant';
+import { API_ROUTES } from '../constant'; // Removed REST_API from here
 import { useRouter } from 'next/navigation';
 
 export default function VerificationOverlay() {
@@ -31,7 +31,8 @@ export default function VerificationOverlay() {
     setError('');
     
     try {
-      const res = await fetch(`${REST_API}/auth/verify-code`, {
+      // Correctly using API_ROUTES constant
+      const res = await fetch(API_ROUTES.VERIFY_OTP, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: user.email, code })
@@ -58,7 +59,8 @@ export default function VerificationOverlay() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch(`${REST_API}/auth/resend-verification`, {
+      // Correctly using API_ROUTES constant
+      const res = await fetch(API_ROUTES.RESEND_OTP, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: user.email })
@@ -88,7 +90,6 @@ export default function VerificationOverlay() {
 
         <h2 className="text-4xl font-extrabold mb-2">Verify Account</h2>
         <p className="text-gray-500 text-lg mb-1">Enter the 6-digit code sent to</p>
-        {/* Masked Email Display Restored */}
         <p className="font-bold mb-8 truncate text-blue-600">{maskEmail(user?.email || "")}</p>
 
         <form onSubmit={handleVerify} className="mb-6">

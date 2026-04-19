@@ -34,7 +34,6 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  // Initialize state directly from localStorage to prevent UI "flicker" or "Session Lost" on refresh
   const [user, setUser] = useState<User | null>(() => {
     if (typeof window !== 'undefined') {
       const savedUser = localStorage.getItem('user_data');
@@ -94,22 +93,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(mappedUser);
         localStorage.setItem('user_data', JSON.stringify(mappedUser));
       } else {
-        // --- CRITICAL FIX: SENSITIVE ERROR HANDLING ---
-        // If the server rejects the token (401 or 404), check if we have unverified data locally.
+        // --- IMPROVED LOGIC FOR UNVERIFIED USERS ---
+        const savedUser = localStorage.getItem('user_data');
+        const parsedUser = savedUser ? (JSON.parse(savedUser) as User) : null;
+
+        // If user is NOT verified, DO NOT logout on 401 or 404.
+        // We stay in the "verification" state.
+        if (parsedUser && parsedUser.isVerified === false) {
+           setLoading(false);
+           return;
+        }
+
+        // Only logout if they were supposed to be active or data is missing.
         if (res.status === 401 || res.status === 404) {
-          const savedUser = localStorage.getItem('user_data');
-          const parsedUser = savedUser ? (JSON.parse(savedUser) as User) : null;
-          
-          // Only force a logout if the user was PREVIOUSLY verified.
-          // If they are unverified, we keep the local data so the verification screen works.
-          if (!parsedUser || parsedUser.isVerified) {
-             logout();
-          }
+           logout();
         }
       }
     } catch (err) {
-      console.error("Auth server unreachable, relying on persistent local state.", err);
-      // We don't logout on network error to prevent kicking users out on poor Wi-Fi
+      console.error("Network error, preserving local state:", err);
     } finally {
       setLoading(false);
     }
