@@ -1,7 +1,6 @@
-
 'use client';
 
-import { useState, useLayoutEffect } from 'react';
+import { useState, useLayoutEffect, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Loader2, Mail, CheckCircle2 } from 'lucide-react';
 import DashboardSidebar from './Components/DashboardSidebar';
@@ -31,13 +30,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
 
+  // Close sidebar on navigation
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [pathname]);
+
   const isUnverified = user && !user.isVerified;
 
-  // Mask Email Helper
+  // Improved Mask Email Helper - Prevents "your email" flash
   const maskEmail = (email: string) => {
-    if (!email) return "your email";
+    if (!email) return "identifying account...";
     const [userPart, domain] = email.split("@");
-    return userPart.length <= 2 ? `${userPart}***@${domain}` : `${userPart.substring(0, 2)}*****@${domain}`;
+    if (!domain) return email;
+    return userPart.length <= 2 
+      ? `${userPart}***@${domain}` 
+      : `${userPart.substring(0, 2)}*****@${domain}`;
   };
 
   // 1. Redirect Logic
@@ -61,6 +68,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     if (code.length < 6) return setError("Enter 6-digit code");
+    if (!user?.email) return setError("Session missing. Please refresh.");
     
     setVerifying(true);
     setError('');
@@ -81,13 +89,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         setError(data.msg || "Invalid code");
       }
     } catch {
-      setError("Server error. Check connection.");
+      setError("Server connection error.");
     } finally {
       setVerifying(false);
     }
   };
 
   const handleResend = async () => {
+    if (!user?.email) return;
     setResending(true);
     setError('');
     try {
@@ -115,7 +124,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="text-blue-500 animate-spin w-10 h-10" />
           <p className="text-gray-400 text-xs font-bold uppercase tracking-widest animate-pulse">
-            Authenticating...
+            Verifying Session...
           </p>
         </div>
       </div>
@@ -134,7 +143,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           setIsOpen={setIsSidebarOpen} 
         />
         
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden text-black">
           <DashboardHeader 
             onMenuClick={() => setIsSidebarOpen(true)} 
             role={user?.role} 
@@ -147,15 +156,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </div>
 
-      {/* Verification Overlay UI */}
-      {isUnverified && (
+      {/* Verification Overlay UI - Only show if we have user data */}
+      {isUnverified && user?.email && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-md px-4 text-gray-900">
           <div className="bg-white rounded-[40px] p-10 max-w-lg w-full text-center shadow-2xl border border-gray-100 animate-in fade-in zoom-in duration-300">
             <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-8">
               <Mail className="w-10 h-10" />
             </div>
 
-            <h2 className="text-4xl font-extrabold mb-2">Verify Account</h2>
+            <h2 className="text-4xl font-extrabold mb-2 text-black">Verify Account</h2>
             <p className="text-gray-500 text-lg mb-1">Enter the 6-digit code sent to</p>
             <p className="font-bold mb-8 truncate text-blue-600">{maskEmail(user.email)}</p>
             
@@ -166,7 +175,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 maxLength={6} 
                 value={code}
                 onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-                className="w-full text-center text-4xl tracking-[12px] font-mono py-5 border-2 border-gray-100 rounded-2xl focus:border-blue-600 focus:outline-none mb-4"
+                className="w-full text-center text-4xl tracking-[12px] font-mono py-5 border-2 border-gray-100 rounded-2xl focus:border-blue-600 focus:outline-none mb-4 text-black"
                 placeholder="000000"
                 autoFocus
               />
@@ -200,7 +209,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle2 className="w-8 h-8" strokeWidth={3} />
             </div>
-            <h3 className="text-xl font-bold mb-2 text-gray-900">Check Inbox</h3>
+            <h3 className="text-xl font-bold mb-2 text-black">Check Inbox</h3>
             <p className="text-gray-500 mb-8 text-sm">A new verification code has been sent to your email.</p>
             <button 
               onClick={() => setShowSuccessModal(false)} 
@@ -214,9 +223,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </div>
   );
 }
-
-
-
 
 
 
