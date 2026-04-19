@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   ShoppingBag, 
   MessageSquare, 
@@ -14,9 +14,13 @@ import {
   ShieldCheck,
   ArrowRight,
   LucideIcon,
-  GraduationCap // Added for Internship
+  GraduationCap,
+  MessageCircle, 
+  Loader2
 } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '../../context/AuthContext'; 
+import { REST_API } from '../../constant';
 
 interface HubCardProps {
   title: string;
@@ -24,10 +28,11 @@ interface HubCardProps {
   icon: LucideIcon;
   href: string;
   color: string;
+  isExternal?: boolean;
 }
 
-const HubCard = ({ title, description, icon: Icon, href, color }: HubCardProps) => (
-  <Link href={href} className="group">
+const HubCard = ({ title, description, icon: Icon, href, color, isExternal }: HubCardProps) => {
+  const content = (
     <div className="h-full p-6 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-300 transition-all duration-300 flex flex-col">
       <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
         <Icon className="text-white" size={24} />
@@ -42,11 +47,84 @@ const HubCard = ({ title, description, icon: Icon, href, color }: HubCardProps) 
         </p>
       </div>
     </div>
-  </Link>
-);
+  );
+
+  if (isExternal) {
+    return <a href={href} target="_blank" rel="noopener noreferrer" className="group">{content}</a>;
+  }
+
+  return <Link href={href} className="group">{content}</Link>;
+};
 
 export default function RegularPage() {
+  const { user, login } = useAuth();
+  const [verifying, setVerifying] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [error, setError] = useState('');
+
+  // --- LOGIC: Verification Guard ---
+  // If user exists but is not verified, show the verification UI
+  if (user && !user.isVerified) {
+    const handleVerify = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setVerifying(true);
+      setError('');
+      try {
+        const res = await fetch(`${REST_API}/auth/verify-code`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: user.email, code: otp }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          login(data.token, data.user); // Persist verified state
+        } else {
+          setError(data.msg || 'Invalid code');
+        }
+      } catch {
+        setError('Verification failed. Check your connection.');
+      } finally {
+        setVerifying(false);
+      }
+    };
+
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] p-4 text-center">
+        <div className="max-w-sm w-full bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+          <ShieldCheck className="w-12 h-12 text-blue-600 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-gray-900">Verify Your Email</h2>
+          <p className="text-sm text-gray-500 mt-2">
+            We sent a code to <span className="font-bold text-gray-900">{user.email}</span>
+          </p>
+          
+          <form onSubmit={handleVerify} className="mt-6 space-y-4">
+            <input 
+              required 
+              maxLength={6}
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              className="w-full text-center text-2xl font-bold tracking-[0.5rem] py-3 rounded-xl bg-gray-50 border border-gray-200 outline-none focus:border-blue-500" 
+              placeholder="000000" 
+            />
+            {error && <p className="text-xs text-red-500 font-bold uppercase">{error}</p>}
+            <button disabled={verifying} className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg uppercase tracking-widest text-[10px] flex items-center justify-center">
+              {verifying ? <Loader2 className="animate-spin" /> : "Verify Account"}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   const hubItems = [
+    {
+      title: 'WhatsApp Community',
+      description: 'Join our official group to network with other creatives and stay updated.',
+      icon: MessageCircle,
+      href: 'https://whatsapp.com/channel/your-link-here', 
+      color: 'bg-green-500',
+      isExternal: true,
+    },
     {
       title: 'Inanst Products',
       description: 'Explore our curated digital assets, creative tools, and hardware offerings.',
@@ -129,7 +207,7 @@ export default function RegularPage() {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="border-b border-gray-200 pb-6">
-        <p className="text-sm text-gray-500 mt-1">Manage your professional growth and services in one place.</p>
+        <p className="text-sm text-gray-500 mt-1">Welcome back, <span className="text-gray-900 font-bold">{user?.name}</span>. Manage your growth here.</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
@@ -141,6 +219,7 @@ export default function RegularPage() {
             icon={item.icon}
             href={item.href}
             color={item.color}
+            isExternal={item.isExternal}
           />
         ))}
       </div>

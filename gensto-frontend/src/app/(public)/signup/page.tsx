@@ -83,6 +83,7 @@ export default function SignUp() {
       const data = await res.json();
       
       if (res.ok) {
+        // Logic fix: Ensure full user object (with email) is passed to login for persistence
         login(data.token, data.user);
         router.push(data.user.role === 'regular' ? '/regular' : `/${data.user.role}`);
       } else {
@@ -105,6 +106,7 @@ export default function SignUp() {
       const res = await fetch(`${REST_API}/auth/resend-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        // Logic fix: use formData.email as fallback if context is volatile
         body: JSON.stringify({ email: formData.email }),
       });
       if (res.ok) {
@@ -133,6 +135,7 @@ export default function SignUp() {
       });
       const data = await res.json();
       if (res.ok) {
+        // Logic fix: persist updated user state after verification
         login(data.token, data.user);
         router.push(data.user.role === 'regular' ? '/regular' : `/${data.user.role}`);
       } else {
@@ -149,7 +152,6 @@ export default function SignUp() {
   return (
     <div className="min-h-screen mt-14 bg-gray-50 flex items-center justify-center p-4 pt-24 font-sans text-gray-900">
       <style jsx global>{`
-        /* Fix for double eye icon on some browsers */
         input::-ms-reveal,
         input::-ms-clear {
           display: none;

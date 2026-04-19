@@ -11,6 +11,7 @@ interface BackendUser {
   isVerified: boolean;
   phone?: string;
   country?: string;
+  fullName?: string; 
 }
 
 interface User {
@@ -33,11 +34,15 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  // Initialize state from localStorage to prevent "Session Lost" on refresh
   const [user, setUser] = useState<User | null>(() => {
     if (typeof window !== 'undefined') {
       const savedUser = localStorage.getItem('user_data');
-      return savedUser ? JSON.parse(savedUser) : null;
+      try {
+        return savedUser ? JSON.parse(savedUser) : null;
+      } catch { 
+        // Omitted the variable entirely to fix ESLint 'unused-vars'
+        return null;
+      }
     }
     return null;
   });
@@ -79,7 +84,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const userData: BackendUser = await res.json();
         const mappedUser: User = {
           id: userData._id,
-          name: userData.name,
+          name: userData.name || userData.fullName || 'User',
           email: userData.email,
           role: userData.role,
           isVerified: userData.isVerified,
@@ -87,19 +92,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         setToken(storedToken);
         setUser(mappedUser);
-        // Keep persisted data fresh
         localStorage.setItem('user_data', JSON.stringify(mappedUser));
       } else {
-        // If it's a 404, the route might be wrong. If 401/403, token is bad.
-        console.warn(`Auth failed: Status ${res.status} at ${API_ROUTES.PROFILE}`);
-        // Optional: Only logout on 401/403 to prevent accidental logouts on server 404s
-        if (res.status === 401 || res.status === 403) {
-            logout();
+        if (res.status === 401) {
+          const savedUser = localStorage.getItem('user_data');
+          const parsedUser = savedUser ? (JSON.parse(savedUser) as User) : null;
+          
+          if (!parsedUser || parsedUser.isVerified) {
+             logout();
+          }
         }
       }
     } catch (err) {
-      const error = err as Error;
-      console.error("Connection to Auth API failed:", error.message);
+      console.error("Connection to Auth API failed", err);
     } finally {
       setLoading(false);
     }
@@ -112,6 +117,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = useCallback((newToken: string, newUser: User) => {
     localStorage.setItem('token', newToken);
     localStorage.setItem('user_data', JSON.stringify(newUser));
+    
     setToken(newToken);
     setUser(newUser);
     setLoading(false); 
