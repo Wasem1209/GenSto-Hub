@@ -16,8 +16,8 @@ export default function JoinCommunity() {
 
                 {/* CTA BUTTON */}
                 <div className="mt-6">
-                    <Link href="https://chat.whatsapp.com/KM6t9EI89LQ0O3ZCvADNMt" target="_blank">
-                        <button className="bg-gray-400 hover:bg-gray-700 text-white font-medium px-15 py-3 rounded-full shadow-md transition-all duration-300 ">
+                    <Link href="https://chat.whatsapp.com/HoQcoL4sXnbFWzO7SZoKhM?mode=gi_t" target="_blank">
+                        <button className="bg-gray-600 hover:bg-gray-700 text-white font-medium px-15 py-3 rounded-full shadow-md transition-all duration-300 ">
                             Way In  →
                         </button>
                     </Link>
