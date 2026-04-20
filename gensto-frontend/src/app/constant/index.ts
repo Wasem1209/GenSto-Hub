@@ -23,6 +23,7 @@ export const API_ROUTES = {
 
     NEWSLETTER: `${REST_API}/newsletter/subscribe`,
     CONTACT: `${REST_API}/contact`,
+    COMMENTS: `${REST_API}/comments`,
 };
 
 
