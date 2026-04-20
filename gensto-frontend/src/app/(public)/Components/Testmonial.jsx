@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import { REST_API } from '../../constant';
 
 export default function Testimonials() {
@@ -8,11 +7,11 @@ export default function Testimonials() {
   const [visibleIndexes, setVisibleIndexes] = useState([0, 1, 2]);
   const [screenSize, setScreenSize] = useState('desktop');
 
-  // Fetch comments from Database (Display only)
   const fetchComments = async () => {
     try {
-      // Using REST_API.COMMENTS from  constant file
-      const res = await fetch(REST_API.COMMENTS);
+      // Cast as any if using TS to avoid the property error we saw earlier
+      const apiEndpoints = REST_API;
+      const res = await fetch(apiEndpoints.COMMENTS);
       const data = await res.json();
       setComments(data.length > 0 ? data : []);
     } catch (err) {
@@ -24,7 +23,6 @@ export default function Testimonials() {
     fetchComments();
   }, []);
 
-  // Responsive logic to determine how many cards to show
   useEffect(() => {
     const updateScreenSize = () => {
       const width = window.innerWidth;
@@ -37,13 +35,10 @@ export default function Testimonials() {
     return () => window.removeEventListener('resize', updateScreenSize);
   }, []);
 
-  // Auto-scroll animation logic
   useEffect(() => {
     if (comments.length === 0) return;
-
     let itemsToShow = screenSize === 'mobile' ? 1 : screenSize === 'tablet' ? 2 : 3;
 
-    // Only set up interval if we have enough comments to actually scroll
     if (comments.length <= itemsToShow) {
       setVisibleIndexes(comments.map((_, i) => i));
       return;
@@ -64,9 +59,11 @@ export default function Testimonials() {
 
   return (
     <div className="py-12 px-4 md:px-16 bg-white">
+      {/* Aligned Heading Style */}
       <h2 className="text-3xl font-bold text-center mb-10">
-        <span className="text-gray-900">Com</span>
-        <span className="text-blue-900">ment</span>s
+        <span className="text-gray-900">User </span>
+        <span className="text-blue-900">Com</span>
+        <span className="text-blue-900">ments</span>
       </h2>
 
       <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
@@ -78,26 +75,25 @@ export default function Testimonials() {
             return (
               <div
                 key={item._id || index}
-                className="bg-gray-100 p-6 rounded-2xl hover:scale-105 shadow-md transition-all duration-500 ease-in-out"
+                className="bg-gray-100 p-6 rounded-3xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-500 ease-in-out min-h-[160px] flex flex-col justify-center"
               >
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="relative w-12 h-12">
-                    <Image
-                      src={item.image || '/images/default-avatar.jpg'}
-                      alt={item.name}
-                      fill
-                      className="rounded-full object-cover"
-                    />
-                  </div>
-                  <h4 className="text-lg font-semibold">{item.name}</h4>
+                {/* Header matching the new preview style */}
+                <div className="border-b border-gray-200 pb-2 mb-3">
+                  <h4 className="text-lg font-bold text-gray-900 truncate">
+                    {item.name}
+                  </h4>
                 </div>
-                <p className="text-gray-700 italic">“{item.comment}”</p>
+
+                {/* Comment body */}
+                <p className="text-gray-700 italic leading-relaxed">
+                  “{item.comment}”
+                </p>
               </div>
             );
           })
         ) : (
           <div className="col-span-full py-10 text-center">
-            <p className="text-gray-500 animate-pulse">Loading...</p>
+            <p className="text-gray-400 animate-pulse font-medium">Loading...</p>
           </div>
         )}
       </div>
