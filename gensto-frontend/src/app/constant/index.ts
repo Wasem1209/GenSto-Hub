@@ -24,6 +24,8 @@ export const API_ROUTES = {
     NEWSLETTER: `${REST_API}/newsletter/subscribe`,
     CONTACT: `${REST_API}/contact`,
     COMMENTS: `${REST_API}/comments`,
+    ENROLL_REGISTER: `${REST_API}/v1/enrollments/register`,
+    ENROLL_STATUS: `${REST_API}/v1/enrollments/status`,
 };
 
 
