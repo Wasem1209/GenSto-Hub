@@ -10,7 +10,6 @@ import {
   LucideIcon, Briefcase, X
 } from 'lucide-react';
 
-// Added plural versions to match your AuthContext and DB
 type UserRole = 'regular' | 'admin' | 'admins' | 'instructor' | 'instructors' | 'worker' | 'workers';
 
 interface NavLink {
@@ -73,7 +72,6 @@ const roleLinks: Record<string, NavLink[]> = {
   ],
 };
 
-// Aliases for singular roles to point to the plural link sets
 roleLinks.worker = roleLinks.workers;
 roleLinks.admin = roleLinks.admins;
 roleLinks.instructor = roleLinks.instructors;
@@ -82,12 +80,10 @@ export default function DashboardSidebar({ role = 'regular', isOpen, setIsOpen }
   const pathname = usePathname();
   const { logout } = useAuth();
   
-  // Safely find the links based on the role provided
   const links = roleLinks[role] || roleLinks.regular;
 
   return (
     <>
-      {/* Mobile Overlay */}
       <div 
         className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-50 transition-opacity duration-300 md:hidden ${
           isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
@@ -101,50 +97,32 @@ export default function DashboardSidebar({ role = 'regular', isOpen, setIsOpen }
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="p-6 flex items-center justify-between">
-          
           <Link href="/" className="flex items-center group">
-            <span className="text-2xl font-black tracking-tighter text-white leading-none">
-              IN
-            </span>
-            
-            <svg 
-              className="-mx-1 h-7 w-auto" 
-              viewBox="0 0 100 100" 
-              fill="none" 
-              xmlns="http://www.w3.org/2000/svg"
-            >
+            <span className="text-2xl font-black tracking-tighter text-white leading-none">IN</span>
+            <svg className="-mx-1 h-7 w-auto" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <linearGradient id="sidebarInanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#38BDF8" />
                   <stop offset="100%" stopColor="#2563EB" />
                 </linearGradient>
               </defs>
-              <path 
-                d="M50 15L90 85H10L50 15ZM50 42L65 70H35L50 42Z" 
-                fill="url(#sidebarInanGradient)" 
-                fillRule="evenodd"
-              />
+              <path d="M50 15L90 85H10L50 15ZM50 42L65 70H35L50 42Z" fill="url(#sidebarInanGradient)" fillRule="evenodd" />
             </svg>
-
-            <span className="text-2xl font-black tracking-tighter text-white leading-none">
-              NST
-            </span>
+            <span className="text-2xl font-black tracking-tighter text-white leading-none">NST</span>
           </Link>
-          
-          <button 
-            onClick={() => setIsOpen(false)}
-            className="md:hidden p-1 text-gray-400 hover:text-white transition-colors"
-          >
+          <button onClick={() => setIsOpen(false)} className="md:hidden p-1 text-gray-400 hover:text-white transition-colors">
             <X size={20} />
           </button>
         </div>
         
-        {/* Added scrollbar-hide  */}
         <nav className="flex-1 px-4 space-y-1 mt-2 overflow-y-auto scrollbar-hide">
           {links.map((link, index) => {
             const Icon = link.icon;
           
-            const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
+            // Fix: Check if current path is an exact match for the base role route 
+            // otherwise check if it starts with the link href for sub-pages
+            const isBaseRoute = ['/regular', '/workers', '/instructors', '/admins'].includes(link.href);
+            const isActive = isBaseRoute ? pathname === link.href : pathname.startsWith(link.href);
             
             return (
               <Link 
@@ -163,10 +141,7 @@ export default function DashboardSidebar({ role = 'regular', isOpen, setIsOpen }
         </nav>
 
         <div className="p-4 border-t border-gray-800">
-          <button 
-            onClick={logout}
-            className="w-full flex items-center space-x-3 px-4 py-2.5 text-red-400 hover:bg-red-950/30 rounded-lg transition-colors"
-          >
+          <button onClick={logout} className="w-full flex items-center space-x-3 px-4 py-2.5 text-red-400 hover:bg-red-950/30 rounded-lg transition-colors">
             <LogOut size={18} />
             <span className="font-bold text-sm">Logout</span>
           </button>

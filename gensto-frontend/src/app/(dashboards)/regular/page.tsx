@@ -16,7 +16,7 @@ import {
   LucideIcon,
   GraduationCap,
   MessageCircle, 
-  Loader2
+  Loader2,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '../../context/AuthContext'; 
@@ -121,7 +121,7 @@ export default function RegularPage() {
       title: 'WhatsApp Community',
       description: 'Join our official group to network with other creatives and stay updated.',
       icon: MessageCircle,
-      href: 'https://whatsapp.com/channel/your-link-here', 
+      href: 'https://chat.whatsapp.com/HoQcoL4sXnbFWzO7SZoKhM?mode=gi_t', 
       color: 'bg-green-500',
       isExternal: true,
     },
@@ -201,6 +201,13 @@ export default function RegularPage() {
       icon: ShieldCheck,
       href: '/regular/legal-policy',
       color: 'bg-gray-800',
+    },
+    {
+      title: 'Post Comments',
+      description: 'Share your thought publicly and engage with the community.',
+      icon: MessageCircle,
+      href: '/regular/comments',
+      color: 'bg-cyan-600',
     },
   ];
 
