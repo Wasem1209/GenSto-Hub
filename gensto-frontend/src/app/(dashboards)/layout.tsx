@@ -1,3 +1,6 @@
+/*
+
+
 'use client';
 
 import { useState, useLayoutEffect, useEffect } from 'react';
@@ -139,7 +142,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </div>
 
-      {/* Verification Overlay */}
+      
       {isUnverified && user?.email && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-md px-4">
           <div className="bg-white rounded-[40px] p-10 max-w-lg w-full text-center shadow-2xl animate-in zoom-in">
@@ -167,7 +170,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       )}
 
-      {/* Resend Success Modal */}
+      
       {showSuccessModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
@@ -181,12 +184,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   );
 }
 
+*/
 
 
 
 
-
-/*
 
 'use client';
 
