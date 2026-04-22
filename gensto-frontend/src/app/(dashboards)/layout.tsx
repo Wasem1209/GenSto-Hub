@@ -22,6 +22,196 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter();
   const pathname = usePathname();
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [, setResending] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [code, setCode] = useState('');
+  const [error, setError] = useState('');
+
+  // --- LOCAL VIEWING BYPASS ---
+  // If true, this will stop the layout from kicking you out to signin/regular role
+  const isDevelopment = pathname.includes('/workers'); 
+
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [pathname]);
+
+  // If we are in dev mode/workers preview, we treat the user as verified
+  const isUnverified = user && !user.isVerified && !isDevelopment;
+
+  const maskEmail = (email: string) => {
+    if (!email) return "identifying account...";
+    const [userPart, domain] = email.split("@");
+    return userPart.length <= 2 
+      ? `${userPart}***@${domain}` 
+      : `${userPart.substring(0, 2)}*****@${domain}`;
+  };
+
+  useLayoutEffect(() => {
+    if (authLoading || isDevelopment) return; // Skip redirect if testing /workers
+    
+    if (!user) {
+      router.replace('/signin');
+      return;
+    }
+
+    if (user.isVerified) {
+      const rolePath = `/${user.role}`;
+      if (!pathname.startsWith(rolePath)) {
+        router.replace(rolePath);
+      }
+    }
+  }, [user, authLoading, pathname, router, isDevelopment]);
+
+  // API Verification Handler
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (code.length < 6) return setError("Enter 6-digit code");
+    setVerifying(true);
+    try {
+      const res = await fetch(API_ROUTES.VERIFY_OTP, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user?.email, code })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        await login(data.token, data.user);
+        router.refresh();
+      } else {
+        setError(data.msg || "Invalid code");
+      }
+    } catch {
+      setError("Server error");
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const handleResend = async () => {
+    if (!user?.email) return;
+    setResending(true);
+    try {
+      const res = await fetch(API_ROUTES.RESEND_OTP, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user.email })
+      });
+      if (res.ok) setShowSuccessModal(true);
+    } catch {
+      setError("Server unreachable");
+    } finally {
+      setResending(false);
+    }
+  };
+
+  // Show loading only if not in dev mode and still fetching auth
+  if (authLoading && !isDevelopment) {
+    return (
+      <div className="h-screen w-full bg-black flex items-center justify-center">
+        <Loader2 className="text-blue-500 animate-spin w-10 h-10" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative flex h-screen bg-[#f8fafc] overflow-hidden">
+      <div className={`flex flex-1 h-full overflow-hidden transition-all duration-700 
+        ${isUnverified ? "blur-2xl grayscale opacity-40 pointer-events-none" : ""}`}>
+        
+        <DashboardSidebar 
+          role={isDevelopment ? "workers" : user?.role} 
+          isOpen={isSidebarOpen} 
+          setIsOpen={setIsSidebarOpen} 
+        />
+        
+        <div className="flex-1 flex flex-col overflow-hidden text-black">
+          <DashboardHeader 
+            onMenuClick={() => setIsSidebarOpen(true)} 
+            role={isDevelopment ? "workers" : user?.role} 
+          />
+          <main className="flex-1 overflow-y-auto p-4 md:p-10">
+            <div className="max-w-7xl mx-auto">
+              {children}
+            </div>
+          </main>
+        </div>
+      </div>
+
+      {/* Verification Overlay */}
+      {isUnverified && user?.email && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-md px-4">
+          <div className="bg-white rounded-[40px] p-10 max-w-lg w-full text-center shadow-2xl animate-in zoom-in">
+            <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-8">
+              <Mail className="w-10 h-10" />
+            </div>
+            <h2 className="text-4xl font-extrabold mb-2 text-black">Verify Account</h2>
+            <p className="font-bold mb-8 text-blue-600">{maskEmail(user.email)}</p>
+            <form onSubmit={handleVerify} className="mb-6">
+              <input 
+                type="text" 
+                maxLength={6} 
+                value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+                className="w-full text-center text-4xl tracking-[12px] font-mono py-5 border-2 rounded-2xl mb-4 text-black"
+                placeholder="000000"
+              />
+              {error && <p className="text-red-500 font-bold mb-4 text-sm">{error}</p>}
+              <button className="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl">
+                {verifying ? "VERIFYING..." : "ACTIVATE ACCOUNT"}
+              </button>
+            </form>
+            <button onClick={handleResend} className="text-blue-600 font-bold">Resend code</button>
+          </div>
+        </div>
+      )}
+
+      {/* Resend Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+            <CheckCircle2 className="w-16 h-16 text-green-600 mx-auto mb-6" />
+            <h3 className="text-xl font-bold mb-2">Check Inbox</h3>
+            <button onClick={() => setShowSuccessModal(false)} className="w-full bg-gray-900 text-white py-3 rounded-xl">Okay</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+
+
+
+
+/*
+
+'use client';
+
+import { useState, useLayoutEffect, useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { Loader2, Mail, CheckCircle2 } from 'lucide-react';
+import DashboardSidebar from './Components/DashboardSidebar';
+import DashboardHeader from './Components/DashboardHeader'; 
+import { useAuth } from '../context/AuthContext';
+import { API_ROUTES } from '../constant';
+
+interface AuthenticatedUser {
+  id: string;
+  email: string;
+  role: "regular" | "admins" | "instructors" | "workers";
+  isVerified: boolean;
+  name?: string;
+}
+
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const { user: authUser, loading: authLoading, login } = useAuth();
+  const user = authUser as unknown as AuthenticatedUser;
+  const router = useRouter();
+  const pathname = usePathname();
+
   // Component States
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -133,7 +323,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="relative flex h-screen bg-[#f8fafc] overflow-hidden">
-      {/* Main Dashboard UI - Blurred if not verified */}
+      
       <div className={`flex flex-1 h-full overflow-hidden transition-all duration-700 
         ${isUnverified ? "blur-2xl grayscale opacity-40 pointer-events-none select-none" : ""}`}>
         
@@ -156,7 +346,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </div>
 
-      {/* Verification Overlay UI - Only show if we have user data */}
+      
       {isUnverified && user?.email && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-md px-4 text-gray-900">
           <div className="bg-white rounded-[40px] p-10 max-w-lg w-full text-center shadow-2xl border border-gray-100 animate-in fade-in zoom-in duration-300">
@@ -202,7 +392,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       )}
 
-      {/* Success Modal for Resend */}
+      
       {showSuccessModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl animate-in fade-in zoom-in duration-200">

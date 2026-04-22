@@ -14,18 +14,14 @@ export const API_ROUTES = {
     SIGNUP: `${REST_API}/auth/register`,
     SIGNIN: `${REST_API}/auth/login`,
     VERIFY_OTP: `${REST_API}/auth/verify-code`,
-
-    //  'resend-verification' 
     RESEND_OTP: `${REST_API}/auth/resend-verification`,
-
-    //  '/profile' to '
     PROFILE: `${REST_API}/auth/me`,
-
     NEWSLETTER: `${REST_API}/newsletter/subscribe`,
     CONTACT: `${REST_API}/contact`,
     COMMENTS: `${REST_API}/comments`,
     ENROLL_REGISTER: `${REST_API}/v1/enrollments/register`,
     ENROLL_STATUS: `${REST_API}/v1/enrollments/status`,
+    DASHBOARD_STATS: `${REST_API}/v1/stats/dashboard`,
 };
 
 

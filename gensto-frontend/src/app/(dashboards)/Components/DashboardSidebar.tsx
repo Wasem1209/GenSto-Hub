@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import { 
   LayoutDashboard, School, FileText, CheckSquare, 
   MessageSquare, Settings, LifeBuoy, Palette, 
-  LogOut, Users, Bell, ClipboardList, Activity, Eye,
+  LogOut, Users, Bell, ClipboardList, Eye,
   LucideIcon, Briefcase, X
 } from 'lucide-react';
 
@@ -39,14 +39,11 @@ const roleLinks: Record<string, NavLink[]> = {
     { name: 'Active Users', href: '/workers/users', icon: Users },
     { name: 'Class', href: '/workers/class', icon: School },
     { name: 'Notifications', href: '/workers/notifications', icon: Bell },
-    { name: 'Supports', href: '/workers/support', icon: LifeBuoy },
     { name: 'Enrollments', href: '/workers/enrollments', icon: ClipboardList },
     { name: 'Tasks', href: '/workers/tasks', icon: CheckSquare },
     { name: 'Chats', href: '/workers/chat', icon: MessageSquare },
-    { name: 'Activities', href: '/workers/activities', icon: Activity },
     { name: 'Monitor Users', href: '/workers/monitor', icon: Eye },
     { name: 'Settings', href: '/workers/settings', icon: Settings },
-    { name: 'Theme', href: '/workers/theme', icon: Palette },
   ],
   instructors: [
     { name: 'Dashboard', href: '/instructors', icon: LayoutDashboard },
