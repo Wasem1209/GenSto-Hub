@@ -17,7 +17,8 @@ export default function WorkerPage() {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                const response = await fetch(`${REST_API}/workers/stats`);
+                // LOGIC UPDATE: Pointing to the correct backend route
+                const response = await fetch(`${REST_API}/v1/stats/dashboard`);
                 const result = await response.json();
                 if (result.success) {
                     setDashboardData(result.data);
@@ -32,6 +33,9 @@ export default function WorkerPage() {
     }, []);
 
     const navigateTo = (path) => router.push(`/worker/${path}`);
+
+    // LOGIC UPDATE: Map growthData to chart values if it exists
+    const growthChart = dashboardData?.growthChart || [];
 
     const mainStats = [
         { label: "Enrollments", value: dashboardData?.mainStats?.enrollments || "0", icon: Users, color: "text-blue-600", bg: "bg-blue-50", desc: "Pending review", path: "enrollments" },
@@ -108,8 +112,8 @@ export default function WorkerPage() {
                                         <tr key={enrollment._id} className="hover:bg-gray-50/50">
                                             <td className="px-6 py-4 font-semibold">{enrollment.studentName}</td>
                                             <td className="px-6 py-4">
-                                                <span className={`px-2 py-1 rounded text-[10px] font-bold ${enrollment.status === 'verified' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
-                                                    {enrollment.status.toUpperCase()}
+                                                <span className={`px-2 py-1 rounded text-[10px] font-bold ${enrollment.status === 'paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                                                    {(enrollment.status || 'pending').toUpperCase()}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 text-right">
@@ -126,8 +130,24 @@ export default function WorkerPage() {
                 <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm text-center">
                     <h2 className="font-bold text-gray-800 mb-4 flex items-center gap-2 text-left"><TrendingUp className="w-5 h-5 text-emerald-500" /> User Growth</h2>
                     <div className="h-48 bg-gray-50 rounded-xl flex flex-col items-center justify-center border-2 border-dashed border-gray-100">
-                        <BarChart3 className="w-8 h-8 text-gray-200 mb-2" />
-                        <p className="text-[10px] text-gray-400 font-bold uppercase">Growth Analytics Data Ready</p>
+                        {growthChart.length > 0 ? (
+                            <div className="flex items-end gap-2 w-full px-4 h-32">
+                                {growthChart.map((day, i) => (
+                                    <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                                        <div
+                                            className="w-full bg-emerald-500 rounded-t-sm transition-all"
+                                            style={{ height: `${Math.max((day.value / 10) * 100, 10)}%` }}
+                                        ></div>
+                                        <span className="text-[8px] text-gray-400 font-bold">{day.label}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <>
+                                <BarChart3 className="w-8 h-8 text-gray-200 mb-2" />
+                                <p className="text-[10px] text-gray-400 font-bold uppercase">Growth Analytics Data Ready</p>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
