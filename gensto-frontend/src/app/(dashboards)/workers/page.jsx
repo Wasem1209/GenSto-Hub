@@ -17,7 +17,7 @@ export default function WorkerPage() {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                // LOGIC UPDATE: Pointing to the correct backend route
+                // Hits the versioned route for consistent data retrieval
                 const response = await fetch(`${REST_API}/v1/stats/dashboard`);
                 const result = await response.json();
                 if (result.success) {
@@ -34,7 +34,6 @@ export default function WorkerPage() {
 
     const navigateTo = (path) => router.push(`/worker/${path}`);
 
-    // LOGIC UPDATE: Map growthData to chart values if it exists
     const growthChart = dashboardData?.growthChart || [];
 
     const mainStats = [
@@ -45,6 +44,7 @@ export default function WorkerPage() {
     ];
 
     const operationalCards = [
+        // Ensure values pull correctly from the dashboardData.operational object
         { label: "Newsletter", value: dashboardData?.operational?.newsletter?.toLocaleString() || "0", icon: Mail, color: "text-pink-600", bg: "bg-pink-50", path: "newsletter" },
         { label: "Contacts Mgmt", value: dashboardData?.operational?.contacts || "0", icon: Contact, color: "text-cyan-600", bg: "bg-cyan-50", path: "contacts" },
         { label: "Internships", value: dashboardData?.operational?.internships || "0", icon: Briefcase, color: "text-orange-600", bg: "bg-orange-50", path: "internships" },
@@ -110,7 +110,8 @@ export default function WorkerPage() {
                                 ) : (
                                     dashboardData?.recentEnrollments?.map((enrollment) => (
                                         <tr key={enrollment._id} className="hover:bg-gray-50/50">
-                                            <td className="px-6 py-4 font-semibold">{enrollment.studentName}</td>
+                                            {/* studentName is mapped from fullName in backend */}
+                                            <td className="px-6 py-4 font-semibold">{enrollment.studentName || "N/A"}</td>
                                             <td className="px-6 py-4">
                                                 <span className={`px-2 py-1 rounded text-[10px] font-bold ${enrollment.status === 'paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
                                                     {(enrollment.status || 'pending').toUpperCase()}
