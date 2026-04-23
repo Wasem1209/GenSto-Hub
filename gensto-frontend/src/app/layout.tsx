@@ -13,9 +13,8 @@ export const metadata: Metadata = {
   description: "Nigeria's architectural response to the long technology problem. We bridge the gap between academic knowledge and industrial execution through indigenous hardware, software, and data intelligence.",
   
   keywords: [
-    'INANST', 'Innovation Nigeria', 'Data Analytics Africa', 
-    'Indigenous Hardware Manufacturing', 'Tech Ecosystem Abuja', 
-    'MERN Stack Training', 'Societal Transformation', 'African Ed-Tech'
+    'INANST', 'Innovation Nigeria', 'Data Analytics Africa', 'Software Development Nigeria', 'Software Development Africal', 'Indigenous Tech', 'Tech Talent Nigeria', 'Tech Ecosystem Africa', 'Tech Training Nigeria',
+    'Indigenous Hardware Manufacturing', 'Tech Ecosystem Abuja', 'Societal Transformation', 'Tech Ecosystem Nigeria', 'African Ed-Tech'
   ],
   
   authors: [{ name: 'Philip Terfa Wasem', url: 'https://inanst.com' }],
