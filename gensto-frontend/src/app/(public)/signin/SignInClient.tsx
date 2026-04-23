@@ -1,30 +1,3 @@
-import SignInClient from "./SignInClient";
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: 'Sign In',
-  description: 'Access your INANST dashboard to manage your courses, view analytics, and engage with the technological ecosystem.',
-  openGraph: {
-    title: 'Sign In | INANST Ecosystem',
-    description: 'Log in to your professional INANST account.',
-  },
-  // We tell bots not to index the actual login "success" or "error" states
-  robots: {
-    index: true,
-    follow: false,
-  }
-};
-
-export default function SignInPage() {
-  return <SignInClient />;
-}
-
-
-
-
-
-
-/*
 'use client';
 import { useState, FormEvent, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
@@ -34,7 +7,6 @@ import { signIn, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { REST_API } from '../../constant';
 
-// Define a local interface to handle the Google session data safely
 interface GoogleUser {
     id: string;
     name?: string | null;
@@ -43,7 +15,7 @@ interface GoogleUser {
     role?: "regular" | "admins" | "instructors" | "workers";
 }
 
-export default function SignIn() {
+export default function SignInClient() {
     const { login } = useAuth();
     const router = useRouter();
     const { data: session, status } = useSession();
@@ -54,8 +26,6 @@ export default function SignIn() {
     useEffect(() => {
         if (status === 'authenticated' && session?.user) {
             const googleUser = session.user as GoogleUser;
-            
-            
             const userToLogin = {
                 id: googleUser.id,
                 name: googleUser.name || '',
@@ -64,9 +34,7 @@ export default function SignIn() {
                 isVerified: true 
             };
 
-            
             login('google-session', userToLogin);
-            
             const targetRole = googleUser.role || 'regular';
             router.push(targetRole === 'regular' ? '/regular' : `/${targetRole}`);
         }
@@ -87,7 +55,6 @@ export default function SignIn() {
             const data = await res.json();
 
             if (res.ok) {
-                // Pass both token and user to the updated AuthContext login function
                 login(data.token, data.user);
                 router.push(data.user.role === 'regular' ? '/regular' : `/${data.user.role}`);
             } else {
@@ -156,5 +123,3 @@ export default function SignIn() {
         </div>
     );
 }
-
-*/

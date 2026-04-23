@@ -1,27 +1,3 @@
-import SignUpClient from "./SignUpClient";
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: 'Create an Account',
-  description: 'Join the INANST ecosystem. Start your journey in technology, innovation, and indigenous hardware manufacturing in Africa.',
-  openGraph: {
-    title: 'Join INANST | Technological Ecosystem',
-    description: 'Register today to access our integrated stack of education, hardware, and software development tools.',
-  },
-  robots: {
-    index: true,
-    follow: false,
-  }
-};
-
-export default function SignUpPage() {
-  return <SignUpClient />;
-}
-
-
-
-
-/*
 'use client';
 import { useState, FormEvent, useEffect, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
@@ -42,7 +18,7 @@ function RequirementItem({ label, met }: { label: string; met: boolean }) {
   );
 }
 
-export default function SignUp() {
+export default function SignUpClient() {
   const { login } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -107,7 +83,6 @@ export default function SignUp() {
       const data = await res.json();
       
       if (res.ok) {
-        // Logic fix: Ensure full user object (with email) is passed to login for persistence
         login(data.token, data.user);
         router.push(data.user.role === 'regular' ? '/regular' : `/${data.user.role}`);
       } else {
@@ -130,7 +105,6 @@ export default function SignUp() {
       const res = await fetch(`${REST_API}/auth/resend-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // Logic fix: use formData.email as fallback if context is volatile
         body: JSON.stringify({ email: formData.email }),
       });
       if (res.ok) {
@@ -159,7 +133,6 @@ export default function SignUp() {
       });
       const data = await res.json();
       if (res.ok) {
-        // Logic fix: persist updated user state after verification
         login(data.token, data.user);
         router.push(data.user.role === 'regular' ? '/regular' : `/${data.user.role}`);
       } else {
@@ -336,4 +309,3 @@ export default function SignUp() {
     </div>
   );
 }
-  */
