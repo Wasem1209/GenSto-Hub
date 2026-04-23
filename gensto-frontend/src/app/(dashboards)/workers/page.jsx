@@ -9,6 +9,30 @@ import {
     Share2, Award, MessageCircle, Loader2
 } from 'lucide-react';
 
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Filler,
+    Legend,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Filler,
+    Legend
+);
+
 export default function WorkerPage() {
     const router = useRouter();
     const [dashboardData, setDashboardData] = useState(null);
@@ -17,7 +41,6 @@ export default function WorkerPage() {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                // Hits the versioned route for consistent data retrieval
                 const response = await fetch(`${REST_API}/v1/stats/dashboard`);
                 const result = await response.json();
                 if (result.success) {
@@ -34,17 +57,60 @@ export default function WorkerPage() {
 
     const navigateTo = (path) => router.push(`/worker/${path}`);
 
-    const growthChart = dashboardData?.growthChart || [];
+    const growthChartData = dashboardData?.growthChart || [];
+
+    const chartData = {
+        labels: growthChartData.map(day => day.label),
+        datasets: [
+            {
+                fill: true,
+                label: 'New Registrations',
+                data: growthChartData.map(day => day.value),
+                borderColor: 'rgb(16, 185, 129)',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                tension: 0.4,
+                pointRadius: 4,
+                pointHitRadius: 10,
+                pointBackgroundColor: 'rgb(16, 185, 129)',
+                borderWidth: 2,
+            },
+        ],
+    };
+
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: '#1f2937',
+                padding: 10,
+                displayColors: false,
+                titleFont: { size: 12 },
+                bodyFont: { size: 12, weight: 'bold' },
+            }
+        },
+        scales: {
+            x: {
+                grid: { display: false },
+                ticks: { font: { size: 10, weight: 'bold' }, color: '#9ca3af' }
+            },
+            y: {
+                beginAtZero: true,
+                grid: { color: '#f3f4f6', drawTicks: false },
+                ticks: { display: false }
+            }
+        }
+    };
 
     const mainStats = [
         { label: "Enrollments", value: dashboardData?.mainStats?.enrollments || "0", icon: Users, color: "text-blue-600", bg: "bg-blue-50", desc: "Pending review", path: "enrollments" },
         { label: "Payments", value: dashboardData?.mainStats?.payments || "0", icon: CreditCard, color: "text-amber-600", bg: "bg-amber-50", desc: "Unverified transfers", path: "payments" },
         { label: "Supports", value: dashboardData?.mainStats?.supports || "0", icon: MessageSquare, color: "text-purple-600", bg: "bg-purple-50", desc: "Open tickets", path: "supports" },
-        { label: "Live Now", value: dashboardData?.mainStats?.live || "0", icon: PlayCircle, color: "text-emerald-600", bg: "bg-emerald-50", desc: "Active sessions", path: "live-sessions" },
+        { label: "Registrations", value: dashboardData?.mainStats?.live || "0", icon: Users, color: "text-emerald-600", bg: "bg-emerald-50", desc: "Total Accounts", path: "registrations" },
     ];
 
     const operationalCards = [
-        // Ensure values pull correctly from the dashboardData.operational object
         { label: "Newsletter", value: dashboardData?.operational?.newsletter?.toLocaleString() || "0", icon: Mail, color: "text-pink-600", bg: "bg-pink-50", path: "newsletter" },
         { label: "Contacts Mgmt", value: dashboardData?.operational?.contacts || "0", icon: Contact, color: "text-cyan-600", bg: "bg-cyan-50", path: "contacts" },
         { label: "Internships", value: dashboardData?.operational?.internships || "0", icon: Briefcase, color: "text-orange-600", bg: "bg-orange-50", path: "internships" },
@@ -57,7 +123,6 @@ export default function WorkerPage() {
 
     return (
         <div className="p-8 space-y-8 min-h-screen bg-gray-50 animate-in fade-in duration-700">
-            {/* Header */}
             <div className="flex justify-between items-center slide-in-from-top-4 animate-in duration-500 fill-mode-both">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Operations Control</h1>
@@ -66,29 +131,19 @@ export default function WorkerPage() {
                 {loading && <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />}
             </div>
 
-            {/* Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {mainStats.map((stat, i) => (
-                    <div
-                        key={i}
-                        onClick={() => navigateTo(stat.path)}
-                        className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer group"
-                    >
+                    <div key={i} onClick={() => navigateTo(stat.path)} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer group">
                         <div className={`w-12 h-12 rounded-xl ${stat.bg} flex items-center justify-center mb-4 transition-transform group-hover:scale-110`}>
                             <stat.icon className={`w-6 h-6 ${stat.color}`} />
                         </div>
                         <h3 className="text-gray-500 text-sm font-medium">{stat.label}</h3>
-                        {loading ? (
-                            <div className="h-8 w-16 bg-gray-200 animate-pulse rounded mt-1"></div>
-                        ) : (
-                            <p className="text-2xl font-black text-gray-900">{stat.value}</p>
-                        )}
+                        {loading ? <div className="h-8 w-16 bg-gray-200 animate-pulse rounded mt-1"></div> : <p className="text-2xl font-black text-gray-900">{stat.value}</p>}
                         <p className="text-[10px] text-gray-400 uppercase mt-1 font-bold">{stat.desc}</p>
                     </div>
                 ))}
             </div>
 
-            {/* Table & Growth */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                     <div className="p-6 border-b border-gray-50 flex justify-between items-center">
@@ -110,7 +165,6 @@ export default function WorkerPage() {
                                 ) : (
                                     dashboardData?.recentEnrollments?.map((enrollment) => (
                                         <tr key={enrollment._id} className="hover:bg-gray-50/50">
-                                            {/* studentName is mapped from fullName in backend */}
                                             <td className="px-6 py-4 font-semibold">{enrollment.studentName || "N/A"}</td>
                                             <td className="px-6 py-4">
                                                 <span className={`px-2 py-1 rounded text-[10px] font-bold ${enrollment.status === 'paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
@@ -128,32 +182,23 @@ export default function WorkerPage() {
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm text-center">
-                    <h2 className="font-bold text-gray-800 mb-4 flex items-center gap-2 text-left"><TrendingUp className="w-5 h-5 text-emerald-500" /> User Growth</h2>
-                    <div className="h-48 bg-gray-50 rounded-xl flex flex-col items-center justify-center border-2 border-dashed border-gray-100">
-                        {growthChart.length > 0 ? (
-                            <div className="flex items-end gap-2 w-full px-4 h-32">
-                                {growthChart.map((day, i) => (
-                                    <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                                        <div
-                                            className="w-full bg-emerald-500 rounded-t-sm transition-all"
-                                            style={{ height: `${Math.max((day.value / 10) * 100, 10)}%` }}
-                                        ></div>
-                                        <span className="text-[8px] text-gray-400 font-bold">{day.label}</span>
-                                    </div>
-                                ))}
-                            </div>
+                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                    <h2 className="font-bold text-gray-800 mb-4 flex items-center gap-2 text-left">
+                        <TrendingUp className="w-5 h-5 text-emerald-500" /> User Growth
+                    </h2>
+                    <div className="h-48 w-full">
+                        {growthChartData.length > 0 ? (
+                            <Line data={chartData} options={chartOptions} />
                         ) : (
-                            <>
+                            <div className="h-full bg-gray-50 rounded-xl flex flex-col items-center justify-center border-2 border-dashed border-gray-100">
                                 <BarChart3 className="w-8 h-8 text-gray-200 mb-2" />
-                                <p className="text-[10px] text-gray-400 font-bold uppercase">Growth Analytics Data Ready</p>
-                            </>
+                                <p className="text-[10px] text-gray-400 font-bold uppercase text-center">No Growth Data Available</p>
+                            </div>
                         )}
                     </div>
                 </div>
             </div>
 
-            {/* Operational Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">
                 {operationalCards.map((card, i) => (
                     <div key={i} onClick={() => navigateTo(card.path)} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:border-blue-200 transition-all cursor-pointer group">
@@ -161,11 +206,7 @@ export default function WorkerPage() {
                             <card.icon className={`w-5 h-5 ${card.color}`} />
                         </div>
                         <h3 className="text-xs font-bold text-gray-400 uppercase tracking-tighter">{card.label}</h3>
-                        {loading ? (
-                            <div className="h-6 w-12 bg-gray-100 animate-pulse rounded mt-1"></div>
-                        ) : (
-                            <p className="text-xl font-black text-gray-800">{card.value}</p>
-                        )}
+                        {loading ? <div className="h-6 w-12 bg-gray-100 animate-pulse rounded mt-1"></div> : <p className="text-xl font-black text-gray-800">{card.value}</p>}
                     </div>
                 ))}
             </div>
