@@ -187,7 +187,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
-
+//gensto-frontend/src/app/(dashboards)/layout.tsx
 
 'use client';
 
