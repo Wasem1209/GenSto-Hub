@@ -84,10 +84,14 @@ export default function WorkerPage() {
             legend: { display: false },
             tooltip: {
                 backgroundColor: '#1f2937',
-                padding: 10,
+                padding: 12,
                 displayColors: false,
-                titleFont: { size: 12 },
-                bodyFont: { size: 12, weight: 'bold' },
+                titleFont: { size: 12, weight: 'normal' },
+                bodyFont: { size: 14, weight: 'bold' },
+
+                callbacks: {
+                    label: (context) => `${context.raw} Registrations`
+                }
             }
         },
         scales: {
@@ -98,7 +102,12 @@ export default function WorkerPage() {
             y: {
                 beginAtZero: true,
                 grid: { color: '#f3f4f6', drawTicks: false },
-                ticks: { display: false }
+                ticks: {
+                    display: true,
+                    stepSize: 1,
+                    font: { size: 10 },
+                    color: '#9ca3af'
+                }
             }
         }
     };
