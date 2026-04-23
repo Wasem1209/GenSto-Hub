@@ -5,54 +5,32 @@ import { NextAuthProvider } from '@/providers/NextAuthProvider';
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  // Brand identity based on the Ecosystem pillars
+  // We put 'Tech Talent' right in the title for Google to see immediately
   title: {
-    default: 'INANST | Innovation, Analytics & Societal Transformation',
+    default: 'INANST | Innovation, Ananlytics, Societal Transformation, Technological ecosystem,Tech ecosystem, & Innovation in Nigeria',
     template: '%s | INANST'
   },
-  description: "Nigeria's architectural response to the long technology problem. We bridge the gap between academic knowledge and industrial execution through indigenous hardware, software, and data intelligence.",
+  description: "Join Nigeria's premier tech ecosystem. INANST bridges the gap between academic theory and industry execution through software development, indigenous hardware, software development and data intelligence.",
   
   keywords: [
-    'INANST', 'Innovation Nigeria', 'Data Analytics Africa', 'Software Development Nigeria', 'Software Development Africal', 'Indigenous Tech', 'Tech Talent Nigeria', 'Tech Ecosystem Africa', 'Tech Training Nigeria',
-    'Indigenous Hardware Manufacturing', 'Tech Ecosystem Abuja', 'Societal Transformation', 'Tech Ecosystem Nigeria', 'African Ed-Tech'
+    'Tech Talent Nigeria', 'Software Development Abuja', 'MERN Stack Training Nigeria', 
+    'Embedded Systems Africa', 'Indigenous Tech Hardware', 'INANST', 'Tech Ecosystem Abuja'
   ],
   
   authors: [{ name: 'Philip Terfa Wasem', url: 'https://inanst.com' }],
   
   openGraph: {
-    title: 'INANST Ecosystem',
+    title: 'INANST | Tech Talent & Innovation Ecosystem',
     description: 'Dismantling the productivity gap in Nigeria through a unified stack of education, hardware, and software.',
     url: 'https://www.inanst.com',
     siteName: 'INANST',
-    images: [
-      {
-        url: '/images/inanstlogo.png', 
-        width: 1200,
-        height: 630,
-        alt: 'INANST Ecosystem Pillars',
-      },
-    ],
+    images: [{ url: '/images/inanstlogo.png', width: 1200, height: 630, alt: 'INANST Ecosystem' }],
     locale: 'en_US',
     type: 'website',
   },
-
-  twitter: {
-    card: 'summary_large_image',
-    title: 'INANST | Innovation, Analytics & Societal Transformation',
-    description: 'An ecosystem of infrastructure, intelligence, and talent to solve the long technology problem in Nigeria.',
-  },
-
-  // Tells bots specifically how to index the ecosystem
   robots: {
     index: true,
     follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
   },
 }
 
@@ -62,9 +40,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="antialiased">
         <NextAuthProvider>
           <AuthProvider>
-            <main className="min-h-screen flex flex-col">
-              {children}
-            </main>
+            {/* Removed the extra 'main' here to avoid layout shifts */}
+            {children}
           </AuthProvider>
         </NextAuthProvider>
       </body>
