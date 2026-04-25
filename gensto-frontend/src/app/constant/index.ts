@@ -22,6 +22,8 @@ export const API_ROUTES = {
     ENROLL_REGISTER: `${REST_API}/v1/enrollments/register`,
     ENROLL_STATUS: `${REST_API}/v1/enrollments/status`,
     DASHBOARD_STATS: `${REST_API}/v1/stats/dashboard`,
+    ADMIN_OVERSIGHT: `${REST_API}/v1/admin/oversight-stats`,
+    ADMIN_UPDATE_ROLE: `${REST_API}/v1/admin/update-role`,
 };
 
 
