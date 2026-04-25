@@ -44,7 +44,7 @@ export default function CoursesPage() {
       description: 'Understand security fundamentals to protect digital systems.',
     },
     {
-      title: 'Database School',
+      title: 'Database Management School',
       icon: <Database className="w-10 h-10 text-pink-600" />,
       description: 'Learn how to manage, query, and maintain databases.',
     },

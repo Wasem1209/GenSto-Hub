@@ -6,7 +6,8 @@ import {
     Users, Briefcase, Award, Loader2, ClipboardList, TrendingUp,
     ShieldAlert, UserPlus, UserMinus, ShieldCheck,
     MousePointer2, Clock, MessageSquare, GraduationCap,
-    Mail, Contact, Handshake, Radio, Share2, MessageCircle
+    Mail, Contact, Handshake, Radio, Share2, MessageCircle,
+    Trash2, ListTodo
 } from 'lucide-react';
 
 import {
@@ -29,8 +30,8 @@ export default function AdminDashboard() {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                // Fetching from the oversight stats endpoint
-                const response = await fetch(`${REST_API}/admin/oversight-stats`);
+                // Pointing to your versioned API route: /api/v1/admin/oversight-stats
+                const response = await fetch(`${REST_API}/v1/admin/oversight-stats`);
                 const result = await response.json();
                 if (result.success) {
                     setDashboardData(result.data);
@@ -46,7 +47,7 @@ export default function AdminDashboard() {
 
     const navigateTo = (path) => router.push(`/admins/${path}`);
 
-    // Section 1: System-wide Stats
+    // Section 1: System-wide Stats (Connected to Database)
     const mainStats = [
         { label: "Worker Pulse", value: dashboardData?.mainStats?.workers || "0", icon: Briefcase, color: "text-blue-600", bg: "bg-blue-50", desc: "Active Staff", path: "monitor-workers" },
         { label: "User Monitor", value: dashboardData?.mainStats?.users || "0", icon: Users, color: "text-emerald-600", bg: "bg-emerald-50", desc: "Total Accounts", path: "monitor-users" },
@@ -54,15 +55,15 @@ export default function AdminDashboard() {
         { label: "Instructors", value: dashboardData?.mainStats?.instructors || "0", icon: Award, color: "text-purple-600", bg: "bg-purple-50", desc: "Faculty Load", path: "monitor-instructors" },
     ];
 
-    // Section 2: Authority Management
+    // Section 2: Authority & Management (Added Tasks and Delete User)
     const authorityActions = [
         { label: "Promote User", desc: "Grant Access", icon: UserPlus, color: "text-blue-700", bg: "bg-blue-100", path: "manage-users?action=promote" },
-        { label: "Depromote", desc: "Revoke Access", icon: UserMinus, color: "text-red-700", bg: "bg-red-100", path: "manage-users?action=demote" },
         { label: "Role Audit", desc: "Review Permissions", icon: ShieldCheck, color: "text-emerald-700", bg: "bg-emerald-100", path: "role-audit" },
-        { label: "Admin Logs", desc: "Authority Changes", icon: ShieldAlert, color: "text-amber-700", bg: "bg-amber-100", path: "authority-logs" },
+        { label: "Task Center", desc: "Assign Duties", icon: ListTodo, color: "text-indigo-700", bg: "bg-indigo-100", path: "tasks" },
+        { label: "Delete User", desc: "Remove Account", icon: Trash2, color: "text-red-700", bg: "bg-red-100", path: "manage-users?action=delete" },
     ];
 
-    // Section 3: Operational Cards (Added Back)
+    // Section 3: Operational Cards (Connected to Database)
     const operationalCards = [
         { label: "Newsletter", value: dashboardData?.operational?.newsletter?.toLocaleString() || "0", icon: Mail, color: "text-pink-600", bg: "bg-pink-50", path: "newsletter" },
         { label: "Contacts Mgmt", value: dashboardData?.operational?.contacts || "0", icon: Contact, color: "text-cyan-600", bg: "bg-cyan-50", path: "contacts" },
@@ -102,7 +103,12 @@ export default function AdminDashboard() {
                     <h1 className="text-3xl font-bold text-gray-900 tracking-tight">System Control Unit</h1>
                     <p className="text-gray-500 font-medium">Administrator Command Center | Welcome, Philip</p>
                 </div>
-                {loading && <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />}
+                {loading && (
+                    <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full border border-blue-100">
+                        <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />
+                        <span className="text-xs font-bold text-blue-600">Syncing with DB...</span>
+                    </div>
+                )}
             </div>
 
             {/* Top Row: Main Oversight Stats */}
@@ -135,8 +141,10 @@ export default function AdminDashboard() {
                     </div>
                     <hr className="border-gray-50" />
                     <div className="flex justify-between items-center">
-                        <span className="text-sm font-bold text-gray-800">Pending Requests</span>
-                        <span className="bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-black">{dashboardData?.oversight?.pendingEnrollments || "0"}</span>
+                        <span className="text-sm font-bold text-gray-800">Pending Admissions</span>
+                        <span className="bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-black">
+                            {loading ? "..." : (dashboardData?.oversight?.pendingEnrollments || "0")}
+                        </span>
                     </div>
                 </div>
 
@@ -146,7 +154,9 @@ export default function AdminDashboard() {
                         {growthChartData.length > 0 ? (
                             <Line data={chartData} options={{ responsive: true, maintainAspectRatio: false }} />
                         ) : (
-                            <div className="h-full bg-gray-50 rounded-xl flex items-center justify-center border-2 border-dashed">No Data</div>
+                            <div className="h-full bg-gray-50 rounded-xl flex items-center justify-center border-2 border-dashed">
+                                <span className="text-gray-400 text-sm font-bold">Waiting for Growth Data...</span>
+                            </div>
                         )}
                     </div>
                 </div>
