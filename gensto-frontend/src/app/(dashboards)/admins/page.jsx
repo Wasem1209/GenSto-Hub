@@ -30,11 +30,24 @@ export default function AdminDashboard() {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                // Pointing to your versioned API route: /api/v1/admin/oversight-stats
-                const response = await fetch(`${REST_API}/v1/admin/oversight-stats`);
+                // Get the token from storage (standard for MERN apps)
+                const token = localStorage.getItem('token');
+
+                const response = await fetch(`${REST_API}/v1/admin/oversight-stats`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` // This fixes the 401 Error
+                    }
+                });
+
                 const result = await response.json();
+
                 if (result.success) {
                     setDashboardData(result.data);
+                } else {
+                    console.error("Dashboard error:", result.message);
+                    // Optional: if (response.status === 401) router.push('/login');
                 }
             } catch (error) {
                 console.error("Dashboard API Error:", error);
@@ -43,11 +56,11 @@ export default function AdminDashboard() {
             }
         };
         fetchDashboardData();
-    }, []);
+    }, [router]);
 
     const navigateTo = (path) => router.push(`/admins/${path}`);
 
-    // Section 1: System-wide Stats (Connected to Database)
+    // --- The rest of your code remains the same ---
     const mainStats = [
         { label: "Worker Pulse", value: dashboardData?.mainStats?.workers || "0", icon: Briefcase, color: "text-blue-600", bg: "bg-blue-50", desc: "Active Staff", path: "monitor-workers" },
         { label: "User Monitor", value: dashboardData?.mainStats?.users || "0", icon: Users, color: "text-emerald-600", bg: "bg-emerald-50", desc: "Total Accounts", path: "monitor-users" },
@@ -55,7 +68,6 @@ export default function AdminDashboard() {
         { label: "Instructors", value: dashboardData?.mainStats?.instructors || "0", icon: Award, color: "text-purple-600", bg: "bg-purple-50", desc: "Faculty Load", path: "monitor-instructors" },
     ];
 
-    // Section 2: Authority & Management (Added Tasks and Delete User)
     const authorityActions = [
         { label: "Promote User", desc: "Grant Access", icon: UserPlus, color: "text-blue-700", bg: "bg-blue-100", path: "manage-users?action=promote" },
         { label: "Role Audit", desc: "Review Permissions", icon: ShieldCheck, color: "text-emerald-700", bg: "bg-emerald-100", path: "role-audit" },
@@ -63,7 +75,6 @@ export default function AdminDashboard() {
         { label: "Delete User", desc: "Remove Account", icon: Trash2, color: "text-red-700", bg: "bg-red-100", path: "manage-users?action=delete" },
     ];
 
-    // Section 3: Operational Cards (Connected to Database)
     const operationalCards = [
         { label: "Newsletter", value: dashboardData?.operational?.newsletter?.toLocaleString() || "0", icon: Mail, color: "text-pink-600", bg: "bg-pink-50", path: "newsletter" },
         { label: "Contacts Mgmt", value: dashboardData?.operational?.contacts || "0", icon: Contact, color: "text-cyan-600", bg: "bg-cyan-50", path: "contacts" },
@@ -111,7 +122,7 @@ export default function AdminDashboard() {
                 )}
             </div>
 
-            {/* Top Row: Main Oversight Stats */}
+            {/*  Main Oversight Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {mainStats.map((stat, i) => (
                     <div key={i} onClick={() => navigateTo(stat.path)} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer group">
@@ -125,7 +136,7 @@ export default function AdminDashboard() {
                 ))}
             </div>
 
-            {/* Middle Row: Engagement & Growth */}
+            {/*  Engagement & Growth */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-6">
                     <h2 className="font-bold text-gray-800 flex items-center gap-2"><Clock className="w-5 h-5 text-blue-500" /> Avg Session Time</h2>
