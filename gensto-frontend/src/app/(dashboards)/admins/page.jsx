@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-// Added ADMIN_OVERSIGHT to imports
-import { REST_API, ADMIN_OVERSIGHT } from '../../constant';
+// Using REST_API directly to construct endpoints
+import { REST_API } from '../../constant';
 import {
     Users, Briefcase, Award,
     Loader2, ClipboardList, TrendingUp,
@@ -30,14 +30,14 @@ export default function AdminDashboard() {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                // Updated to use the ADMIN_OVERSIGHT constant
-                const response = await fetch(ADMIN_OVERSIGHT);
+                // Constructing the oversight endpoint manually to avoid missing export errors
+                const response = await fetch(`${REST_API}/admin/oversight-stats`);
                 const result = await response.json();
                 if (result.success) {
                     setDashboardData(result.data);
                 }
             } catch (error) {
-                console.error("Hi Wasem, API Error:", error);
+                console.error("Dashboard API Error:", error);
             } finally {
                 setLoading(false);
             }
@@ -47,7 +47,6 @@ export default function AdminDashboard() {
 
     const navigateTo = (path) => router.push(`/admins/${path}`);
 
-    // Main Vitals using the new visitorRate from backend
     const mainStats = [
         { label: "Worker Pulse", value: dashboardData?.mainStats?.workers || "0", icon: Briefcase, color: "text-blue-600", bg: "bg-blue-50", desc: "Active Staff", path: "monitor-workers" },
         { label: "User Monitor", value: dashboardData?.mainStats?.users || "0", icon: Users, color: "text-emerald-600", bg: "bg-emerald-50", desc: "Total Accounts", path: "monitor-users" },
@@ -62,10 +61,9 @@ export default function AdminDashboard() {
         { label: "Admin Logs", desc: "Recent Authority Changes", icon: ShieldAlert, color: "text-amber-700", bg: "bg-amber-100", path: "authority-logs" },
     ];
 
-    // Helper to find specific role timing from activityReport array
     const getSessionTime = (roleName) => {
-        const report = dashboardData?.activityReport?.find(r => r._id === roleName);
-        return report ? `${Math.round(report.avgSessionTime || 0)} mins` : "0 mins";
+        const stats = dashboardData?.oversight?.avgEngagement?.find(r => r._id === roleName);
+        return stats ? `${Math.round(stats.avgSessionDuration || 0)} mins` : "0 mins";
     };
 
     const growthChartData = dashboardData?.growthChart || [];
@@ -93,7 +91,6 @@ export default function AdminDashboard() {
                 {loading && <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />}
             </div>
 
-            {/* Core Monitoring Vitals */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {mainStats.map((stat, i) => (
                     <div key={i} onClick={() => navigateTo(stat.path)} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer group">
@@ -107,7 +104,6 @@ export default function AdminDashboard() {
                 ))}
             </div>
 
-            {/* Deep Oversight Performance Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                     <h2 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
@@ -146,7 +142,6 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            {/* Authority & Role Management Section */}
             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                 <h2 className="font-bold text-gray-800 mb-6 flex items-center gap-2">
                     <ShieldCheck className="w-5 h-5 text-blue-600" /> User Authority Management
@@ -168,7 +163,6 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            {/* Growth and Activity Stream */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                     <div className="p-6 border-b border-gray-50 flex justify-between items-center">
