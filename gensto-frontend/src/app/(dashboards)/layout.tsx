@@ -1,5 +1,4 @@
 /*
-
 'use client';
 
 import { useState, useLayoutEffect, useEffect } from 'react';
@@ -32,14 +31,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [error, setError] = useState('');
 
   // --- LOCAL VIEWING BYPASS ---
-  // If true, this will stop the layout from kicking you out to signin/regular role
-  const isDevelopment = pathname.includes('/workers'); 
+  // Updated to include both workers and admins for easier navigation on your machine
+  const isDevelopment = pathname.includes('/workers') || pathname.includes('/admins'); 
 
   useEffect(() => {
     setIsSidebarOpen(false);
   }, [pathname]);
 
-  // If we are in dev mode/workers preview, we treat the user as verified
+  // If we are in dev mode/preview, we treat the user as verified to hide the blur
   const isUnverified = user && !user.isVerified && !isDevelopment;
 
   const maskEmail = (email: string) => {
@@ -51,7 +50,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   useLayoutEffect(() => {
-    if (authLoading || isDevelopment) return; // Skip redirect if testing /workers
+    // If we are testing specific routes locally, stop the redirect logic entirely
+    if (authLoading || isDevelopment) return; 
     
     if (!user) {
       router.replace('/signin');
@@ -60,6 +60,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     if (user.isVerified) {
       const rolePath = `/${user.role}`;
+      // Only redirect if the current path doesn't start with their assigned role
       if (!pathname.startsWith(rolePath)) {
         router.replace(rolePath);
       }
@@ -108,7 +109,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   };
 
-  // Show loading only if not in dev mode and still fetching auth
+  // Determine which role to pass to UI components based on the URL during development
+  const currentRole = isDevelopment 
+    ? (pathname.includes('/admins') ? 'admins' : 'workers')
+    : user?.role;
+
   if (authLoading && !isDevelopment) {
     return (
       <div className="h-screen w-full bg-black flex items-center justify-center">
@@ -119,11 +124,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="relative flex h-screen bg-[#f8fafc] overflow-hidden">
+      
       <div className={`flex flex-1 h-full overflow-hidden transition-all duration-700 
         ${isUnverified ? "blur-2xl grayscale opacity-40 pointer-events-none" : ""}`}>
         
         <DashboardSidebar 
-          role={isDevelopment ? "workers" : user?.role} 
+          role={currentRole} 
           isOpen={isSidebarOpen} 
           setIsOpen={setIsSidebarOpen} 
         />
@@ -131,7 +137,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="flex-1 flex flex-col overflow-hidden text-black">
           <DashboardHeader 
             onMenuClick={() => setIsSidebarOpen(true)} 
-            role={isDevelopment ? "workers" : user?.role} 
+            role={currentRole} 
           />
           <main className="flex-1 overflow-y-auto p-4 md:p-10">
             <div className="max-w-7xl mx-auto">
@@ -182,8 +188,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </div>
   );
 }
-
 */
+
 
 
 

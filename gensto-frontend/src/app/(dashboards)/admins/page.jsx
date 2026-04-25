@@ -1,13 +1,12 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-// Using REST_API directly to construct endpoints
 import { REST_API } from '../../constant';
 import {
-    Users, Briefcase, Award,
-    Loader2, ClipboardList, TrendingUp,
+    Users, Briefcase, Award, Loader2, ClipboardList, TrendingUp,
     ShieldAlert, UserPlus, UserMinus, ShieldCheck,
-    MousePointer2, Clock, MessageSquare, GraduationCap
+    MousePointer2, Clock, MessageSquare, GraduationCap,
+    Mail, Contact, Handshake, Radio, Share2, MessageCircle
 } from 'lucide-react';
 
 import {
@@ -30,7 +29,7 @@ export default function AdminDashboard() {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                // Constructing the oversight endpoint manually to avoid missing export errors
+                // Fetching from the oversight stats endpoint
                 const response = await fetch(`${REST_API}/admin/oversight-stats`);
                 const result = await response.json();
                 if (result.success) {
@@ -47,6 +46,7 @@ export default function AdminDashboard() {
 
     const navigateTo = (path) => router.push(`/admins/${path}`);
 
+    // Section 1: System-wide Stats
     const mainStats = [
         { label: "Worker Pulse", value: dashboardData?.mainStats?.workers || "0", icon: Briefcase, color: "text-blue-600", bg: "bg-blue-50", desc: "Active Staff", path: "monitor-workers" },
         { label: "User Monitor", value: dashboardData?.mainStats?.users || "0", icon: Users, color: "text-emerald-600", bg: "bg-emerald-50", desc: "Total Accounts", path: "monitor-users" },
@@ -54,11 +54,24 @@ export default function AdminDashboard() {
         { label: "Instructors", value: dashboardData?.mainStats?.instructors || "0", icon: Award, color: "text-purple-600", bg: "bg-purple-50", desc: "Faculty Load", path: "monitor-instructors" },
     ];
 
+    // Section 2: Authority Management
     const authorityActions = [
-        { label: "Promote User", desc: "Grant Worker/Instructor Access", icon: UserPlus, color: "text-blue-700", bg: "bg-blue-100", path: "manage-users?action=promote" },
-        { label: "Depromote", desc: "Revoke Dashboard Access", icon: UserMinus, color: "text-red-700", bg: "bg-red-100", path: "manage-users?action=demote" },
-        { label: "Role Audit", desc: "Review User Permissions", icon: ShieldCheck, color: "text-emerald-700", bg: "bg-emerald-100", path: "role-audit" },
-        { label: "Admin Logs", desc: "Recent Authority Changes", icon: ShieldAlert, color: "text-amber-700", bg: "bg-amber-100", path: "authority-logs" },
+        { label: "Promote User", desc: "Grant Access", icon: UserPlus, color: "text-blue-700", bg: "bg-blue-100", path: "manage-users?action=promote" },
+        { label: "Depromote", desc: "Revoke Access", icon: UserMinus, color: "text-red-700", bg: "bg-red-100", path: "manage-users?action=demote" },
+        { label: "Role Audit", desc: "Review Permissions", icon: ShieldCheck, color: "text-emerald-700", bg: "bg-emerald-100", path: "role-audit" },
+        { label: "Admin Logs", desc: "Authority Changes", icon: ShieldAlert, color: "text-amber-700", bg: "bg-amber-100", path: "authority-logs" },
+    ];
+
+    // Section 3: Operational Cards (Added Back)
+    const operationalCards = [
+        { label: "Newsletter", value: dashboardData?.operational?.newsletter?.toLocaleString() || "0", icon: Mail, color: "text-pink-600", bg: "bg-pink-50", path: "newsletter" },
+        { label: "Contacts Mgmt", value: dashboardData?.operational?.contacts || "0", icon: Contact, color: "text-cyan-600", bg: "bg-cyan-50", path: "contacts" },
+        { label: "Internships", value: dashboardData?.operational?.internships || "0", icon: Briefcase, color: "text-orange-600", bg: "bg-orange-50", path: "internships" },
+        { label: "Partnerships", value: dashboardData?.operational?.partnerships || "0", icon: Handshake, color: "text-indigo-600", bg: "bg-indigo-50", path: "partnerships" },
+        { label: "BroadCast", value: "Active", icon: Radio, color: "text-red-600", bg: "bg-red-50", path: "broadcast" },
+        { label: "Collaboration", value: dashboardData?.operational?.collabs || "0", icon: Share2, color: "text-teal-600", bg: "bg-teal-50", path: "collaboration" },
+        { label: "Cert. Exams", value: dashboardData?.operational?.exams || "0", icon: Award, color: "text-violet-600", bg: "bg-violet-50", path: "certificates" },
+        { label: "Post Comments", value: dashboardData?.operational?.comments || "0", icon: MessageCircle, color: "text-sky-600", bg: "bg-sky-50", path: "comments" },
     ];
 
     const getSessionTime = (roleName) => {
@@ -83,14 +96,16 @@ export default function AdminDashboard() {
 
     return (
         <div className="p-8 space-y-8 min-h-screen bg-gray-50">
+            {/* Header */}
             <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900 tracking-tight">System Control Unit</h1>
-                    <p className="text-gray-500 font-medium">Administrator Command Center | Welcome, Wasem</p>
+                    <p className="text-gray-500 font-medium">Administrator Command Center | Welcome, Philip</p>
                 </div>
                 {loading && <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />}
             </div>
 
+            {/* Top Row: Main Oversight Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {mainStats.map((stat, i) => (
                     <div key={i} onClick={() => navigateTo(stat.path)} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer group">
@@ -104,11 +119,10 @@ export default function AdminDashboard() {
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                    <h2 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <Clock className="w-5 h-5 text-blue-500" /> Avg Session Time
-                    </h2>
+            {/* Middle Row: Engagement & Growth */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-6">
+                    <h2 className="font-bold text-gray-800 flex items-center gap-2"><Clock className="w-5 h-5 text-blue-500" /> Avg Session Time</h2>
                     <div className="space-y-4">
                         <div className="flex justify-between text-sm">
                             <span className="text-gray-500 font-medium">Workers:</span>
@@ -119,29 +133,26 @@ export default function AdminDashboard() {
                             <span className="font-bold text-purple-600">{loading ? "..." : getSessionTime('instructor')}</span>
                         </div>
                     </div>
-                </div>
-
-                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                    <h2 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <MessageSquare className="w-5 h-5 text-emerald-500" /> Worker Responses
-                    </h2>
-                    <div className="flex items-end gap-2">
-                        <p className="text-3xl font-black text-gray-900">{dashboardData?.oversight?.workerResponses || "0"}</p>
-                        <p className="text-xs text-gray-400 mb-2 font-bold uppercase tracking-widest">Pending</p>
+                    <hr className="border-gray-50" />
+                    <div className="flex justify-between items-center">
+                        <span className="text-sm font-bold text-gray-800">Pending Requests</span>
+                        <span className="bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-black">{dashboardData?.oversight?.pendingEnrollments || "0"}</span>
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                    <h2 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <GraduationCap className="w-5 h-5 text-purple-500" /> Pending Admissions
-                    </h2>
-                    <div className="flex items-end gap-2">
-                        <p className="text-3xl font-black text-gray-900">{dashboardData?.oversight?.pendingEnrollments || "0"}</p>
-                        <p className="text-xs text-gray-400 mb-2 font-bold uppercase tracking-widest">Requests</p>
+                <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                    <h2 className="font-bold text-gray-800 mb-4 flex items-center gap-2"><TrendingUp className="w-5 h-5 text-blue-500" /> Ecosystem Growth</h2>
+                    <div className="h-48 w-full">
+                        {growthChartData.length > 0 ? (
+                            <Line data={chartData} options={{ responsive: true, maintainAspectRatio: false }} />
+                        ) : (
+                            <div className="h-full bg-gray-50 rounded-xl flex items-center justify-center border-2 border-dashed">No Data</div>
+                        )}
                     </div>
                 </div>
             </div>
 
+            {/* Middle Section: Authority Management */}
             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                 <h2 className="font-bold text-gray-800 mb-6 flex items-center gap-2">
                     <ShieldCheck className="w-5 h-5 text-blue-600" /> User Authority Management
@@ -163,27 +174,17 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                    <div className="p-6 border-b border-gray-50 flex justify-between items-center">
-                        <h2 className="font-bold text-gray-800 flex items-center gap-2"><ClipboardList className="w-5 h-5 text-blue-500" /> Activity Stream</h2>
-                        <button onClick={() => navigateTo('logs')} className="text-xs text-blue-600 font-bold hover:underline tracking-widest">FULL REPORT</button>
+            {/* Bottom Row: Operational Control Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {operationalCards.map((card, i) => (
+                    <div key={i} onClick={() => navigateTo(card.path)} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:border-blue-300 transition-all cursor-pointer group">
+                        <div className={`w-9 h-9 rounded-lg ${card.bg} flex items-center justify-center mb-3`}>
+                            <card.icon className={`w-5 h-5 ${card.color}`} />
+                        </div>
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-tighter">{card.label}</h3>
+                        <p className="text-xl font-black text-gray-800">{loading ? "..." : card.value}</p>
                     </div>
-                    <div className="p-20 text-center text-gray-400 italic font-medium">Monitoring staff performance and student engagement...</div>
-                </div>
-
-                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                    <h2 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <TrendingUp className="w-5 h-5 text-blue-500" /> Ecosystem Growth
-                    </h2>
-                    <div className="h-48 w-full">
-                        {growthChartData.length > 0 ? (
-                            <Line data={chartData} options={{ responsive: true, maintainAspectRatio: false }} />
-                        ) : (
-                            <div className="h-full bg-gray-50 rounded-xl flex items-center justify-center border-2 border-dashed">No Growth Data</div>
-                        )}
-                    </div>
-                </div>
+                ))}
             </div>
         </div>
     );
