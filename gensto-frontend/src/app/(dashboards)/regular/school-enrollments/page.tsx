@@ -82,7 +82,7 @@ export default function SchoolEnrollmentsPage() {
     <section className="relative bg-gray-50 pt-24 pb-16 px-4 sm:px-6 lg:px-16 min-h-screen font-sans">
       <div className="max-w-7xl mx-auto">
         
-        {/* STATIC HEADER - Always Visible */}
+        {/* STATIC HEADER  */}
         <div className="text-center mb-16">
           <motion.h1 
             initial={{ opacity: 0, y: -20 }}
@@ -103,7 +103,7 @@ export default function SchoolEnrollmentsPage() {
 
         {/* DYNAMIC CONTENT AREA */}
         {loading ? (
-          /* Loader shown only in the card grid area while fetching */
+          
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <Loader2 className="w-12 h-12 text-[#2563eb] animate-spin" />
             <p className="text-[#64748b] font-bold animate-pulse text-lg">Syncing specialized schools...</p>

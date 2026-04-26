@@ -10,7 +10,7 @@ import {
 import { REST_API } from '../../../constant';
 import Link from 'next/link';
 
-// Map the string names to the actual components for the preview
+
 const iconComponentMap: Record<string, React.ElementType> = {
   Monitor, Server, Layout, Code2, Layers, Terminal,
   Shield, Database, BarChart3, Smartphone, Cpu, Globe,
