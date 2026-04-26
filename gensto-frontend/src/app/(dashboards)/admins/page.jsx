@@ -30,14 +30,13 @@ export default function AdminDashboard() {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                // Get the token from storage (standard for MERN apps)
                 const token = localStorage.getItem('token');
 
                 const response = await fetch(`${REST_API}/v1/admin/oversight-stats`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}` // This fixes the 401 Error
+                        'Authorization': `Bearer ${token}`
                     }
                 });
 
@@ -47,7 +46,6 @@ export default function AdminDashboard() {
                     setDashboardData(result.data);
                 } else {
                     console.error("Dashboard error:", result.message);
-                    // Optional: if (response.status === 401) router.push('/login');
                 }
             } catch (error) {
                 console.error("Dashboard API Error:", error);
@@ -60,7 +58,6 @@ export default function AdminDashboard() {
 
     const navigateTo = (path) => router.push(`/admins/${path}`);
 
-    // --- The rest of your code remains the same ---
     const mainStats = [
         { label: "Worker Pulse", value: dashboardData?.mainStats?.workers || "0", icon: Briefcase, color: "text-blue-600", bg: "bg-blue-50", desc: "Active Staff", path: "monitor-workers" },
         { label: "User Monitor", value: dashboardData?.mainStats?.users || "0", icon: Users, color: "text-emerald-600", bg: "bg-emerald-50", desc: "Total Accounts", path: "monitor-users" },
@@ -70,17 +67,25 @@ export default function AdminDashboard() {
 
     const authorityActions = [
         { label: "Promote User", desc: "Grant Access", icon: UserPlus, color: "text-blue-700", bg: "bg-blue-100", path: "manage-users?action=promote" },
+        // New Add School Card
+        { label: "Add School", desc: "New Institution", icon: GraduationCap, color: "text-orange-700", bg: "bg-orange-100", path: "add-school" },
+        // New Add Service Card
+        { label: "Add Service", desc: "New Deployment", icon: ClipboardList, color: "text-emerald-700", bg: "bg-emerald-100", path: "add-service" },
+        // New Security Audit / Visitor Detection Card
+        { label: "System Audit", desc: "Security Logs", icon: ShieldAlert, color: "text-red-700", bg: "bg-red-100", path: "security-audit" },
         { label: "Role Audit", desc: "Review Permissions", icon: ShieldCheck, color: "text-emerald-700", bg: "bg-emerald-100", path: "role-audit" },
         { label: "Task Center", desc: "Assign Duties", icon: ListTodo, color: "text-indigo-700", bg: "bg-indigo-100", path: "tasks" },
         { label: "Delete User", desc: "Remove Account", icon: Trash2, color: "text-red-700", bg: "bg-red-100", path: "manage-users?action=delete" },
     ];
 
     const operationalCards = [
+        { label: "Schools Running", value: dashboardData?.operational?.schools || "0", icon: GraduationCap, color: "text-orange-600", bg: "bg-orange-50", path: "schools" },
+        { label: "Services Running", value: dashboardData?.operational?.services || "0", icon: ClipboardList, color: "text-emerald-600", bg: "bg-emerald-50", path: "services" },
         { label: "Newsletter", value: dashboardData?.operational?.newsletter?.toLocaleString() || "0", icon: Mail, color: "text-pink-600", bg: "bg-pink-50", path: "newsletter" },
         { label: "Contacts Mgmt", value: dashboardData?.operational?.contacts || "0", icon: Contact, color: "text-cyan-600", bg: "bg-cyan-50", path: "contacts" },
         { label: "Internships", value: dashboardData?.operational?.internships || "0", icon: Briefcase, color: "text-orange-600", bg: "bg-orange-50", path: "internships" },
         { label: "Partnerships", value: dashboardData?.operational?.partnerships || "0", icon: Handshake, color: "text-indigo-600", bg: "bg-indigo-50", path: "partnerships" },
-        { label: "BroadCast", value: "Active", icon: Radio, color: "text-red-600", bg: "bg-red-50", path: "broadcast" },
+        { label: "BroadCast", value: "Live", icon: Radio, color: "text-red-600", bg: "bg-red-50", path: "broadcast" },
         { label: "Collaboration", value: dashboardData?.operational?.collabs || "0", icon: Share2, color: "text-teal-600", bg: "bg-teal-50", path: "collaboration" },
         { label: "Cert. Exams", value: dashboardData?.operational?.exams || "0", icon: Award, color: "text-violet-600", bg: "bg-violet-50", path: "certificates" },
         { label: "Post Comments", value: dashboardData?.operational?.comments || "0", icon: MessageCircle, color: "text-sky-600", bg: "bg-sky-50", path: "comments" },
@@ -122,7 +127,7 @@ export default function AdminDashboard() {
                 )}
             </div>
 
-            {/*  Main Oversight Stats */}
+            {/* Main Oversight Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {mainStats.map((stat, i) => (
                     <div key={i} onClick={() => navigateTo(stat.path)} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer group">
@@ -136,7 +141,7 @@ export default function AdminDashboard() {
                 ))}
             </div>
 
-            {/*  Engagement & Growth */}
+            {/* Engagement & Growth */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-6">
                     <h2 className="font-bold text-gray-800 flex items-center gap-2"><Clock className="w-5 h-5 text-blue-500" /> Avg Session Time</h2>
@@ -203,7 +208,7 @@ export default function AdminDashboard() {
                             <card.icon className={`w-5 h-5 ${card.color}`} />
                         </div>
                         <h3 className="text-xs font-bold text-gray-400 uppercase tracking-tighter">{card.label}</h3>
-                        <p className="text-xl font-black text-gray-800">{loading ? "..." : card.value}</p>
+                        <p className="text-xl font-black text-gray-800">{loading ? "!" : card.value}</p>
                     </div>
                 ))}
             </div>
