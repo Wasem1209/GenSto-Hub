@@ -33,6 +33,8 @@ export const API_ROUTES = {
     DASHBOARD_STATS: `${REST_API}/v1/stats/dashboard`,
     UNIT_OVERSIGHT: `${REST_API}/v1/unit/oversight-stats`,
     UNIT_UPDATE_ROLE: `${REST_API}/v1/unit/update-role`,
+    SCHOOLS: `${REST_API}/schools`,
+
 };
 
 
