@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { API_ROUTES } from '../../constant';
+import { REST_API } from '../../constant'; // Switched to REST_API
 import {
     Users, Briefcase, Award, Loader2, ClipboardList, TrendingUp,
     ShieldAlert, UserPlus, UserMinus, ShieldCheck,
@@ -32,8 +32,8 @@ export default function AdminDashboard() {
             try {
                 const token = localStorage.getItem('token');
 
-
-                const response = await fetch(API_ROUTES.UNIT_OVERSIGHT, {
+                // Using REST_API constant for the fetch call
+                const response = await fetch(`${REST_API}/admin/oversight`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -57,8 +57,12 @@ export default function AdminDashboard() {
         fetchDashboardData();
     }, [router]);
 
-    // Logic Update: Navigating to /unit paths to match new backend naming
-    const navigateTo = (path) => router.push(`/unit/${path}`);
+    /**
+     * LOGIC UPDATE: 
+     * Changed to handle absolute admin paths.
+     * When calling navigateTo('add-school'), it now goes to /admins/add-school
+     */
+    const navigateTo = (path) => router.push(`/admins/${path}`);
 
     const mainStats = [
         { label: "Worker Pulse", value: dashboardData?.mainStats?.workers || "0", icon: Briefcase, color: "text-blue-600", bg: "bg-blue-50", desc: "Active Staff", path: "monitor-workers" },

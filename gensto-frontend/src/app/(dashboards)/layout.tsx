@@ -30,15 +30,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
 
-  // --- LOCAL VIEWING BYPASS ---
-  // Updated to include both workers and admins for easier navigation on your machine
-  const isDevelopment = pathname.includes('/workers') || pathname.includes('/admins'); 
+  // Logic Update: Detect localhost or specific dev paths to disable auth-locks locally
+  const isDevelopment = 
+    (typeof window !== 'undefined' && window.location.hostname === 'localhost') || 
+    pathname.includes('/workers') || 
+    pathname.includes('/admins'); 
 
   useEffect(() => {
     setIsSidebarOpen(false);
   }, [pathname]);
 
-  // If we are in dev mode/preview, we treat the user as verified to hide the blur
+  // If we are in dev mode, we bypass the verification blur entirely
   const isUnverified = user && !user.isVerified && !isDevelopment;
 
   const maskEmail = (email: string) => {
@@ -50,7 +52,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   useLayoutEffect(() => {
-    // If we are testing specific routes locally, stop the redirect logic entirely
+    // Stop all redirect logic if on localhost/dev mode
     if (authLoading || isDevelopment) return; 
     
     if (!user) {
@@ -60,14 +62,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     if (user.isVerified) {
       const rolePath = `/${user.role}`;
-      // Only redirect if the current path doesn't start with their assigned role
       if (!pathname.startsWith(rolePath)) {
         router.replace(rolePath);
       }
     }
   }, [user, authLoading, pathname, router, isDevelopment]);
 
-  // API Verification Handler
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     if (code.length < 6) return setError("Enter 6-digit code");
@@ -109,10 +109,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   };
 
-  // Determine which role to pass to UI components based on the URL during development
-  const currentRole = isDevelopment 
-    ? (pathname.includes('/admins') ? 'admins' : 'workers')
-    : user?.role;
+  // Logic Update: Dynamically set the role based on the URL path for testing
+  const getDisplayRole = () => {
+    if (pathname.includes('/admins')) return 'admins';
+    if (pathname.includes('/workers')) return 'workers';
+    if (pathname.includes('/instructors')) return 'instructors';
+    if (pathname.includes('/regular')) return 'regular';
+    return user?.role || 'regular';
+  };
+
+  const currentRole = isDevelopment ? getDisplayRole() : user?.role;
 
   if (authLoading && !isDevelopment) {
     return (
@@ -147,7 +153,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </div>
 
-      
       {isUnverified && user?.email && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-md px-4">
           <div className="bg-white rounded-[40px] p-10 max-w-lg w-full text-center shadow-2xl animate-in zoom-in">
@@ -175,7 +180,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       )}
 
-      
       {showSuccessModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
@@ -188,10 +192,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </div>
   );
 }
+
 */
-
-
-
 
 //gensto-frontend/src/app/(dashboards)/layout.tsx
 
