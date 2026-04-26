@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { REST_API } from '../../constant';
+import { API_ROUTES } from '../../constant';
 import {
     Users, Briefcase, Award, Loader2, ClipboardList, TrendingUp,
     ShieldAlert, UserPlus, UserMinus, ShieldCheck,
@@ -32,7 +32,8 @@ export default function AdminDashboard() {
             try {
                 const token = localStorage.getItem('token');
 
-                const response = await fetch(`${REST_API}/v1/admin/oversight-stats`, {
+
+                const response = await fetch(API_ROUTES.UNIT_OVERSIGHT, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -56,7 +57,8 @@ export default function AdminDashboard() {
         fetchDashboardData();
     }, [router]);
 
-    const navigateTo = (path) => router.push(`/admins/${path}`);
+    // Logic Update: Navigating to /unit paths to match new backend naming
+    const navigateTo = (path) => router.push(`/unit/${path}`);
 
     const mainStats = [
         { label: "Worker Pulse", value: dashboardData?.mainStats?.workers || "0", icon: Briefcase, color: "text-blue-600", bg: "bg-blue-50", desc: "Active Staff", path: "monitor-workers" },
@@ -67,11 +69,8 @@ export default function AdminDashboard() {
 
     const authorityActions = [
         { label: "Promote User", desc: "Grant Access", icon: UserPlus, color: "text-blue-700", bg: "bg-blue-100", path: "manage-users?action=promote" },
-        // New Add School Card
         { label: "Add School", desc: "New Institution", icon: GraduationCap, color: "text-orange-700", bg: "bg-orange-100", path: "add-school" },
-        // New Add Service Card
         { label: "Add Service", desc: "New Deployment", icon: ClipboardList, color: "text-emerald-700", bg: "bg-emerald-100", path: "add-service" },
-        // New Security Audit / Visitor Detection Card
         { label: "System Audit", desc: "Security Logs", icon: ShieldAlert, color: "text-red-700", bg: "bg-red-100", path: "security-audit" },
         { label: "Role Audit", desc: "Review Permissions", icon: ShieldCheck, color: "text-emerald-700", bg: "bg-emerald-100", path: "role-audit" },
         { label: "Task Center", desc: "Assign Duties", icon: ListTodo, color: "text-indigo-700", bg: "bg-indigo-100", path: "tasks" },
