@@ -9,7 +9,35 @@ export const REST_API = (() => {
     return url;
 })();
 
+
+// API routes.js
+
+export const API_ROUTES = {
+    // Auth
+    SIGNUP: `${REST_API}/auth/register`,
+    SIGNIN: `${REST_API}/auth/login`,
+    VERIFY_OTP: `${REST_API}/auth/verify-code`,
+    RESEND_OTP: `${REST_API}/auth/resend-verification`,
+    PROFILE: `${REST_API}/auth/me`,
+
+    // Engagement & Support
+    NEWSLETTER: `${REST_API}/newsletter/subscribe`,
+    CONTACT: `${REST_API}/contact`,
+    COMMENTS: `${REST_API}/comments`,
+
+    // Enrollments (v1)
+    ENROLL_REGISTER: `${REST_API}/v1/enrollments/register`,
+    ENROLL_STATUS: `${REST_API}/v1/enrollments/status`,
+
+    // Dashboard & Stats
+    DASHBOARD_STATS: `${REST_API}/v1/stats/dashboard`,
+    ADMIN_OVERSIGHT: `${REST_API}/v1/admin/oversight-stats`,
+    ADMIN_UPDATE_ROLE: `${REST_API}/v1/admin/update-role`,
+};
+
+
 // api routes
+/*
 export const API_ROUTES = {
     SIGNUP: `${REST_API}/auth/register`,
     SIGNIN: `${REST_API}/auth/login`,
@@ -25,6 +53,7 @@ export const API_ROUTES = {
     ADMIN_OVERSIGHT: `${REST_API}/v1/admin/oversight-stats`,
     ADMIN_UPDATE_ROLE: `${REST_API}/v1/admin/update-role`,
 };
+*/
 
 
 //index.js
