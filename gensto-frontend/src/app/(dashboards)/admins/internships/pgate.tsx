@@ -6,7 +6,8 @@ import {
   User, Link as LinkIcon, MessageSquare,
   AlertCircle, Users, Clock, CheckCircle2, XCircle
 } from 'lucide-react';
-import { API_ROUTES } from '../../../constant';
+// Updated import to use REST_API
+import { REST_API } from '../../../constant';
 
 interface Applicant {
   _id: string;
@@ -32,10 +33,10 @@ export default function AdminInternshipPage() {
   const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(null);
   const [processingId, setProcessingId] = useState<string | null>(null);
 
-  // Fetch applications and stats from the registered API_ROUTE
+  // Fetch applications and stats from the REST_API
   const fetchData = async () => {
     try {
-      const response = await fetch(API_ROUTES.INTERNSHIPS);
+      const response = await fetch(`${REST_API}/v1/internships`);
       const data = await response.json();
       if (data.success) {
         setApplicants(data.data);
@@ -55,7 +56,7 @@ export default function AdminInternshipPage() {
   const handleDecision = async (id: string, status: 'accepted' | 'denied') => {
     setProcessingId(id);
     try {
-      const response = await fetch(`${API_ROUTES.INTERNSHIPS}/${id}`, {
+      const response = await fetch(`${REST_API}/v1/internships/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),

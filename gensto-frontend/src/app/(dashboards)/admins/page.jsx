@@ -1,3 +1,4 @@
+
 "use client";
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -30,7 +31,7 @@ export default function AdminDashboard() {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                // Updated to use workers logic: simple fetch without explicit headers/auth
+                // Using the unified workers logic/endpoint
                 const response = await fetch(`${REST_API}/v1/stats/dashboard`);
                 const result = await response.json();
 
@@ -46,14 +47,15 @@ export default function AdminDashboard() {
             }
         };
         fetchDashboardData();
-    }, []); // Removed router dependency to match workers logic
+    }, []);
 
 
     const navigateTo = (path) => router.push(`/admins/${path}`);
 
     const mainStats = [
         { label: "Worker Pulse", value: dashboardData?.mainStats?.workers || "0", icon: Briefcase, color: "text-blue-600", bg: "bg-blue-50", desc: "Active Staff", path: "monitor-workers" },
-        { label: "User Monitor", value: dashboardData?.mainStats?.users || "0", icon: Users, color: "text-emerald-600", bg: "bg-emerald-50", desc: "Total Accounts", path: "monitor-users" },
+        // Updated: Ensures User Monitor pulls the specific user count from the database response
+        { label: "User Monitor", value: dashboardData?.mainStats?.users || dashboardData?.mainStats?.totalUsers || "0", icon: Users, color: "text-emerald-600", bg: "bg-emerald-50", desc: "Total Accounts", path: "monitor-users" },
         { label: "Visitor Rate", value: `${dashboardData?.mainStats?.visitorRate || "0"}%`, icon: MousePointer2, color: "text-orange-600", bg: "bg-orange-50", desc: "Daily Traffic Change", path: "analysis" },
         { label: "Instructors", value: dashboardData?.mainStats?.instructors || "0", icon: Award, color: "text-purple-600", bg: "bg-purple-50", desc: "Faculty Load", path: "monitor-instructors" },
     ];
@@ -207,6 +209,7 @@ export default function AdminDashboard() {
 }
 
 
+
 /*
 
 "use client";
@@ -241,17 +244,8 @@ export default function AdminDashboard() {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                const token = localStorage.getItem('token');
-
-                // Using REST_API constant for the fetch call
-                const response = await fetch(`${REST_API}/admins/oversight`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
+                // Updated to use workers logic: simple fetch without explicit headers/auth
+                const response = await fetch(`${REST_API}/v1/stats/dashboard`);
                 const result = await response.json();
 
                 if (result.success) {
@@ -266,7 +260,7 @@ export default function AdminDashboard() {
             }
         };
         fetchDashboardData();
-    }, [router]);
+    }, []); // Removed router dependency to match workers logic
 
 
     const navigateTo = (path) => router.push(`/admins/${path}`);
@@ -323,7 +317,7 @@ export default function AdminDashboard() {
 
     return (
         <div className="p-8 space-y-8 min-h-screen bg-gray-50">
-          
+            
             <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900 tracking-tight">System Control Unit</h1>
@@ -337,7 +331,7 @@ export default function AdminDashboard() {
                 )}
             </div>
 
-            
+           
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {mainStats.map((stat, i) => (
                     <div key={i} onClick={() => navigateTo(stat.path)} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer group">
@@ -388,7 +382,7 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-           
+          
             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                 <h2 className="font-bold text-gray-800 mb-6 flex items-center gap-2">
                     <ShieldCheck className="w-5 h-5 text-blue-600" /> User Authority Management
@@ -410,7 +404,7 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-           
+            
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {operationalCards.map((card, i) => (
                     <div key={i} onClick={() => navigateTo(card.path)} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:border-blue-300 transition-all cursor-pointer group">
@@ -425,4 +419,5 @@ export default function AdminDashboard() {
         </div>
     );
 }
+
 */
