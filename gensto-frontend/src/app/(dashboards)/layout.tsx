@@ -1,4 +1,4 @@
-/*
+
 'use client';
 
 import { useState, useLayoutEffect, useEffect } from 'react';
@@ -109,7 +109,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   };
 
-  // Logic Update: Dynamically set the role based on the URL path for testing
+  //  Dynamically set the role based on the URL path for testing
   const getDisplayRole = () => {
     if (pathname.includes('/admins')) return 'admins';
     if (pathname.includes('/workers')) return 'workers';
@@ -193,7 +193,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   );
 }
 
-*/
+/*
 
 //gensto-frontend/src/app/(dashboards)/layout.tsx
 
@@ -422,7 +422,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </div>
   );
 }
-
+*/
 
 /// Note: The above code is a comprehensive dashboard layout that includes authentication checks, email verification flow, and responsive design elements. It ensures that unverified users are prompted to verify their accounts while providing a seamless experience for verified users. The layout also handles loading states and potential errors gracefully, enhancing the overall user experience.
 
