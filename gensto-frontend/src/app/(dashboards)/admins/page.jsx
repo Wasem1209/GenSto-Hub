@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { REST_API } from '../../constant'; // Switched to REST_API
+import { UNIT_OVERSIGHT } from '../../constant';
 import {
     Users, Briefcase, Award, Loader2, ClipboardList, TrendingUp,
     ShieldAlert, UserPlus, UserMinus, ShieldCheck,
@@ -32,14 +32,19 @@ export default function AdminDashboard() {
             try {
                 const token = localStorage.getItem('token');
 
-                // Using REST_API constant for the fetch call
-                const response = await fetch(`${REST_API}/admins/oversight`, {
+                const response = await fetch(UNIT_OVERSIGHT, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     }
                 });
+
+                // Validate that the response is actually JSON to prevent SyntaxErrors
+                const contentType = response.headers.get("content-type");
+                if (!contentType || !contentType.includes("application/json")) {
+                    throw new Error("Server returned non-JSON response. Check API route configuration.");
+                }
 
                 const result = await response.json();
 
@@ -177,7 +182,7 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            {/* Middle Section: Authority Management */}
+            {/*  Authority Management */}
             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                 <h2 className="font-bold text-gray-800 mb-6 flex items-center gap-2">
                     <ShieldCheck className="w-5 h-5 text-blue-600" /> User Authority Management
@@ -199,7 +204,7 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            {/* Bottom Row: Operational Control Cards */}
+            {/*  Operational Control Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {operationalCards.map((card, i) => (
                     <div key={i} onClick={() => navigateTo(card.path)} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:border-blue-300 transition-all cursor-pointer group">
