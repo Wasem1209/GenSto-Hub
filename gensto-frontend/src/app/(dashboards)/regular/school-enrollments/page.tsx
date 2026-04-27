@@ -106,7 +106,7 @@ export default function SchoolEnrollmentsPage() {
           
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <Loader2 className="w-12 h-12 text-[#2563eb] animate-spin" />
-            <p className="text-[#64748b] font-bold animate-pulse text-lg">Syncing specialized schools...</p>
+            <p className="text-[#64748b] font-bold animate-pulse text-lg">Loading...</p>
           </div>
         ) : (
           /* Schools Grid loaded from DB */
@@ -115,7 +115,7 @@ export default function SchoolEnrollmentsPage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8"
           >
             {schools.map((school) => (
               <motion.div key={school._id} variants={cardVariants}>

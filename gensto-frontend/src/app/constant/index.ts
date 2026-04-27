@@ -34,6 +34,9 @@ export const API_ROUTES = {
     UNIT_OVERSIGHT: `${REST_API}/v1/unit/oversight-stats`,
     UNIT_UPDATE_ROLE: `${REST_API}/v1/unit/update-role`,
     SCHOOLS: `${REST_API}/schools`,
+    INTERNSHIPS: `${REST_API}/internships`,
+    END_INTERNSHIP: (id: string) => `${REST_API}/internships/end/${id}`,
+    SERVICES: `${REST_API}/services`,
 
 };
 

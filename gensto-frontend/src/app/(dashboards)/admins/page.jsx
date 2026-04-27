@@ -33,7 +33,7 @@ export default function AdminDashboard() {
                 const token = localStorage.getItem('token');
 
                 // Using REST_API constant for the fetch call
-                const response = await fetch(`${REST_API}/admin/oversight`, {
+                const response = await fetch(`${REST_API}/admins/oversight`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -57,11 +57,7 @@ export default function AdminDashboard() {
         fetchDashboardData();
     }, [router]);
 
-    /**
-     * LOGIC UPDATE: 
-     * Changed to handle absolute admin paths.
-     * When calling navigateTo('add-school'), it now goes to /admins/add-school
-     */
+
     const navigateTo = (path) => router.push(`/admins/${path}`);
 
     const mainStats = [
