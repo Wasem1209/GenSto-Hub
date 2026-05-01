@@ -48,6 +48,9 @@ export default function Footer() {
             <div className="flex space-x-4 hover:scale-110 transition-transform">
               <SocialIcon url="https://www.instagram.com/inanste_cosystem?igsh=YzljYTk1ODg3Zg==" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
             </div>
+            <div className="flex space-x-4 hover:scale-110 transition-transform">
+              <SocialIcon url="https://www.linkedin.com/company/inanst" target="_blank" rel="noopener noreferrer" style={{ height: 30, width: 30 }} />
+            </div>
           </div>
 
         </div>
