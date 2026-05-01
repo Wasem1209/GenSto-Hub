@@ -424,6 +424,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 }
 
 
+
 /// Note: The above code is a comprehensive dashboard layout that includes authentication checks, email verification flow, and responsive design elements. It ensures that unverified users are prompted to verify their accounts while providing a seamless experience for verified users. The layout also handles loading states and potential errors gracefully, enhancing the overall user experience.
 
 
