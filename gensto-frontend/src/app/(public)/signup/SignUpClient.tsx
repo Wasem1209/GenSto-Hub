@@ -2,7 +2,7 @@
 import { useState, FormEvent, useEffect, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { User as UserIcon, Mail, Lock, Loader2, ArrowRight, Phone, Globe, X, Eye, EyeOff } from 'lucide-react';
+import { User as UserIcon, Mail, Lock, Loader2, Phone, Globe, X, Eye, EyeOff } from 'lucide-react';
 import { signIn } from 'next-auth/react'; 
 import Link from 'next/link'; 
 import { REST_API, countryCode } from '../../constant';
@@ -261,7 +261,7 @@ export default function SignUpClient() {
           </div>
 
           <button disabled={loading} className="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition active:scale-95 disabled:opacity-50 uppercase tracking-widest text-xs">
-            {loading ? <Loader2 className="animate-spin" /> : <>SIGN UP <ArrowRight className="w-4 h-4" /></>}
+            {loading ? <Loader2 className="animate-spin" /> : <>SIGN UP </>}
           </button>
         </form>
 
