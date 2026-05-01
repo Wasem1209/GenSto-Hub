@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   authors: [{ name: 'Philip Terfa Wasem', url: 'https://inanst.com' }],
   
   openGraph: {
-    title: 'INANST | Tech Talent & Innovation Ecosystem',
+    title: 'INANST | Innovation, Ananlytics, Societal Transformation, Technological ecosystem,Tech ecosystem, & Innovation in Nigeria, hands-on training programs, build scalable Software and hardware products for clients across sectors',
     description: 'Dismantling the productivity gap in Nigeria through a unified stack of education, hardware, and software.',
     url: 'https://www.inanst.com',
     siteName: 'INANST',
