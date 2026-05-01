@@ -37,6 +37,12 @@ export const API_ROUTES = {
     INTERNSHIPS: `${REST_API}/internships`,
     END_INTERNSHIP: (id: string) => `${REST_API}/internships/end/${id}`,
     SERVICES: `${REST_API}/services`,
+    // instructor routes
+    INSTRUCTOR_STATS: `${REST_API}/v1/instructor/dashboard`,
+    INSTRUCTOR_SCHOOLS: `${REST_API}/v1/instructor/schools`,
+    INSTRUCTOR_STUDENTS: `${REST_API}/v1/instructor/students`,
+    INSTRUCTOR_COHORTS: `${REST_API}/v1/instructor/cohorts`,
+    INSTRUCTOR_CLASSES: `${REST_API}/v1/instructor/classes`,
 
 };
 
