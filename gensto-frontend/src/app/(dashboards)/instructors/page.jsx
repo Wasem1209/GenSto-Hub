@@ -5,7 +5,9 @@ import Link from 'next/link';
 import {
     School, Users, Calendar, FileText,
     ClipboardList, TrendingUp, PlayCircle,
-    Layers, Loader2
+    Layers, Loader2, HelpCircle, GraduationCap,
+    CheckSquare, ListTodo, library, BookOpen,
+    BarChart
 } from 'lucide-react';
 // Only importing REST_API as requested
 import { REST_API } from '../../constant';
@@ -41,6 +43,15 @@ export default function InstructorPage() {
         { label: 'Student progress', value: 'Analytics', icon: TrendingUp, href: '/progress', color: 'text-rose-600 bg-rose-50' },
         { label: 'Active class', value: stats?.activeClasses || 0, icon: PlayCircle, href: '/classes/active', color: 'text-cyan-600 bg-cyan-50' },
         { label: 'Active Cohort', value: stats?.activeCohorts || 0, icon: Layers, href: '/cohorts', color: 'text-orange-600 bg-orange-50' },
+
+        // New Added Cards
+        { label: 'Quiz', value: 'Manage', icon: HelpCircle, href: '/quiz', color: 'text-violet-600 bg-violet-50' },
+        { label: 'Test', value: 'Evaluate', icon: CheckSquare, href: '/tests', color: 'text-pink-600 bg-pink-50' },
+        { label: 'Exam', value: 'Portal', icon: GraduationCap, href: '/exams', color: 'text-red-600 bg-red-50' },
+        { label: 'Weekly Task', value: 'Track', icon: ListTodo, href: '/tasks/weekly', color: 'text-lime-600 bg-lime-50' },
+        { label: 'Monthly Task', value: 'Overview', icon: ClipboardList, href: '/tasks/monthly', color: 'text-teal-600 bg-teal-50' },
+        { label: 'Materials', value: 'Library', icon: BookOpen, href: '/materials', color: 'text-sky-600 bg-sky-50' },
+        { label: 'Results', value: 'Grades', icon: BarChart, href: '/results', color: 'text-fuchsia-600 bg-fuchsia-50' },
     ];
 
     if (loading) {
