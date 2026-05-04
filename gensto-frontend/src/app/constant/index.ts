@@ -43,6 +43,10 @@ export const API_ROUTES = {
     INSTRUCTOR_STUDENTS: `${REST_API}/v1/instructor/students`,
     INSTRUCTOR_COHORTS: `${REST_API}/v1/instructor/cohorts`,
     INSTRUCTOR_CLASSES: `${REST_API}/v1/instructor/classes`,
+    CREATE: `${REST_API}/v1/tasks/create`,
+    GET_ALL: `${REST_API}/v1/tasks/all`,
+    DELETE: (id: string) => `${REST_API}/v1/tasks/delete/${id}`,
+    UPDATE_STATUS: `${REST_API}/v1/tasks/update-status`,
 
 };
 
