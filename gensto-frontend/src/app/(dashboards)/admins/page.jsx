@@ -1,4 +1,3 @@
-
 "use client";
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -31,7 +30,6 @@ export default function AdminDashboard() {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                // Using the unified workers logic/endpoint
                 const response = await fetch(`${REST_API}/v1/stats/dashboard`);
                 const result = await response.json();
 
@@ -49,15 +47,30 @@ export default function AdminDashboard() {
         fetchDashboardData();
     }, []);
 
-
     const navigateTo = (path) => router.push(`/admins/${path}`);
 
+    // mapping logic for cards and stats
     const mainStats = [
-        { label: "Worker Pulse", value: dashboardData?.mainStats?.workers || "0", icon: Briefcase, color: "text-blue-600", bg: "bg-blue-50", desc: "Active Staff", path: "monitor-workers" },
-        // Updated: Ensures User Monitor pulls the specific user count from the database response
-        { label: "User Monitor", value: dashboardData?.mainStats?.users || dashboardData?.mainStats?.totalUsers || "0", icon: Users, color: "text-emerald-600", bg: "bg-emerald-50", desc: "Total Accounts", path: "monitor-users" },
-        { label: "Visitor Rate", value: `${dashboardData?.mainStats?.visitorRate || "0"}%`, icon: MousePointer2, color: "text-orange-600", bg: "bg-orange-50", desc: "Daily Traffic Change", path: "analysis" },
-        { label: "Instructors", value: dashboardData?.mainStats?.instructors || "0", icon: Award, color: "text-purple-600", bg: "bg-purple-50", desc: "Faculty Load", path: "monitor-instructors" },
+        {
+            label: "Worker Pulse",
+            value: dashboardData?.mainStats?.workers ?? "0",
+            icon: Briefcase, color: "text-blue-600", bg: "bg-blue-50", desc: "Active Staff", path: "monitor-workers"
+        },
+        {
+            label: "User Monitor",
+            value: dashboardData?.mainStats?.users ?? "0",
+            icon: Users, color: "text-emerald-600", bg: "bg-emerald-50", desc: "Total Accounts", path: "monitor-users"
+        },
+        {
+            label: "Visitor Rate",
+            value: `${dashboardData?.mainStats?.visitorRate ?? "0"}%`,
+            icon: MousePointer2, color: "text-orange-600", bg: "bg-orange-50", desc: "Daily Traffic Change", path: "analysis"
+        },
+        {
+            label: "Instructors",
+            value: dashboardData?.mainStats?.instructors ?? "0",
+            icon: Award, color: "text-purple-600", bg: "bg-purple-50", desc: "Faculty Load", path: "monitor-instructors"
+        },
     ];
 
     const authorityActions = [
@@ -71,16 +84,16 @@ export default function AdminDashboard() {
     ];
 
     const operationalCards = [
-        { label: "Schools Running", value: dashboardData?.operational?.schools || "0", icon: GraduationCap, color: "text-orange-600", bg: "bg-orange-50", path: "schools" },
-        { label: "Services Running", value: dashboardData?.operational?.services || "0", icon: ClipboardList, color: "text-emerald-600", bg: "bg-emerald-50", path: "services" },
-        { label: "Newsletter", value: dashboardData?.operational?.newsletter?.toLocaleString() || "0", icon: Mail, color: "text-pink-600", bg: "bg-pink-50", path: "newsletter" },
-        { label: "Contacts Mgmt", value: dashboardData?.operational?.contacts || "0", icon: Contact, color: "text-cyan-600", bg: "bg-cyan-50", path: "contacts" },
-        { label: "Internships", value: dashboardData?.operational?.internships || "0", icon: Briefcase, color: "text-orange-600", bg: "bg-orange-50", path: "internships" },
-        { label: "Partnerships", value: dashboardData?.operational?.partnerships || "0", icon: Handshake, color: "text-indigo-600", bg: "bg-indigo-50", path: "partnerships" },
-        { label: "BroadCast", value: "Live", icon: Radio, color: "text-red-600", bg: "bg-red-50", path: "broadcast" },
-        { label: "Collaboration", value: dashboardData?.operational?.collabs || "0", icon: Share2, color: "text-teal-600", bg: "bg-teal-50", path: "collaboration" },
-        { label: "Cert. Exams", value: dashboardData?.operational?.exams || "0", icon: Award, color: "text-violet-600", bg: "bg-violet-50", path: "certificates" },
-        { label: "Post Comments", value: dashboardData?.operational?.comments || "0", icon: MessageCircle, color: "text-sky-600", bg: "bg-sky-50", path: "comments" },
+        { label: "Schools Running", value: dashboardData?.operational?.schools ?? "0", icon: GraduationCap, color: "text-orange-600", bg: "bg-orange-50", path: "schools" },
+        { label: "Services Running", value: dashboardData?.operational?.services ?? "0", icon: ClipboardList, color: "text-emerald-600", bg: "bg-emerald-50", path: "services" },
+        { label: "Newsletter", value: dashboardData?.operational?.newsletter?.toLocaleString() ?? "0", icon: Mail, color: "text-pink-600", bg: "bg-pink-50", path: "newsletter" },
+        { label: "Contacts Mgmt", value: dashboardData?.operational?.contacts ?? "0", icon: Contact, color: "text-cyan-600", bg: "bg-cyan-50", path: "contacts" },
+        { label: "Internships", value: dashboardData?.operational?.internships ?? "0", icon: Briefcase, color: "text-orange-600", bg: "bg-orange-50", path: "internships" },
+        { label: "Partnerships", value: dashboardData?.operational?.partnerships ?? "0", icon: Handshake, color: "text-indigo-600", bg: "bg-indigo-50", path: "partnerships" },
+        { label: "BroadCast", value: dashboardData?.operational?.broadcast ?? "Live", icon: Radio, color: "text-red-600", bg: "bg-red-50", path: "broadcast" },
+        { label: "Collaboration", value: dashboardData?.operational?.collabs ?? "0", icon: Share2, color: "text-teal-600", bg: "bg-teal-50", path: "collaboration" },
+        { label: "Cert. Exams", value: dashboardData?.operational?.exams ?? "0", icon: Award, color: "text-violet-600", bg: "bg-violet-50", path: "certificates" },
+        { label: "Post Comments", value: dashboardData?.operational?.comments ?? "0", icon: MessageCircle, color: "text-sky-600", bg: "bg-sky-50", path: "comments" },
     ];
 
     const getSessionTime = (roleName) => {
@@ -151,7 +164,7 @@ export default function AdminDashboard() {
                     <div className="flex justify-between items-center">
                         <span className="text-sm font-bold text-gray-800">Pending Admissions</span>
                         <span className="bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-black">
-                            {loading ? "..." : (dashboardData?.oversight?.pendingEnrollments || "0")}
+                            {loading ? "..." : (dashboardData?.oversight?.pendingEnrollments ?? "0")}
                         </span>
                     </div>
                 </div>
@@ -170,7 +183,7 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            {/* Middle Section: Authority Management */}
+            {/* Authority Management */}
             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                 <h2 className="font-bold text-gray-800 mb-6 flex items-center gap-2">
                     <ShieldCheck className="w-5 h-5 text-blue-600" /> User Authority Management
@@ -192,7 +205,7 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            {/* Bottom Row: Operational Control Cards */}
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {operationalCards.map((card, i) => (
                     <div key={i} onClick={() => navigateTo(card.path)} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:border-blue-300 transition-all cursor-pointer group">
@@ -200,14 +213,13 @@ export default function AdminDashboard() {
                             <card.icon className={`w-5 h-5 ${card.color}`} />
                         </div>
                         <h3 className="text-xs font-bold text-gray-400 uppercase tracking-tighter">{card.label}</h3>
-                        <p className="text-xl font-black text-gray-800">{loading ? "!" : card.value}</p>
+                        <p className="text-xl font-black text-gray-800">{loading ? "..." : card.value}</p>
                     </div>
                 ))}
             </div>
         </div>
     );
 }
-
 
 
 /*
