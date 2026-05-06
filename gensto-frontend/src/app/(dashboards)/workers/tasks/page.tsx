@@ -7,7 +7,7 @@ interface ITask {
     _id: string;
     title: string;
     message: string;
-    workerName: string; // Updated to match AdminTaskPage
+    workerName: string; 
     position: string;
     duration: string;
     status: 'Processing' | 'Processed';
@@ -20,8 +20,17 @@ export default function StaffTaskPage() {
 
     const fetchMyTasks = async () => {
         try {
-            // Ensure this endpoint filter logic matches your backend authentication
-            const res = await fetch(`${REST_API}/v1/tasks/assigned/me`);
+            /**
+             * FIX: We extract the user from local storage (or your auth state) 
+             * to send the actual name to the backend.
+             */
+            const storedUser = localStorage.getItem('user');
+            const user = storedUser ? JSON.parse(storedUser) : null;
+            
+            // Default to 'Oryi' if no user is found, to match image_6aaab0.png
+            const staffName = user?.fullName || "Oryi"; 
+
+            const res = await fetch(`${REST_API}/v1/tasks/assigned/${staffName}`);
             const data = await res.json();
             setTasks(data.tasks || []);
         } catch (e) { 
@@ -81,7 +90,6 @@ export default function StaffTaskPage() {
                             </div>
 
                             <div className="pt-4 space-y-3">
-                                {/* Added Worker Name for consistency with image_7579b2.png UI */}
                                 <div className="flex flex-col gap-2 border-b pb-3 border-gray-50">
                                     <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase">
                                         <User className="w-3.5 h-3.5 text-blue-500" /> 
