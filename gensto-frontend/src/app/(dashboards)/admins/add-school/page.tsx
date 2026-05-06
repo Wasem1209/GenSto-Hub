@@ -26,6 +26,7 @@ export default function AddSchoolPage() {
     title: '',
     description: '',
     price: '₦',
+    duration: '',
     iconName: 'Monitor'
   });
 
@@ -43,7 +44,7 @@ export default function AddSchoolPage() {
       const data = await response.json();
       if (data.success) {
         setShowSuccess(true);
-        setFormData({ title: '', description: '', price: '₦', iconName: 'Monitor' });
+        setFormData({ title: '', description: '', price: '₦', duration: '', iconName: 'Monitor' });
       }
     } catch (error) {
       console.error("Failed to add school:", error);
@@ -54,7 +55,6 @@ export default function AddSchoolPage() {
 
   return (
     <section className="min-h-screen bg-gray-50 pt-24 pb-16 px-4 font-sans relative">
-      {/* Success Modal */}
       <AnimatePresence>
         {showSuccess && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#1a1f2e]/60 backdrop-blur-sm">
@@ -71,16 +71,11 @@ export default function AddSchoolPage() {
               >
                 <X className="w-5 h-5" />
               </button>
-              
               <div className="w-20 h-20 bg-emerald-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
                 <CheckCircle2 className="w-10 h-10 text-emerald-500" />
               </div>
-              
               <h3 className="text-2xl font-black text-[#1a1f2e] mb-2">School Published!</h3>
-              <p className="text-gray-500 font-medium mb-8">
-                The new institution has been successfully added to the enrollment catalog.
-              </p>
-              
+              <p className="text-gray-500 font-medium mb-8">The new institution has been successfully added to the catalog.</p>
               <button
                 onClick={() => setShowSuccess(false)}
                 className="w-full bg-[#1a1f2e] text-white font-black py-4 rounded-2xl hover:bg-emerald-600 transition-all duration-300 uppercase tracking-widest text-xs"
@@ -97,12 +92,7 @@ export default function AddSchoolPage() {
           <Link href="/admin/dashboard" className="text-blue-600 flex items-center gap-2 mb-4 font-bold uppercase text-xs tracking-widest">
             <ArrowLeft className="w-4 h-4" /> Back to Dashboard
           </Link>
-          <h1 className="text-[42px] font-black text-[#1a1f2e] tracking-tight leading-none mb-4">
-            Add New Tech School
-          </h1>
-          <p className="text-[#64748b] text-lg font-medium">
-            Configure a new specialized school for the <span className="text-blue-600 font-bold">INANST</span> enrollment catalog.
-          </p>
+          <h1 className="text-[42px] font-black text-[#1a1f2e] tracking-tight leading-none mb-4">Add New Tech School</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-gray-100">
@@ -110,25 +100,32 @@ export default function AddSchoolPage() {
             <div className="flex flex-col gap-2">
               <label className="text-[#1a1f2e] font-black text-sm uppercase tracking-wider">School Title</label>
               <input 
-                type="text"
-                required
-                placeholder="e.g., Cloud Engineering School"
-                className="bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 font-medium text-gray-800"
+                type="text" required
+                className="bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 font-medium"
                 value={formData.title}
                 onChange={(e) => setFormData({...formData, title: e.target.value})}
               />
             </div>
 
-            <div className="flex flex-col gap-2">
-              <label className="text-[#1a1f2e] font-black text-sm uppercase tracking-wider">Price</label>
-              <input 
-                type="text"
-                required
-                placeholder="₦45,000"
-                className="bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 font-medium text-gray-800"
-                value={formData.price}
-                onChange={(e) => setFormData({...formData, price: e.target.value})}
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
+                <label className="text-[#1a1f2e] font-black text-sm uppercase tracking-wider">Price</label>
+                <input 
+                  type="text" required
+                  className="bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 font-medium"
+                  value={formData.price}
+                  onChange={(e) => setFormData({...formData, price: e.target.value})}
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-[#1a1f2e] font-black text-sm uppercase tracking-wider">Duration</label>
+                <input 
+                  type="text" required placeholder="e.g. 6 Months"
+                  className="bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 font-medium"
+                  value={formData.duration}
+                  onChange={(e) => setFormData({...formData, duration: e.target.value})}
+                />
+              </div>
             </div>
 
             <div className="md:col-span-2 flex flex-col gap-2">
@@ -138,17 +135,14 @@ export default function AddSchoolPage() {
                   const IconComponent = iconComponentMap[iconName];
                   return (
                     <button
-                      key={iconName}
-                      type="button"
+                      key={iconName} type="button"
                       onClick={() => setFormData({...formData, iconName})}
-                      className={`p-4 rounded-2xl flex flex-col items-center gap-3 transition-all duration-300 border-2 ${
-                        formData.iconName === iconName 
-                          ? "border-blue-600 bg-blue-50 text-blue-600" 
-                          : "border-transparent bg-gray-50 text-gray-400 hover:bg-gray-100"
+                      className={`p-4 rounded-2xl flex flex-col items-center gap-3 transition-all border-2 ${
+                        formData.iconName === iconName ? "border-blue-600 bg-blue-50 text-blue-600" : "border-transparent bg-gray-50 text-gray-400"
                       }`}
                     >
                       <IconComponent className="w-6 h-6" />
-                      <span className="text-[10px] font-bold uppercase tracking-tighter">{iconName}</span>
+                      <span className="text-[10px] font-bold uppercase">{iconName}</span>
                     </button>
                   );
                 })}
@@ -158,10 +152,8 @@ export default function AddSchoolPage() {
             <div className="md:col-span-2 flex flex-col gap-2">
               <label className="text-[#1a1f2e] font-black text-sm uppercase tracking-wider">Description</label>
               <textarea 
-                required
-                rows={4}
-                placeholder="Describe the curriculum and learning outcomes..."
-                className="bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 font-medium text-gray-800 resize-none"
+                required rows={4}
+                className="bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 font-medium resize-none"
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
               />
@@ -169,12 +161,11 @@ export default function AddSchoolPage() {
           </div>
 
           <button
-            type="submit"
-            disabled={loading}
-            className="mt-10 w-full bg-[#1a1f2e] text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 hover:bg-blue-600 transition-all duration-300 uppercase tracking-widest text-xs"
+            type="submit" disabled={loading}
+            className="mt-10 w-full bg-[#1a1f2e] text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 hover:bg-blue-600 transition-all uppercase tracking-widest text-xs"
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
-            {loading ? "Publishing School..." : "Add School to Catalog"}
+            {loading ? "Publishing..." : "Add School to Catalog"}
           </button>
         </form>
       </div>
