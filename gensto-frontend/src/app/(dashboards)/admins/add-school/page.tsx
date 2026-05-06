@@ -26,6 +26,7 @@ export default function AddSchoolPage() {
     title: '',
     description: '',
     price: '₦',
+    duration: '', // Added duration field
     iconName: 'Monitor'
   });
 
@@ -43,7 +44,7 @@ export default function AddSchoolPage() {
       const data = await response.json();
       if (data.success) {
         setShowSuccess(true);
-        setFormData({ title: '', description: '', price: '₦', iconName: 'Monitor' });
+        setFormData({ title: '', description: '', price: '₦', duration: '', iconName: 'Monitor' });
       }
     } catch (error) {
       console.error("Failed to add school:", error);
@@ -119,16 +120,29 @@ export default function AddSchoolPage() {
               />
             </div>
 
-            <div className="flex flex-col gap-2">
-              <label className="text-[#1a1f2e] font-black text-sm uppercase tracking-wider">Price</label>
-              <input 
-                type="text"
-                required
-                placeholder="₦45,000"
-                className="bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 font-medium text-gray-800"
-                value={formData.price}
-                onChange={(e) => setFormData({...formData, price: e.target.value})}
-              />
+            <div className="grid grid-cols-2 gap-4">
+               <div className="flex flex-col gap-2">
+                <label className="text-[#1a1f2e] font-black text-sm uppercase tracking-wider">Price</label>
+                <input 
+                  type="text"
+                  required
+                  placeholder="₦45,000"
+                  className="bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 font-medium text-gray-800"
+                  value={formData.price}
+                  onChange={(e) => setFormData({...formData, price: e.target.value})}
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-[#1a1f2e] font-black text-sm uppercase tracking-wider">Duration</label>
+                <input 
+                  type="text"
+                  required
+                  placeholder="e.g., 6 Months"
+                  className="bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 font-medium text-gray-800"
+                  value={formData.duration}
+                  onChange={(e) => setFormData({...formData, duration: e.target.value})}
+                />
+              </div>
             </div>
 
             <div className="md:col-span-2 flex flex-col gap-2">
