@@ -31,7 +31,7 @@ export default function AdminDashboard() {
         const fetchDashboardData = async () => {
             try {
 
-                const response = await fetch(`${REST_API}/api/v1/admin/oversight-stats`, {
+                const response = await fetch(`${REST_API}/v1/admin/oversight-stats`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
