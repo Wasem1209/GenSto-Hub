@@ -7,7 +7,7 @@ interface ITask {
     _id: string;
     title: string;
     message: string;
-    workerId: string;
+    workerName: string;
     position: string;
     duration: string;
     status: 'Processing' | 'Processed';
@@ -20,7 +20,7 @@ export default function AdminTaskPage() {
     
     const [formData, setFormData] = useState({
         title: '',
-        workerId: '', 
+        workerName: '',
         position: '',
         duration: '',
         message: ''
@@ -50,7 +50,7 @@ export default function AdminTaskPage() {
                 body: JSON.stringify(formData)
             });
             if (res.ok) {
-                setFormData({ title: '', workerId: '', position: '', duration: '', message: '' });
+                setFormData({ title: '', workerName: '', position: '', duration: '', message: '' });
                 fetchTasks();
             }
         } catch (e) {
@@ -86,11 +86,12 @@ export default function AdminTaskPage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                {/* Dispatch Form */}
+                {/* Dispatch Form - Updated for Better Alignment */}
                 <form onSubmit={handleSend} className="lg:col-span-4 bg-gray-50 p-6 rounded-3xl border border-gray-100 space-y-4 h-fit">
                     <h2 className="font-black text-gray-800 flex items-center gap-2 mb-2 uppercase">
                         <Send className="w-5 h-5 text-blue-600" /> Dispatch Task
                     </h2>
+                    
                     <input 
                         required 
                         className="w-full p-4 rounded-2xl bg-white border border-gray-200 outline-none focus:border-blue-500 transition-all font-medium" 
@@ -98,36 +99,39 @@ export default function AdminTaskPage() {
                         value={formData.title} 
                         onChange={e => setFormData({...formData, title: e.target.value})} 
                     />
-                    <div className="flex gap-2">
-                        <input 
-                            required 
-                            className="w-1/2 p-4 rounded-2xl bg-white border border-gray-200 outline-none" 
-                            placeholder="Staff ID" 
-                            value={formData.workerId} 
-                            onChange={e => setFormData({...formData, workerId: e.target.value})} 
-                        />
-                        <input 
-                            required 
-                            className="w-1/2 p-4 rounded-2xl bg-white border border-gray-200 outline-none" 
-                            placeholder="Position" 
-                            value={formData.position} 
-                            onChange={e => setFormData({...formData, position: e.target.value})} 
-                        />
-                    </div>
+
                     <input 
                         required 
-                        className="w-full p-4 rounded-2xl bg-white border border-gray-200 outline-none" 
+                        className="w-full p-4 rounded-2xl bg-white border border-gray-200 outline-none focus:border-blue-500 transition-all font-medium" 
+                        placeholder="Staff Name" 
+                        value={formData.workerName} 
+                        onChange={e => setFormData({...formData, workerName: e.target.value})} 
+                    />
+
+                    <input 
+                        required 
+                        className="w-full p-4 rounded-2xl bg-white border border-gray-200 outline-none focus:border-blue-500 transition-all font-medium" 
+                        placeholder="Position" 
+                        value={formData.position} 
+                        onChange={e => setFormData({...formData, position: e.target.value})} 
+                    />
+
+                    <input 
+                        required 
+                        className="w-full p-4 rounded-2xl bg-white border border-gray-200 outline-none focus:border-blue-500 transition-all font-medium" 
                         placeholder="Timeframe (e.g. 12 Hours)" 
                         value={formData.duration} 
                         onChange={e => setFormData({...formData, duration: e.target.value})} 
                     />
+
                     <textarea 
                         required 
-                        className="w-full p-4 h-32 rounded-2xl bg-white border border-gray-200 outline-none resize-none" 
+                        className="w-full p-4 h-32 rounded-2xl bg-white border border-gray-200 outline-none focus:border-blue-500 transition-all resize-none font-medium" 
                         placeholder="Detailed instructions..." 
                         value={formData.message} 
                         onChange={e => setFormData({...formData, message: e.target.value})} 
                     />
+
                     <button 
                         disabled={submitting} 
                         className="w-full bg-blue-600 text-white font-black py-4 rounded-2xl hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all flex justify-center items-center gap-2"
@@ -139,7 +143,7 @@ export default function AdminTaskPage() {
                 {/* Live Monitor */}
                 <div className="lg:col-span-8 space-y-4">
                     <div className="flex justify-between items-center px-2">
-                        <h2 className="font-black text-gray-800 uppercase tracking-widest text-sm">Real-Time Monitor</h2>
+                        <h2 className="font-black text-gray-800 uppercase tracking-widest text-sm">Monitor</h2>
                         <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full uppercase">Live Sync</span>
                     </div>
                     
@@ -155,7 +159,7 @@ export default function AdminTaskPage() {
                                 <div className="space-y-1">
                                     <h3 className="font-black text-gray-900 text-lg uppercase leading-tight">{task.title}</h3>
                                     <div className="flex gap-3 text-[10px] font-bold text-gray-400">
-                                        <span className="flex items-center gap-1 uppercase"><User className="w-3 h-3 text-blue-500" /> {task.workerId}</span>
+                                        <span className="flex items-center gap-1 uppercase"><User className="w-3 h-3 text-blue-500" /> {task.workerName}</span>
                                         <span className="flex items-center gap-1 uppercase"><Briefcase className="w-3 h-3 text-blue-500" /> {task.position}</span>
                                     </div>
                                 </div>

@@ -1,13 +1,13 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Clock, Briefcase, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { Clock, Briefcase, CheckCircle2, AlertCircle, Loader2, User } from 'lucide-react';
 import { REST_API } from '../../../constant';
 
 interface ITask {
     _id: string;
     title: string;
     message: string;
-    workerId: string;
+    workerName: string; // Updated to match AdminTaskPage
     position: string;
     duration: string;
     status: 'Processing' | 'Processed';
@@ -16,11 +16,11 @@ interface ITask {
 export default function StaffTaskPage() {
     const [tasks, setTasks] = useState<ITask[]>([]);
     const [loading, setLoading] = useState(true);
-    // Track which specific task is being updated to show a loader on the button
     const [updatingId, setUpdatingId] = useState<string | null>(null);
 
     const fetchMyTasks = async () => {
         try {
+            // Ensure this endpoint filter logic matches your backend authentication
             const res = await fetch(`${REST_API}/v1/tasks/assigned/me`);
             const data = await res.json();
             setTasks(data.tasks || []);
@@ -81,9 +81,16 @@ export default function StaffTaskPage() {
                             </div>
 
                             <div className="pt-4 space-y-3">
-                                <div className="flex items-center gap-2 text-xs font-bold text-gray-400 border-b pb-3 border-gray-50">
-                                    <Briefcase className="w-4 h-4 text-blue-500" /> 
-                                    ROLE: <span className="text-gray-900 uppercase">{task.position}</span>
+                                {/* Added Worker Name for consistency with image_7579b2.png UI */}
+                                <div className="flex flex-col gap-2 border-b pb-3 border-gray-50">
+                                    <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase">
+                                        <User className="w-3.5 h-3.5 text-blue-500" /> 
+                                        Assignee: <span className="text-gray-900">{task.workerName}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase">
+                                        <Briefcase className="w-3.5 h-3.5 text-blue-500" /> 
+                                        Role: <span className="text-gray-900">{task.position}</span>
+                                    </div>
                                 </div>
                                 
                                 {task.status === 'Processing' ? (
