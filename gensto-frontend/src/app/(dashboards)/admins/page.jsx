@@ -88,7 +88,7 @@ export default function AdminDashboard() {
         { label: "Add Service", desc: "New Deployment", icon: ClipboardList, color: "text-emerald-700", bg: "bg-emerald-100", path: "add-service" },
         { label: "System Audit", desc: "Security Logs", icon: ShieldAlert, color: "text-red-700", bg: "bg-red-100", path: "security-audit" },
         { label: "Role Audit", desc: "Review Permissions", icon: ShieldCheck, color: "text-emerald-700", bg: "bg-emerald-100", path: "role-audit" },
-        { label: "Task Center", desc: "Assign Duties", icon: ListTodo, color: "text-indigo-700", bg: "bg-indigo-100", path: "tasks" },
+        { label: "Task Center", desc: "Assign Duties", icon: ListTodo, color: "text-indigo-700", bg: "bg-indigo-100", path: "task" },
         { label: "Delete User", desc: "Remove Account", icon: Trash2, color: "text-red-700", bg: "bg-red-100", path: "manage-users?action=delete" },
     ];
 
