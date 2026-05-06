@@ -1,13 +1,11 @@
-// gensto-frontend/src/app/(dashboards)/admins/page.jsx
-
 "use client";
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { REST_API } from '../../constant';
 import {
     Users, Briefcase, Award, Loader2, ClipboardList, TrendingUp,
-    ShieldAlert, UserPlus, ShieldCheck,
-    MousePointer2, Clock, GraduationCap,
+    ShieldAlert, UserPlus, UserMinus, ShieldCheck,
+    MousePointer2, Clock, MessageSquare, GraduationCap,
     Mail, Contact, Handshake, Radio, Share2, MessageCircle,
     Trash2, ListTodo
 } from 'lucide-react';
@@ -32,8 +30,16 @@ export default function AdminDashboard() {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                // FIXED: URL updated to match backend controller route
-                const response = await fetch(`${REST_API}/v1/unit/oversight-stats`);
+
+                const response = await fetch(`${REST_API}/api/v1/admin/oversight-stats`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
                 const result = await response.json();
 
                 if (result.success) {
@@ -52,6 +58,7 @@ export default function AdminDashboard() {
 
     const navigateTo = (path) => router.push(`/admins/${path}`);
 
+    // mapping logic for cards and stats
     const mainStats = [
         {
             label: "Worker Pulse",
@@ -66,7 +73,7 @@ export default function AdminDashboard() {
         {
             label: "Visitor Rate",
             value: `${dashboardData?.mainStats?.visitorRate ?? "0"}%`,
-            icon: MousePointer2, color: "text-orange-600", bg: "bg-orange-50", desc: "Weekly Growth Rate", path: "analysis"
+            icon: MousePointer2, color: "text-orange-600", bg: "bg-orange-50", desc: "Daily Traffic Change", path: "analysis"
         },
         {
             label: "Instructors",
@@ -207,7 +214,7 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            {/* Operational Cards */}
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {operationalCards.map((card, i) => (
                     <div key={i} onClick={() => navigateTo(card.path)} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:border-blue-300 transition-all cursor-pointer group">
@@ -222,7 +229,6 @@ export default function AdminDashboard() {
         </div>
     );
 }
-
 
 /*
 
