@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Suspense, useState, useEffect } from 'react';
 import Script from 'next/script';
 import { CheckCircle, CreditCard, User, Globe, Loader2, Clock, Banknote } from 'lucide-react';
-import { REST_API } from '@/constant';
+import { REST_API } from '../../../constant';
 
 function RegisterForm() {
   const searchParams = useSearchParams();
