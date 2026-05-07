@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, Plus, ArrowLeft, CheckCircle2, X } from 'lucide-react';
+import { Loader2, Plus, ArrowLeft, CheckCircle2, X, AlertCircle } from 'lucide-react';
 import { 
   Monitor, Server, Layout, Code2, Layers, 
   Shield, Database, BarChart3, Smartphone, 
@@ -22,6 +22,7 @@ const iconOptions = Object.keys(iconComponentMap);
 export default function AddSchoolPage() {
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -33,21 +34,35 @@ export default function AddSchoolPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage(null);
     
+    // Clean price data: remove ₦, commas, and spaces before sending to backend
+    const cleanPrice = formData.price.replace(/[₦, ]/g, '').trim();
+    
+    const payload = {
+      ...formData,
+      price: cleanPrice
+    };
+
     try {
       const response = await fetch(`${REST_API}/schools`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
       
       const data = await response.json();
+      
       if (data.success) {
         setShowSuccess(true);
         setFormData({ title: '', description: '', price: '₦', duration: '', iconName: 'Monitor' });
+      } else {
+        // Capture backend validation errors (e.g., Duplicate title or missing fields)
+        setErrorMessage(data.message || "Failed to publish school.");
       }
     } catch (error) {
       console.error("Failed to add school:", error);
+      setErrorMessage("Network error: Could not reach the server.");
     } finally {
       setLoading(false);
     }
@@ -93,6 +108,18 @@ export default function AddSchoolPage() {
             <ArrowLeft className="w-4 h-4" /> Back to Dashboard
           </Link>
           <h1 className="text-[42px] font-black text-[#1a1f2e] tracking-tight leading-none mb-4">Add New Tech School</h1>
+          
+          {/* Error Alert Box */}
+          {errorMessage && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-red-50 border border-red-100 p-4 rounded-2xl flex items-center gap-3 text-red-600 mb-6"
+            >
+              <AlertCircle className="w-5 h-5 shrink-0" />
+              <p className="text-sm font-bold uppercase tracking-tight">{errorMessage}</p>
+            </motion.div>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-gray-100">
@@ -101,6 +128,7 @@ export default function AddSchoolPage() {
               <label className="text-[#1a1f2e] font-black text-sm uppercase tracking-wider">School Title</label>
               <input 
                 type="text" required
+                placeholder="e.g. Full-Stack School"
                 className="bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 font-medium"
                 value={formData.title}
                 onChange={(e) => setFormData({...formData, title: e.target.value})}
