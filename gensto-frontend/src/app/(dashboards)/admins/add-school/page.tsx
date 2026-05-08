@@ -1,4 +1,3 @@
-//gensto-frontend/src/app/(dashboards)/admins/add-school/page.tsx
 
 'use client';
 
@@ -38,7 +37,7 @@ export default function AddSchoolPage() {
     setLoading(true);
     setErrorMessage(null);
     
-    // Clean price data: remove ₦, commas, and spaces before sending to backend
+    // Clean price data: remove ₦, commas, and spaces
     const cleanPrice = formData.price.replace(/[₦, ]/g, '').trim();
     
     const payload = {
@@ -47,24 +46,35 @@ export default function AddSchoolPage() {
     };
 
     try {
+      /**
+       * IMPORTANT: Ensure your REST_API in constant.js does NOT end with /api 
+       * to avoid the /api/api/schools 404 error.
+       */
       const response = await fetch(`${REST_API}/api/schools`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       
-      const data = await response.json();
-      
-      if (data.success) {
-        setShowSuccess(true);
-        setFormData({ title: '', description: '', price: '₦', duration: '', iconName: 'Monitor' });
+      // Check if the response is actually JSON before parsing
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          setShowSuccess(true);
+          setFormData({ title: '', description: '', price: '₦', duration: '', iconName: 'Monitor' });
+        } else {
+          setErrorMessage(data.message || "Failed to publish school.");
+        }
       } else {
-        // Capture backend validation errors (e.g., Duplicate title or missing fields)
-        setErrorMessage(data.message || "Failed to publish school.");
+        // This handles cases where the server returns an HTML error page (404/500)
+        setErrorMessage("Server error: Received an invalid response format. Please check the API URL.");
       }
+
     } catch (error) {
       console.error("Failed to add school:", error);
-      setErrorMessage("Network error: Could not reach the server.");
+      setErrorMessage("Network error: Could not reach the server. Please check your connection.");
     } finally {
       setLoading(false);
     }
@@ -131,7 +141,7 @@ export default function AddSchoolPage() {
               <input 
                 type="text" required
                 placeholder="e.g. Full-Stack School"
-                className="bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 font-medium"
+                className="bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 font-medium text-[#1a1f2e]"
                 value={formData.title}
                 onChange={(e) => setFormData({...formData, title: e.target.value})}
               />
@@ -142,7 +152,7 @@ export default function AddSchoolPage() {
                 <label className="text-[#1a1f2e] font-black text-sm uppercase tracking-wider">Price</label>
                 <input 
                   type="text" required
-                  className="bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 font-medium"
+                  className="bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 font-medium text-[#1a1f2e]"
                   value={formData.price}
                   onChange={(e) => setFormData({...formData, price: e.target.value})}
                 />
@@ -150,8 +160,8 @@ export default function AddSchoolPage() {
               <div className="flex flex-col gap-2">
                 <label className="text-[#1a1f2e] font-black text-sm uppercase tracking-wider">Duration</label>
                 <input 
-                  type="text" required placeholder="e.g. 6 Months"
-                  className="bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 font-medium"
+                  type="text" required placeholder="e.g. 4 Months"
+                  className="bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 font-medium text-[#1a1f2e]"
                   value={formData.duration}
                   onChange={(e) => setFormData({...formData, duration: e.target.value})}
                 />
@@ -168,7 +178,7 @@ export default function AddSchoolPage() {
                       key={iconName} type="button"
                       onClick={() => setFormData({...formData, iconName})}
                       className={`p-4 rounded-2xl flex flex-col items-center gap-3 transition-all border-2 ${
-                        formData.iconName === iconName ? "border-blue-600 bg-blue-50 text-blue-600" : "border-transparent bg-gray-50 text-gray-400"
+                        formData.iconName === iconName ? "border-blue-600 bg-blue-50 text-blue-600" : "border-transparent bg-gray-50 text-gray-400 hover:bg-gray-100"
                       }`}
                     >
                       <IconComponent className="w-6 h-6" />
@@ -183,7 +193,8 @@ export default function AddSchoolPage() {
               <label className="text-[#1a1f2e] font-black text-sm uppercase tracking-wider">Description</label>
               <textarea 
                 required rows={4}
-                className="bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 font-medium resize-none"
+                className="bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 font-medium resize-none text-[#1a1f2e]"
+                placeholder="What will students learn?"
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
               />
@@ -192,7 +203,7 @@ export default function AddSchoolPage() {
 
           <button
             type="submit" disabled={loading}
-            className="mt-10 w-full bg-[#1a1f2e] text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 hover:bg-blue-600 transition-all uppercase tracking-widest text-xs"
+            className="mt-10 w-full bg-[#1a1f2e] text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all uppercase tracking-widest text-xs"
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
             {loading ? "Publishing..." : "Add School to Catalog"}
