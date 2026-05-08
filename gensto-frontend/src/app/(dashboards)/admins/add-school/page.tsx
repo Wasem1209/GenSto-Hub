@@ -1,3 +1,5 @@
+//gensto-frontend/src/app/(dashboards)/admins/add-school/page.tsx
+
 'use client';
 
 import { useState } from 'react';
@@ -45,7 +47,7 @@ export default function AddSchoolPage() {
     };
 
     try {
-      const response = await fetch(`${REST_API}/schools`, {
+      const response = await fetch(`${REST_API}/api/schools`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
