@@ -2,25 +2,33 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, Plus, ArrowLeft, CheckCircle2, X, AlertCircle } from 'lucide-react';
 import { 
+  Loader2, Plus, ArrowLeft, CheckCircle2, X, AlertCircle,
   Monitor, Server, Layout, Code2, Layers, 
   Shield, Database, BarChart3, Smartphone, 
-  Cpu, Globe, Lock, PenTool, Terminal 
+  Cpu, Globe, Lock, PenTool, Terminal,
+  // Added 10 New Icons
+  Cloud, Wifi, Zap, Settings, Command, 
+  Binary, Briefcase, GraduationCap, Microscope, Rocket
 } from 'lucide-react';
 
 import { API_ROUTES } from '../../../constant';
+import { useAuth } from '../../../context/AuthContext';
 import Link from 'next/link';
 
 const iconComponentMap: Record<string, React.ElementType> = {
   Monitor, Server, Layout, Code2, Layers, Terminal,
   Shield, Database, BarChart3, Smartphone, Cpu, Globe,
-  PenTool, Lock
+  PenTool, Lock,
+  // Mapping New Icons
+  Cloud, Wifi, Zap, Settings, Command, 
+  Binary, Briefcase, GraduationCap, Microscope, Rocket
 };
 
 const iconOptions = Object.keys(iconComponentMap);
 
 export default function AddSchoolPage() {
+  const { token } = useAuth(); // Access the token from AuthContext
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -37,7 +45,6 @@ export default function AddSchoolPage() {
     setLoading(true);
     setErrorMessage(null);
     
-   
     const cleanPrice = formData.price.replace(/[₦, ]/g, '').trim();
     
     const payload = {
@@ -46,10 +53,13 @@ export default function AddSchoolPage() {
     };
 
     try {
-      
+      // The 401 error is fixed here by adding the Authorization header
       const response = await fetch(API_ROUTES.SCHOOLS, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // Sends the token to the backend protect middleware
+        },
         body: JSON.stringify(payload),
       });
       
@@ -62,11 +72,11 @@ export default function AddSchoolPage() {
           setShowSuccess(true);
           setFormData({ title: '', description: '', price: '₦', duration: '', iconName: 'Monitor' });
         } else {
-          setErrorMessage(data.message || "Failed to publish school.");
+          // If the error comes from adminOnly middleware, it usually uses .msg
+          setErrorMessage(data.msg || data.message || "Failed to publish school.");
         }
       } else {
-        
-        setErrorMessage("Server error: Received an invalid response format (HTML 404). Check backend route mounting.");
+        setErrorMessage("Server configuration error. Check route authorization.");
       }
 
     } catch (error) {
@@ -113,7 +123,7 @@ export default function AddSchoolPage() {
 
       <div className="max-w-4xl mx-auto">
         <div className="mb-12">
-          <Link href="/admin/dashboard" className="text-blue-600 flex items-center gap-2 mb-4 font-bold uppercase text-xs tracking-widest">
+          <Link href="/admins" className="text-blue-600 flex items-center gap-2 mb-4 font-bold uppercase text-xs tracking-widest">
             <ArrowLeft className="w-4 h-4" /> Back to Dashboard
           </Link>
           <h1 className="text-[42px] font-black text-[#1a1f2e] tracking-tight leading-none mb-4">Add New Tech School</h1>
@@ -166,7 +176,7 @@ export default function AddSchoolPage() {
 
             <div className="md:col-span-2 flex flex-col gap-2">
               <label className="text-[#1a1f2e] font-black text-sm uppercase tracking-wider">Select Display Icon</label>
-              <div className="grid grid-cols-3 sm:grid-cols-7 gap-3 mt-2">
+              <div className="grid grid-cols-4 sm:grid-cols-8 gap-3 mt-2">
                 {iconOptions.map((iconName) => {
                   const IconComponent = iconComponentMap[iconName];
                   return (
@@ -177,8 +187,8 @@ export default function AddSchoolPage() {
                         formData.iconName === iconName ? "border-blue-600 bg-blue-50 text-blue-600" : "border-transparent bg-gray-50 text-gray-400 hover:bg-gray-100"
                       }`}
                     >
-                      <IconComponent className="w-6 h-6" />
-                      <span className="text-[10px] font-bold uppercase">{iconName}</span>
+                      <IconComponent className="w-5 h-5" />
+                      <span className="text-[8px] font-bold uppercase truncate w-full text-center">{iconName}</span>
                     </button>
                   );
                 })}
@@ -198,12 +208,13 @@ export default function AddSchoolPage() {
           </div>
 
           <button
-            type="submit" disabled={loading}
+            type="submit" disabled={loading || !token}
             className="mt-10 w-full bg-[#1a1f2e] text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all uppercase tracking-widest text-xs"
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
             {loading ? "Publishing..." : "Add School to Catalog"}
           </button>
+          {!token && <p className="text-center text-red-500 text-[10px] mt-2 font-bold uppercase tracking-widest">Authentication missing: Please re-login</p>}
         </form>
       </div>
     </section>
