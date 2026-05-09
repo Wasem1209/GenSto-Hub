@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -46,18 +45,16 @@ export default function AddSchoolPage() {
     };
 
     try {
-      /**
-       * IMPORTANT: Ensure your REST_API in constant.js does NOT end with /api 
-       * to avoid the /api/api/schools 404 error.
-       */
+      // Constructs the full URL using only REST_API import
       const response = await fetch(`${REST_API}/api/schools`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       
-      // Check if the response is actually JSON before parsing
       const contentType = response.headers.get("content-type");
+      
+      // Safe parsing: check if response is JSON to avoid 
       if (contentType && contentType.includes("application/json")) {
         const data = await response.json();
         
@@ -68,13 +65,12 @@ export default function AddSchoolPage() {
           setErrorMessage(data.message || "Failed to publish school.");
         }
       } else {
-        // This handles cases where the server returns an HTML error page (404/500)
-        setErrorMessage("Server error: Received an invalid response format. Please check the API URL.");
+        setErrorMessage("Server error: Received an invalid response format (HTML instead of JSON).");
       }
 
     } catch (error) {
       console.error("Failed to add school:", error);
-      setErrorMessage("Network error: Could not reach the server. Please check your connection.");
+      setErrorMessage("Network error: Could not reach the server.");
     } finally {
       setLoading(false);
     }
@@ -121,7 +117,6 @@ export default function AddSchoolPage() {
           </Link>
           <h1 className="text-[42px] font-black text-[#1a1f2e] tracking-tight leading-none mb-4">Add New Tech School</h1>
           
-          {/* Error Alert Box */}
           {errorMessage && (
             <motion.div 
               initial={{ opacity: 0, y: -10 }}
