@@ -11,16 +11,20 @@ import {
   Loader2,
   CheckCircle2,
   Sparkles,
-  Rocket
+  Rocket,
+  AlertCircle
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { REST_API } from '../../../constant';
+import { useAuth } from '../../../context/AuthContext';
 
 export default function AddServicePage() {
   const router = useRouter();
+  const { token } = useAuth(); 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -32,21 +36,28 @@ export default function AddServicePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
 
     try {
       const res = await fetch(`${REST_API}/services`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
         body: JSON.stringify(formData),
       });
 
       if (res.ok) {
         setSuccess(true);
-        
         setTimeout(() => router.push('/admins/services'), 2500);
+      } else {
+        const data = await res.json();
+        setError(data.msg || "Authorization failed or server error.");
       }
     } catch (error) {
       console.error("Failed to add service:", error);
+      setError("Network error. Please check your connection.");
     } finally {
       setLoading(false);
     }
@@ -88,6 +99,13 @@ export default function AddServicePage() {
         <header className="mb-12 text-center md:text-left">
           <h1 className="text-4xl font-black text-[#1a1f2e] tracking-tight">Deploy New Service</h1>
           <p className="text-gray-500 font-medium mt-1">Register a new solution in the tech ecosystem.</p>
+          
+          {error && (
+            <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-2xl flex items-center gap-3 border border-red-100 animate-pulse">
+              <AlertCircle size={18} />
+              <p className="text-xs font-bold uppercase tracking-wider">{error}</p>
+            </div>
+          )}
         </header>
 
         <div className="bg-white rounded-[3.5rem] p-8 md:p-12 shadow-2xl shadow-blue-900/5 border border-gray-100">
@@ -155,12 +173,12 @@ export default function AddServicePage() {
             </div>
 
             <button 
-              disabled={loading || success}
+              disabled={loading || success || !token}
               type="submit"
               className={`w-full py-6 rounded-3xl font-black uppercase tracking-[0.3em] text-xs flex items-center justify-center gap-3 transition-all ${
                 success 
                 ? 'bg-emerald-500 text-white cursor-default' 
-                : 'bg-[#1a1f2e] text-white hover:bg-blue-600 shadow-xl shadow-blue-900/10 active:scale-95'
+                : 'bg-[#1a1f2e] text-white hover:bg-blue-600 shadow-xl shadow-blue-900/10 active:scale-95 disabled:bg-gray-300 disabled:shadow-none'
               }`}
             >
               {loading ? (
@@ -170,6 +188,8 @@ export default function AddServicePage() {
                   <Rocket className="animate-bounce" size={18} />
                   Deployed
                 </>
+              ) : !token ? (
+                "Session Expired - Please Login"
               ) : (
                 <>
                   <Plus size={18} />
