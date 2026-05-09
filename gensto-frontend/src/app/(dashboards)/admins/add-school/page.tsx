@@ -8,7 +8,8 @@ import {
   Shield, Database, BarChart3, Smartphone, 
   Cpu, Globe, Lock, PenTool, Terminal 
 } from 'lucide-react';
-import { REST_API } from '../../../constant';
+
+import { API_ROUTES } from '../../../constant';
 import Link from 'next/link';
 
 const iconComponentMap: Record<string, React.ElementType> = {
@@ -36,7 +37,7 @@ export default function AddSchoolPage() {
     setLoading(true);
     setErrorMessage(null);
     
-    // Clean price data: remove ₦, commas, and spaces
+   
     const cleanPrice = formData.price.replace(/[₦, ]/g, '').trim();
     
     const payload = {
@@ -45,8 +46,8 @@ export default function AddSchoolPage() {
     };
 
     try {
-      // Constructs the full URL using only REST_API import
-      const response = await fetch(`${REST_API}/api/schools`, {
+      
+      const response = await fetch(API_ROUTES.SCHOOLS, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -54,7 +55,6 @@ export default function AddSchoolPage() {
       
       const contentType = response.headers.get("content-type");
       
-      // Safe parsing: check if response is JSON to avoid 
       if (contentType && contentType.includes("application/json")) {
         const data = await response.json();
         
@@ -65,7 +65,8 @@ export default function AddSchoolPage() {
           setErrorMessage(data.message || "Failed to publish school.");
         }
       } else {
-        setErrorMessage("Server error: Received an invalid response format (HTML instead of JSON).");
+        
+        setErrorMessage("Server error: Received an invalid response format (HTML 404). Check backend route mounting.");
       }
 
     } catch (error) {
