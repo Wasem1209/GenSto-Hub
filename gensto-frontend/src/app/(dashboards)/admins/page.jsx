@@ -7,7 +7,7 @@ import {
     ShieldAlert, UserPlus, UserMinus, ShieldCheck,
     MousePointer2, Clock, MessageSquare, GraduationCap,
     Mail, Contact, Handshake, Radio, Share2, MessageCircle,
-    Trash2, ListTodo
+    Trash2, ListTodo, FileText, PenTool
 } from 'lucide-react';
 
 import {
@@ -30,12 +30,10 @@ export default function AdminDashboard() {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-
                 const response = await fetch(`${REST_API}/v1/admin/oversight-stats`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
@@ -58,7 +56,6 @@ export default function AdminDashboard() {
 
     const navigateTo = (path) => router.push(`/admins/${path}`);
 
-    // mapping logic for cards and stats
     const mainStats = [
         {
             label: "Worker Pulse",
@@ -83,6 +80,7 @@ export default function AdminDashboard() {
     ];
 
     const authorityActions = [
+        { label: "Add Blog", desc: "Publish Content", icon: PenTool, color: "text-pink-700", bg: "bg-pink-100", path: "add-blog" },
         { label: "Promote User", desc: "Grant Access", icon: UserPlus, color: "text-blue-700", bg: "bg-blue-100", path: "manage-users?action=promote" },
         { label: "Add School", desc: "New Institution", icon: GraduationCap, color: "text-orange-700", bg: "bg-orange-100", path: "add-school" },
         { label: "Add Service", desc: "New Deployment", icon: ClipboardList, color: "text-emerald-700", bg: "bg-emerald-100", path: "add-service" },
@@ -93,6 +91,7 @@ export default function AdminDashboard() {
     ];
 
     const operationalCards = [
+        { label: "Published Blogs", value: dashboardData?.operational?.blogs ?? "0", icon: FileText, color: "text-pink-600", bg: "bg-pink-50", path: "manage-blogs" },
         { label: "Schools Running", value: dashboardData?.operational?.schools ?? "0", icon: GraduationCap, color: "text-orange-600", bg: "bg-orange-50", path: "schools" },
         { label: "Services Running", value: dashboardData?.operational?.services ?? "0", icon: ClipboardList, color: "text-emerald-600", bg: "bg-emerald-50", path: "services" },
         { label: "Newsletter", value: dashboardData?.operational?.newsletter?.toLocaleString() ?? "0", icon: Mail, color: "text-pink-600", bg: "bg-pink-50", path: "newsletter" },
@@ -127,7 +126,6 @@ export default function AdminDashboard() {
 
     return (
         <div className="p-8 space-y-8 min-h-screen bg-gray-50">
-            {/* Header */}
             <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900 tracking-tight">System Control Unit</h1>
@@ -141,7 +139,6 @@ export default function AdminDashboard() {
                 )}
             </div>
 
-            {/* Main Oversight Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {mainStats.map((stat, i) => (
                     <div key={i} onClick={() => navigateTo(stat.path)} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer group">
@@ -155,7 +152,6 @@ export default function AdminDashboard() {
                 ))}
             </div>
 
-            {/* Engagement & Growth */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-6">
                     <h2 className="font-bold text-gray-800 flex items-center gap-2"><Clock className="w-5 h-5 text-blue-500" /> Avg Session Time</h2>
@@ -192,7 +188,6 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            {/* Authority Management */}
             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                 <h2 className="font-bold text-gray-800 mb-6 flex items-center gap-2">
                     <ShieldCheck className="w-5 h-5 text-blue-600" /> User Authority Management
@@ -213,7 +208,6 @@ export default function AdminDashboard() {
                     ))}
                 </div>
             </div>
-
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {operationalCards.map((card, i) => (

@@ -1,3 +1,235 @@
+
+'use client';
+
+import { useState } from 'react';
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Loader2, Plus, ArrowLeft, CheckCircle2, X, AlertCircle,
+  Monitor, Server, Layout, Code2, Layers, 
+  Shield, Database, BarChart3, Smartphone, 
+  Cpu, Globe, Lock, PenTool, Terminal,
+  Cloud, Wifi, Zap, Settings, Command, 
+  Binary, Briefcase, GraduationCap, Microscope, Rocket
+} from 'lucide-react';
+
+import { API_ROUTES } from '../../../constant';
+import { useAuth } from '../../../context/AuthContext';
+import Link from 'next/link';
+
+const iconComponentMap: Record<string, React.ElementType> = {
+  Monitor, Server, Layout, Code2, Layers, Terminal,
+  Shield, Database, BarChart3, Smartphone, Cpu, Globe,
+  PenTool, Lock,
+  Cloud, Wifi, Zap, Settings, Command, 
+  Binary, Briefcase, GraduationCap, Microscope, Rocket
+};
+
+const iconOptions = Object.keys(iconComponentMap);
+
+export default function AddSchoolPage() {
+  const { token } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    price: '₦', 
+    duration: '',
+    iconName: 'Monitor'
+  });
+
+  
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+    if (!value.startsWith('₦')) {
+      value = '₦' + value.replace(/₦/g, '');
+    }
+    setFormData({ ...formData, price: value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setErrorMessage(null);
+    
+    // Strips the ₦ and commas before sending to the backend
+    const cleanPrice = formData.price.replace(/[₦, ]/g, '').trim();
+    
+    const payload = {
+      ...formData,
+      price: cleanPrice
+    };
+
+    try {
+      const response = await fetch(API_ROUTES.SCHOOLS, {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify(payload),
+      });
+      
+      const contentType = response.headers.get("content-type");
+      
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          setShowSuccess(true);
+          // Reset form with ₦ sign ready for next entry
+          setFormData({ title: '', description: '', price: '₦', duration: '', iconName: 'Monitor' });
+        } else {
+          setErrorMessage(data.msg || data.message || "Failed to publish school.");
+        }
+      } else {
+        setErrorMessage("Server configuration error. Check route authorization.");
+      }
+
+    } catch (error) {
+      console.error("Failed to add school:", error);
+      setErrorMessage("Network error: Could not reach the server.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <section className="min-h-screen bg-gray-50 pt-24 pb-16 px-4 font-sans relative">
+      <AnimatePresence>
+        {showSuccess && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#1a1f2e]/60 backdrop-blur-sm">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-white rounded-[2.5rem] p-8 max-w-sm w-full shadow-2xl text-center relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 w-full h-2 bg-emerald-500" />
+              <button 
+                onClick={() => setShowSuccess(false)}
+                className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <div className="w-20 h-20 bg-emerald-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <CheckCircle2 className="w-10 h-10 text-emerald-500" />
+              </div>
+              <h3 className="text-2xl font-black text-[#1a1f2e] mb-2">School Published!</h3>
+              <p className="text-gray-500 font-medium mb-8">The new institution has been successfully added to the catalog.</p>
+              <button
+                onClick={() => setShowSuccess(false)}
+                className="w-full bg-[#1a1f2e] text-white font-black py-4 rounded-2xl hover:bg-emerald-600 transition-all duration-300 uppercase tracking-widest text-xs"
+              >
+                Continue
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-12">
+          <Link href="/admins" className="text-blue-600 flex items-center gap-2 mb-4 font-bold uppercase text-xs tracking-widest">
+            <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          </Link>
+          <h1 className="text-[42px] font-black text-[#1a1f2e] tracking-tight leading-none mb-4">Add New Tech School</h1>
+          
+          {errorMessage && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-red-50 border border-red-100 p-4 rounded-2xl flex items-center gap-3 text-red-600 mb-6"
+            >
+              <AlertCircle className="w-5 h-5 shrink-0" />
+              <p className="text-sm font-bold uppercase tracking-tight">{errorMessage}</p>
+            </motion.div>
+          )}
+        </div>
+
+        <form onSubmit={handleSubmit} className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-gray-100">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="flex flex-col gap-2">
+              <label className="text-[#1a1f2e] font-black text-sm uppercase tracking-wider">School Title</label>
+              <input 
+                type="text" required
+                placeholder="e.g. Full-Stack School"
+                className="bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 font-medium text-[#1a1f2e]"
+                value={formData.title}
+                onChange={(e) => setFormData({...formData, title: e.target.value})}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
+                <label className="text-[#1a1f2e] font-black text-sm uppercase tracking-wider">Price</label>
+                <input 
+                  type="text" required
+                  className="bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 font-black text-[#1a1f2e]"
+                  value={formData.price}
+                  onChange={handlePriceChange}
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-[#1a1f2e] font-black text-sm uppercase tracking-wider">Duration</label>
+                <input 
+                  type="text" required placeholder="e.g. 4 Months"
+                  className="bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 font-medium text-[#1a1f2e]"
+                  value={formData.duration}
+                  onChange={(e) => setFormData({...formData, duration: e.target.value})}
+                />
+              </div>
+            </div>
+
+            <div className="md:col-span-2 flex flex-col gap-2">
+              <label className="text-[#1a1f2e] font-black text-sm uppercase tracking-wider">Select Display Icon</label>
+              <div className="grid grid-cols-4 sm:grid-cols-8 gap-3 mt-2">
+                {iconOptions.map((iconName) => {
+                  const IconComponent = iconComponentMap[iconName];
+                  return (
+                    <button
+                      key={iconName} type="button"
+                      onClick={() => setFormData({...formData, iconName})}
+                      className={`p-4 rounded-2xl flex flex-col items-center gap-3 transition-all border-2 ${
+                        formData.iconName === iconName ? "border-blue-600 bg-blue-50 text-blue-600" : "border-transparent bg-gray-50 text-gray-400 hover:bg-gray-100"
+                      }`}
+                    >
+                      <IconComponent className="w-5 h-5" />
+                      <span className="text-[8px] font-bold uppercase truncate w-full text-center">{iconName}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="md:col-span-2 flex flex-col gap-2">
+              <label className="text-[#1a1f2e] font-black text-sm uppercase tracking-wider">Description</label>
+              <textarea 
+                required rows={4}
+                className="bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 font-medium resize-none text-[#1a1f2e]"
+                placeholder="What will students learn?"
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit" disabled={loading || !token}
+            className="mt-10 w-full bg-[#1a1f2e] text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all uppercase tracking-widest text-xs"
+          >
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
+            {loading ? "Publishing..." : "Add School to Catalog"}
+          </button>
+          {!token && <p className="text-center text-red-500 text-[10px] mt-2 font-bold uppercase tracking-widest">Authentication missing: Please re-login</p>}
+        </form>
+      </div>
+    </section>
+  );
+}
+
+/*
 'use client';
 
 import { useState } from 'react';
@@ -53,12 +285,12 @@ export default function AddSchoolPage() {
     };
 
     try {
-      // The 401 error is fixed here by adding the Authorization header
+      
       const response = await fetch(API_ROUTES.SCHOOLS, {
         method: 'POST',
         headers: { 
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` // Sends the token to the backend protect middleware
+            'Authorization': `Bearer ${token}` 
         },
         body: JSON.stringify(payload),
       });
@@ -220,3 +452,4 @@ export default function AddSchoolPage() {
     </section>
   );
 }
+*/
