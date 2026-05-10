@@ -2,7 +2,7 @@
 import { useState, FormEvent, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { Mail, Lock, Loader2, LogIn, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react';
 import { signIn, useSession } from 'next-auth/react'; 
 import Link from 'next/link';
 import { REST_API } from '../../constant';
@@ -127,7 +127,7 @@ export default function SignInClient() {
                     </div>
 
                     <button disabled={loading || status === 'loading'} className="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition active:scale-95 disabled:opacity-50 uppercase tracking-widest text-sm">
-                        {loading ? <Loader2 className="animate-spin" /> : <>SIGN IN <LogIn className="w-4 h-4" /></>}
+                        {loading ? <Loader2 className="animate-spin" /> : <>SIGN IN</>}
                     </button>
                 </form>
 
