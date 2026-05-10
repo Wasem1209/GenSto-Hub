@@ -47,7 +47,8 @@ export const API_ROUTES = {
     GET_ALL: `${REST_API}/v1/tasks/all`,
     DELETE: (id: string) => `${REST_API}/v1/tasks/delete/${id}`,
     UPDATE_STATUS: `${REST_API}/v1/tasks/update-status`,
-
+    BLOG_PUBLISH: `${REST_API}/v1/blogs/publish`,
+    BLOG_BASE: `${REST_API}/v1/blogs`
 };
 
 

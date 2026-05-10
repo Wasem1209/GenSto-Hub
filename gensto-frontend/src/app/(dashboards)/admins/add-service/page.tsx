@@ -1,3 +1,6 @@
+//gensto-frontend/src/app/(dashboards)/admins/add-service/page.tsx
+
+
 'use client';
 
 import React, { useState } from 'react';
