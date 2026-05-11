@@ -1,3 +1,5 @@
+//gensto-frontend/src/providers/NextAuthProvider.tsx
+
 'use client';
 
 import { SessionProvider } from "next-auth/react";
