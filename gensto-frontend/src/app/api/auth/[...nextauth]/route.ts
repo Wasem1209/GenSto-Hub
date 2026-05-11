@@ -22,6 +22,7 @@ const handler = NextAuth({
     ],
     session: {
         strategy: "jwt",
+        maxAge: 30 * 24 * 60 * 60,
     },
     callbacks: {
         async signIn({ user }) {
@@ -29,18 +30,17 @@ const handler = NextAuth({
                 await connectDB();
                 if (!user?.email) return false;
 
-                const existingUser = await User.findOne({ email: user.email });
+                const existingUser = await User.findOne({ email: user.email.toLowerCase() });
 
                 if (!existingUser) {
                     await User.create({
                         name: user.name,
-                        email: user.email,
+                        email: user.email.toLowerCase(),
                         image: user.image,
                         role: "regular",
                         isVerified: true,
                     });
                 } else if (!existingUser.isVerified) {
-
                     existingUser.isVerified = true;
                     await existingUser.save();
                 }
@@ -52,14 +52,18 @@ const handler = NextAuth({
         },
 
         async jwt({ token, user, trigger, session }) {
-            // Initial sign in
+            // Initial sign in: Fetch user details from DB
             if (user) {
-                await connectDB();
-                const dbUser = await User.findOne({ email: user.email });
-                if (dbUser) {
-                    token.role = dbUser.role;
-                    token.id = dbUser._id.toString();
-                    token.isVerified = dbUser.isVerified;
+                try {
+                    await connectDB();
+                    const dbUser = await User.findOne({ email: user.email?.toLowerCase() });
+                    if (dbUser) {
+                        token.role = dbUser.role;
+                        token.id = dbUser._id.toString();
+                        token.isVerified = dbUser.isVerified;
+                    }
+                } catch (error) {
+                    console.error("JWT Initial Signin Error:", error);
                 }
             }
 
@@ -68,12 +72,16 @@ const handler = NextAuth({
                 return { ...token, ...session.user };
             }
 
-            // Periodic database check to keep verification status fresh
+            // Periodic refresh of verification status if not already verified
             if (token.email && !token.isVerified) {
-                await connectDB();
-                const dbUser = await User.findOne({ email: token.email });
-                if (dbUser?.isVerified) {
-                    token.isVerified = true;
+                try {
+                    await connectDB();
+                    const dbUser = await User.findOne({ email: (token.email as string).toLowerCase() });
+                    if (dbUser?.isVerified) {
+                        token.isVerified = true;
+                    }
+                } catch (e) {
+                    console.error("JWT Periodic Check Error:", e);
                 }
             }
 
@@ -81,12 +89,22 @@ const handler = NextAuth({
         },
 
         async session({ session, token }) {
-            if (session.user) {
+            if (session.user && token) {
                 session.user.role = token.role as string;
                 session.user.id = token.id as string;
                 session.user.isVerified = token.isVerified as boolean;
             }
             return session;
+        },
+
+        async redirect({ url, baseUrl }) {
+            // If the url is the sign-in page, go to the default dashboard
+            if (url.includes("/signin")) return `${baseUrl}/regular/dashboard`;
+            // Allows relative callback URLs
+            if (url.startsWith("/")) return `${baseUrl}${url}`;
+            // Allows callback URLs on the same origin
+            else if (new URL(url).origin === baseUrl) return url;
+            return baseUrl;
         },
     },
     pages: {
