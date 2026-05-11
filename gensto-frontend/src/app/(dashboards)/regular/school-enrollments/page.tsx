@@ -120,7 +120,7 @@ export default function SchoolEnrollmentsPage() {
             {schools.map((school) => (
               <motion.div key={school._id} variants={cardVariants}>
                 <Link
-                  href="/regular/register"
+                  href={`/regular/register?course=${school._id}`}
                   className="group h-full bg-white rounded-[2.5rem] shadow-sm hover:shadow-2xl p-10 flex flex-col items-center text-center transition-all duration-500 border border-gray-100 hover:border-blue-100"
                 >
                   <div className="bg-gray-50 rounded-3xl p-6 mb-8 group-hover:bg-blue-50 group-hover:rotate-6 transition-all duration-300">
@@ -136,7 +136,7 @@ export default function SchoolEnrollmentsPage() {
                   </p>
 
                   <p className="text-gray-900 font-black text-lg mb-8 tracking-tight">
-                    {school.price}
+                    ₦{Number(school.price).toLocaleString()}
                   </p>
 
                   <div className="mt-auto pt-4 w-full border-t border-gray-50 group-hover:border-blue-50">
@@ -153,9 +153,9 @@ export default function SchoolEnrollmentsPage() {
     </section>
   );
 }
+
+
 /*
-
-
 'use client';
 
 import Link from "next/link";
