@@ -1,4 +1,4 @@
-
+//gensto-frontend/src/app/(dashboards)/admins/add-school/page.tsx
 'use client';
 
 import { useState } from 'react';
