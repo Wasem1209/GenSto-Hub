@@ -20,7 +20,7 @@ export default function SignInClient() {
     const router = useRouter();
     const { data: session, status } = useSession();
     const [loading, setLoading] = useState(false);
-    const [showPassword, setShowPassword] = useState(false); // State for visibility toggle
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [formData, setFormData] = useState({ email: '', password: '' });
 
@@ -83,7 +83,11 @@ export default function SignInClient() {
                     <button 
                         type="button" 
                         disabled={status === 'loading'}
-                        onClick={() => signIn('google')} 
+                        // Updated logic to include explicit callbackUrl and redirect handling
+                        onClick={() => signIn('google', { 
+                            callbackUrl: 'https://www.inanst.com/regular',
+                            redirect: true 
+                        })} 
                         className="w-full flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-2xl hover:bg-gray-50 transition font-bold text-[10px] text-gray-600 tracking-widest uppercase disabled:opacity-50"
                     >
                         {status === 'loading' ? (
