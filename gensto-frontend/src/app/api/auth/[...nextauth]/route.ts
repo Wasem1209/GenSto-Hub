@@ -18,6 +18,8 @@ const handler = NextAuth({
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID!,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+
+            checks: ['none'],
         }),
     ],
     session: {
@@ -52,7 +54,6 @@ const handler = NextAuth({
         },
 
         async jwt({ token, user, trigger, session }) {
-            // Initial sign in: Fetch user details from DB
             if (user) {
                 try {
                     await connectDB();
@@ -67,12 +68,10 @@ const handler = NextAuth({
                 }
             }
 
-            // Handle manual session updates 
             if (trigger === "update" && session?.user) {
                 return { ...token, ...session.user };
             }
 
-            // Periodic refresh of verification status if not already verified
             if (token.email && !token.isVerified) {
                 try {
                     await connectDB();
@@ -98,18 +97,16 @@ const handler = NextAuth({
         },
 
         async redirect({ url, baseUrl }) {
-            // If the url is the sign-in page, go to the default dashboard
-            if (url.includes("/signin")) return `${baseUrl}/regular/dashboard`;
-            // Allows relative callback URLs
+
+            if (url.includes("/signin")) return `${baseUrl}/regular`;
             if (url.startsWith("/")) return `${baseUrl}${url}`;
-            // Allows callback URLs on the same origin
             else if (new URL(url).origin === baseUrl) return url;
-            return baseUrl;
+            return `${baseUrl}/regular`;
         },
     },
     pages: {
         signIn: '/signin',
-        error: '/auth/error',
+        error: '/signin',
     },
     secret: process.env.NEXTAUTH_SECRET,
 });
