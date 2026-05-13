@@ -10,7 +10,6 @@ function RegisterForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Renamed variable to schoolId for clarity
   const schoolId = searchParams.get('course') || searchParams.get('school');
 
   const [schoolData, setSchoolData] = useState(null);
@@ -18,6 +17,7 @@ function RegisterForm() {
   const [error, setError] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [paystackLoaded, setPaystackLoaded] = useState(false);
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -37,8 +37,6 @@ function RegisterForm() {
       try {
         const res = await fetch(`${REST_API}/schools/${schoolId}`);
         const result = await res.json();
-
-        // Handle both { data: {...} } and {...} response formats
         const school = result.data || result;
 
         if (!school || !school.title) {
@@ -59,46 +57,57 @@ function RegisterForm() {
 
   const handlePayment = (e) => {
     e.preventDefault();
+
+
+    if (!window.PaystackPop) {
+      alert("Payment gateway is still loading. Please wait a moment.");
+      return;
+    }
+
     if (!schoolData || isProcessing) return;
 
     setIsProcessing(true);
 
-    // Your model ensures price is a Number, so we just ensure it's valid
     const amountInKobo = Math.round(Number(schoolData.price) * 100);
 
-    const handler = window.PaystackPop.setup({
-      key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
-      email: formData.email,
-      amount: amountInKobo,
-      currency: 'NGN',
-      metadata: {
-        schoolId: schoolData._id,
-        schoolTitle: schoolData.title
-      },
-      callback: async (response) => {
-        try {
-          const verifyRes = await fetch(`${REST_API}/registrations/verify`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              reference: response.reference,
-              schoolId: schoolData._id,
-              ...formData
-            })
-          });
+    try {
+      const handler = window.PaystackPop.setup({
+        key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
+        email: formData.email,
+        amount: amountInKobo,
+        currency: 'NGN',
+        metadata: {
+          schoolId: schoolData._id,
+          schoolTitle: schoolData.title
+        },
+        callback: async (response) => {
+          try {
+            const verifyRes = await fetch(`${REST_API}/registrations/verify`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                reference: response.reference,
+                schoolId: schoolData._id,
+                ...formData
+              })
+            });
 
-          if (verifyRes.ok) setShowSuccess(true);
-          else alert("Payment verified but registration failed. Please contact support.");
-        } catch (err) {
-          console.error("Verification error:", err);
-        } finally {
-          setIsProcessing(false);
-        }
-      },
-      onClose: () => setIsProcessing(false)
-    });
+            if (verifyRes.ok) setShowSuccess(true);
+            else alert("Payment verified but registration failed. Please contact support.");
+          } catch (err) {
+            console.error("Verification error:", err);
+          } finally {
+            setIsProcessing(false);
+          }
+        },
+        onClose: () => setIsProcessing(false)
+      });
 
-    handler.openIframe();
+      handler.openIframe();
+    } catch (err) {
+      console.error("Paystack error:", err);
+      setIsProcessing(false);
+    }
   };
 
   if (loading) {
@@ -122,7 +131,12 @@ function RegisterForm() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 flex mt-14 items-center justify-center font-sans">
-      <Script src="https://js.paystack.co/v1/inline.js" strategy="beforeInteractive" />
+
+      <Script
+        src="https://js.paystack.co/v1/inline.js"
+        strategy="lazyOnload"
+        onLoad={() => setPaystackLoaded(true)}
+      />
 
       <div className="max-w-2xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
         <div className="bg-sky-500 p-10 text-white text-center">
@@ -188,13 +202,13 @@ function RegisterForm() {
               onChange={(e) => setFormData({ ...formData, mode: e.target.value })}
             >
               <option value="distance">Distance Learning</option>
-              <option value="in-person">In-Person (On-site)</option>
+
             </select>
           </div>
 
           <button
             type="submit"
-            disabled={isProcessing}
+            disabled={isProcessing || !paystackLoaded}
             className="w-full bg-sky-500 text-white font-black py-5 rounded-2xl shadow-xl hover:bg-sky-600 active:scale-95 transition-all uppercase tracking-widest text-sm flex items-center justify-center gap-3 disabled:bg-gray-300"
           >
             {isProcessing ? <Loader2 className="animate-spin w-5 h-5" /> : <CreditCard className="w-5 h-5" />}
@@ -224,7 +238,6 @@ export default function RegistrationPage() {
     </Suspense>
   );
 }
-
 
 /*
 'use client';
