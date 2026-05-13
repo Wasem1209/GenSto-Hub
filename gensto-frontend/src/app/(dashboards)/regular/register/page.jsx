@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Suspense, useState, useEffect } from 'react';
+import { Suspense, useState, useEffect, useCallback } from 'react';
 import Script from 'next/script';
 import { CheckCircle, CreditCard, User, Globe, Loader2, Clock, Banknote, AlertCircle } from 'lucide-react';
 import { REST_API } from '../../../constant';
@@ -55,9 +55,30 @@ function RegisterForm() {
     fetchSchool();
   }, [schoolId]);
 
+
+  const onPaymentSuccess = useCallback(async (response) => {
+    try {
+      const verifyRes = await fetch(`${REST_API}/registrations/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          reference: response.reference,
+          schoolId: schoolData._id,
+          ...formData
+        })
+      });
+
+      if (verifyRes.ok) setShowSuccess(true);
+      else alert("Payment verified but registration failed. Please contact support.");
+    } catch (err) {
+      console.error("Verification error:", err);
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [schoolData, formData]);
+
   const handlePayment = (e) => {
     e.preventDefault();
-
 
     if (!window.PaystackPop) {
       alert("Payment gateway is still loading. Please wait a moment.");
@@ -80,26 +101,7 @@ function RegisterForm() {
           schoolId: schoolData._id,
           schoolTitle: schoolData.title
         },
-        callback: async (response) => {
-          try {
-            const verifyRes = await fetch(`${REST_API}/registrations/verify`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                reference: response.reference,
-                schoolId: schoolData._id,
-                ...formData
-              })
-            });
-
-            if (verifyRes.ok) setShowSuccess(true);
-            else alert("Payment verified but registration failed. Please contact support.");
-          } catch (err) {
-            console.error("Verification error:", err);
-          } finally {
-            setIsProcessing(false);
-          }
-        },
+        callback: (response) => onPaymentSuccess(response),
         onClose: () => setIsProcessing(false)
       });
 
@@ -131,10 +133,9 @@ function RegisterForm() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 flex mt-14 items-center justify-center font-sans">
-
       <Script
         src="https://js.paystack.co/v1/inline.js"
-        strategy="lazyOnload"
+        strategy="afterInteractive"
         onLoad={() => setPaystackLoaded(true)}
       />
 
@@ -196,14 +197,15 @@ function RegisterForm() {
             <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2 border-b pb-2">
               <Globe className="w-5 h-5 text-sky-500" /> Learning Preferences
             </h3>
-            <select
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:border-sky-400 font-bold text-sm"
-              value={formData.mode}
-              onChange={(e) => setFormData({ ...formData, mode: e.target.value })}
-            >
-              <option value="distance">Distance Learning</option>
-
-            </select>
+            {/* Removed dropdown, replaced with static badge-style input */}
+            <div className="relative">
+              <input
+                readOnly
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-100 font-bold text-sm text-gray-600 cursor-default"
+                value="Distance Learning"
+              />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-sky-500 uppercase tracking-tighter">Selected</span>
+            </div>
           </div>
 
           <button
