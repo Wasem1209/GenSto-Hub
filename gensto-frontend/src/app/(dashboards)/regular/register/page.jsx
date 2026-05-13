@@ -55,16 +55,19 @@ function RegisterForm() {
     fetchSchool();
   }, [schoolId]);
 
-
   const onPaymentSuccess = useCallback(async (response) => {
     try {
-      const verifyRes = await fetch(`${REST_API}/registrations/verify`, {
+
+      const verifyRes = await fetch(`${REST_API}/v1/enrollments/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           reference: response.reference,
           schoolId: schoolData._id,
-          ...formData
+          fullName: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          mode: formData.mode
         })
       });
 
@@ -97,9 +100,12 @@ function RegisterForm() {
         email: formData.email,
         amount: amountInKobo,
         currency: 'NGN',
+
         metadata: {
-          schoolId: schoolData._id,
-          schoolTitle: schoolData.title
+          fullName: formData.fullName,
+          phone: formData.phone,
+          courseId: schoolData._id,
+          mode: formData.mode
         },
         callback: (response) => onPaymentSuccess(response),
         onClose: () => setIsProcessing(false)
@@ -197,7 +203,6 @@ function RegisterForm() {
             <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2 border-b pb-2">
               <Globe className="w-5 h-5 text-sky-500" /> Learning Preferences
             </h3>
-            {/* Removed dropdown, replaced with static badge-style input */}
             <div className="relative">
               <input
                 readOnly
