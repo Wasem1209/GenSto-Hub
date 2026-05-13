@@ -76,7 +76,7 @@ export default function MySchoolPage() {
 
         {enrolledSchools.length > 0 && (
           <Link
-            href="/regular/school-enrollment"
+            href="/regular/school-enrollments"
             className="inline-flex items-center gap-2 bg-slate-900 text-white px-6 py-3 rounded-2xl text-sm font-bold hover:bg-slate-800 transition-all shadow-xl shadow-slate-200"
           >
             <Plus size={18} />
