@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { User, Lock, Eye, EyeOff, Save, CheckCircle2, AlertTriangle, Loader2 } from 'lucide-react';
-import { ENDPOINTS } from '../../../constant';
+// Reverted to your preferred consistent import
+import { REST_API } from '../../../constant';
 
 export default function SettingsPage() {
     const [activeSection, setActiveSection] = useState('profile');
@@ -16,14 +17,15 @@ export default function SettingsPage() {
     const [userData, setUserData] = useState({ fullName: '', email: '' });
     const [passwords, setPasswords] = useState({ current: '', next: '', confirm: '' });
 
-    // Fetch User Data on Load using the dedicated Settings Profile endpoint
+    // Fetch User Data on Load
     useEffect(() => {
         const fetchUserData = async () => {
             try {
                 const token = localStorage.getItem('token');
                 if (!token) throw new Error("No authorization token found");
 
-                const res = await fetch(ENDPOINTS.SETTINGS_PROFILE, {
+                // Using REST_API directly with template literals
+                const res = await fetch(`${REST_API}/settings/profile`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
@@ -58,7 +60,7 @@ export default function SettingsPage() {
         try {
             // Update Bio Logic
             if (activeSection === 'profile') {
-                const res = await fetch(ENDPOINTS.SETTINGS_BIO, {
+                const res = await fetch(`${REST_API}/settings/update-bio`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -84,7 +86,7 @@ export default function SettingsPage() {
                     throw new Error('Passwords do not match');
                 }
 
-                const res = await fetch(ENDPOINTS.SETTINGS_PASSWORD, {
+                const res = await fetch(`${REST_API}/settings/change-password`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
