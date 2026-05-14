@@ -18,8 +18,8 @@ export const API_ROUTES = {
     SIGNIN: `${REST_API}/auth/login`,
     VERIFY_OTP: `${REST_API}/auth/verify-code`,
     RESEND_OTP: `${REST_API}/auth/resend-verification`,
-    //PROFILE: `${REST_API}/auth/me`,
-    PROFILE: `${REST_API}/auth/profile`,
+    PROFILE: `${REST_API}/auth/me`,
+    //PROFILE: `${REST_API}/auth/profile`,
     UPDATE_BIO: `${REST_API}/auth/update-bio`,
     CHANGE_PASSWORD: `${REST_API}/auth/change-password`,
 
