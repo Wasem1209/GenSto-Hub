@@ -1,61 +1,94 @@
 'use client';
 
-import React, { useState } from 'react';
-import {
-    User, Lock, Bell, Eye, EyeOff, Camera,
-    Shield, Save, CheckCircle2, AlertTriangle
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { User, Lock, Eye, EyeOff, Save, CheckCircle2, AlertTriangle, Loader2 } from 'lucide-react';
+import { REST_API } from '../../../constant';
 
 export default function SettingsPage() {
     const [activeSection, setActiveSection] = useState('profile');
     const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [statusMsg, setStatusMsg] = useState('');
+    const [statusMsg, setStatusMsg] = useState({ text: '', type: '' });
 
     // Form States
-    const [bio, setBio] = useState('Full-stack Developer | MERN Expert');
+    const [bio, setBio] = useState('');
+    const [userData, setUserData] = useState({ fullName: '', email: '' });
     const [passwords, setPasswords] = useState({ current: '', next: '', confirm: '' });
-    const [notifications, setNotifications] = useState(true);
 
-    // Read-only Mock Data (From Signup)
-    const userData = {
-        name: "John Doe",
-        email: "john.doe@inanstench.com"
-    };
+    // Fetch User Data on Load
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch(`${REST_API}/users/profile`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await res.json();
+                if (result.success) {
+                    setUserData({ fullName: result.data.fullName, email: result.data.email });
+                    setBio(result.data.bio || '');
+                }
+            } catch (err) {
+                console.error("Failed to fetch profile");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchUserData();
+    }, []);
 
     const handlePasswordChange = (e) => {
         setPasswords({ ...passwords, [e.target.name]: e.target.value });
     };
 
-    const validateAndSave = () => {
+    const validateAndSave = async () => {
         setSaving(true);
-        setStatusMsg('');
+        setStatusMsg({ text: '', type: '' });
+        const token = localStorage.getItem('token');
 
-        // Logic for Security Validation
-        if (activeSection === 'security') {
-            if (passwords.next !== passwords.confirm) {
-                setStatusMsg('Passwords do not match');
-                setSaving(false);
-                return;
+        try {
+            if (activeSection === 'profile') {
+                const res = await fetch(`${REST_API}/users/update-bio`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ bio })
+                });
+                if (res.ok) setStatusMsg({ text: 'Bio updated successfully!', type: 'success' });
             }
-            if (passwords.next.length < 8) {
-                setStatusMsg('New password must be at least 8 characters');
-                setSaving(false);
-                return;
-            }
-        }
 
-        // Mock API Call
-        setTimeout(() => {
+            else if (activeSection === 'security') {
+                if (passwords.next !== passwords.confirm) {
+                    throw new Error('Passwords do not match');
+                }
+                const res = await fetch(`${REST_API}/users/change-password`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        currentPassword: passwords.current,
+                        newPassword: passwords.next
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Failed to update password');
+
+                setStatusMsg({ text: 'Password updated successfully!', type: 'success' });
+                setPasswords({ current: '', next: '', confirm: '' });
+            }
+        } catch (err) {
+            setStatusMsg({ text: err.message, type: 'error' });
+        } finally {
             setSaving(false);
-            setStatusMsg(activeSection === 'security'
-                ? 'Password updated. A confirmation email has been sent.'
-                : 'Settings synchronized successfully.');
-
-            // Reset password fields if successful
-            if (activeSection === 'security') setPasswords({ current: '', next: '', confirm: '' });
-        }, 1500);
+        }
     };
+
+    if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="animate-spin text-blue-600" /></div>;
 
     return (
         <div className="p-6 lg:p-10 max-w-5xl mx-auto animate-in fade-in duration-500">
@@ -65,16 +98,15 @@ export default function SettingsPage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                {/* Sidebar */}
+                {/* Sidebar - System Alerts removed as requested */}
                 <div className="space-y-2">
                     {[
                         { id: 'profile', label: 'Identity', icon: User },
                         { id: 'security', label: 'Security', icon: Lock },
-                        { id: 'notifications', label: 'System Alerts', icon: Bell },
                     ].map((item) => (
                         <button
                             key={item.id}
-                            onClick={() => { setActiveSection(item.id); setStatusMsg(''); }}
+                            onClick={() => { setActiveSection(item.id); setStatusMsg({ text: '', type: '' }); }}
                             className={`w-full flex items-center gap-3 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${activeSection === item.id
                                 ? 'bg-blue-600 text-white shadow-lg'
                                 : 'text-slate-500 hover:bg-[#1A1D21] hover:text-slate-300'
@@ -86,16 +118,14 @@ export default function SettingsPage() {
                     ))}
                 </div>
 
-                {/* Content */}
                 <div className="lg:col-span-3 space-y-6">
-
                     {/* PROFILE SECTION */}
                     {activeSection === 'profile' && (
                         <div className="bg-[#1A1D21] border border-slate-800 rounded-[2.5rem] p-8 md:p-10 space-y-8 animate-in slide-in-from-right-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2 opacity-60">
                                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Full Name (Locked)</label>
-                                    <input type="text" value={userData.name} readOnly className="w-full bg-[#0F1113] border border-slate-800/50 rounded-2xl p-4 text-slate-400 text-sm cursor-not-allowed outline-none" />
+                                    <input type="text" value={userData.fullName} readOnly className="w-full bg-[#0F1113] border border-slate-800/50 rounded-2xl p-4 text-slate-400 text-sm cursor-not-allowed outline-none" />
                                 </div>
                                 <div className="space-y-2 opacity-60">
                                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Email (Locked)</label>
@@ -161,40 +191,21 @@ export default function SettingsPage() {
                         </div>
                     )}
 
-                    {/* NOTIFICATIONS SECTION */}
-                    {activeSection === 'notifications' && (
-                        <div className="bg-[#1A1D21] border border-slate-800 rounded-[2.5rem] p-8 md:p-10 space-y-6 animate-in slide-in-from-right-4">
-                            <div className="flex items-center justify-between p-6 bg-[#0F1113] rounded-3xl border border-slate-800">
-                                <div className="space-y-1">
-                                    <h4 className="text-sm font-bold text-white uppercase tracking-tight">System Notifications</h4>
-                                    <p className="text-xs text-slate-500">Receive alerts regarding ticket updates and hub activity.</p>
-                                </div>
-                                <button
-                                    onClick={() => setNotifications(!notifications)}
-                                    className={`w-14 h-8 rounded-full transition-all flex items-center px-1 ${notifications ? 'bg-blue-600' : 'bg-slate-800'}`}
-                                >
-                                    <div className={`w-6 h-6 bg-white rounded-full shadow-lg transform transition-transform ${notifications ? 'translate-x-6' : 'translate-x-0'}`} />
-                                </button>
-                            </div>
-                        </div>
-                    )}
-
                     {/* Status Messages */}
-                    {statusMsg && (
-                        <div className={`flex items-center gap-3 p-4 rounded-2xl border ${statusMsg.includes('match') || statusMsg.includes('characters') ? 'bg-red-500/10 border-red-500/20 text-red-500' : 'bg-green-500/10 border-green-500/20 text-green-500'}`}>
-                            {statusMsg.includes('match') ? <AlertTriangle size={18} /> : <CheckCircle2 size={18} />}
-                            <p className="text-[10px] font-black uppercase tracking-widest">{statusMsg}</p>
+                    {statusMsg.text && (
+                        <div className={`flex items-center gap-3 p-4 rounded-2xl border ${statusMsg.type === 'error' ? 'bg-red-500/10 border-red-500/20 text-red-500' : 'bg-green-500/10 border-green-500/20 text-green-500'}`}>
+                            {statusMsg.type === 'error' ? <AlertTriangle size={18} /> : <CheckCircle2 size={18} />}
+                            <p className="text-[10px] font-black uppercase tracking-widest">{statusMsg.text}</p>
                         </div>
                     )}
 
-                    {/* Action Bar */}
                     <div className="flex items-center justify-end gap-4 pt-4">
                         <button
                             onClick={validateAndSave}
                             disabled={saving}
                             className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white px-10 py-5 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] transition-all flex items-center gap-3 shadow-xl shadow-blue-900/20"
                         >
-                            {saving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save size={18} />}
+                            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save size={18} />}
                             {saving ? 'Processing...' : 'Sync Settings'}
                         </button>
                     </div>

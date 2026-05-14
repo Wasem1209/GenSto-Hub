@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link'; // Import Link for navigation
+import Link from 'next/link'; 
 import { 
   TrendingUp, Award, Clock, AlertCircle,
   CheckCircle2, BarChart3, GraduationCap, ChevronRight
@@ -32,7 +32,7 @@ export default function LearningProgressPage() {
       setLoading(true);
       try {
         await new Promise(resolve => setTimeout(resolve, 800));
-        // Force null to simulate "Not Enrolled" state
+        
         const isEnrolled = false; 
         if (isEnrolled) {
           setProgress({
@@ -167,7 +167,7 @@ export default function LearningProgressPage() {
             <p className="text-gray-400 mb-8 max-w-md mx-auto text-sm leading-relaxed">Join our specialized tech tracks and get direct mentorship from the Inanst hub team.</p>
             
             <Link 
-              href="/school-enrollement" 
+              href="/school-enrollements" 
               className="inline-flex items-center gap-3 px-10 py-5 bg-sky-600 text-white rounded-2xl font-black uppercase text-xs tracking-[0.2em] hover:bg-sky-500 transition-all shadow-xl shadow-sky-900/20 active:scale-95 group"
             >
               Enroll in School
