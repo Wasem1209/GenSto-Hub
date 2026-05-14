@@ -51,7 +51,10 @@ export const API_ROUTES = {
     DELETE: (id: string) => `${REST_API}/v1/tasks/delete/${id}`,
     UPDATE_STATUS: `${REST_API}/v1/tasks/update-status`,
     BLOG_PUBLISH: `${REST_API}/v1/blogs/publish`,
-    BLOG_BASE: `${REST_API}/v1/blogs`
+    BLOG_BASE: `${REST_API}/v1/blogs`,
+    SETTINGS_PROFILE: `${REST_API}/settings/profile`,
+    SETTINGS_BIO: `${REST_API}/settings/update-bio`,
+    SETTINGS_PASSWORD: `${REST_API}/settings/change-password`,
 };
 
 

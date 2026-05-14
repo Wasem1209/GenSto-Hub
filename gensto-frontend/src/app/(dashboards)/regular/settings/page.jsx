@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { User, Lock, Eye, EyeOff, Save, CheckCircle2, AlertTriangle, Loader2 } from 'lucide-react';
+// Reverted to your preferred consistent import
 import { REST_API } from '../../../constant';
 
 export default function SettingsPage() {
@@ -21,16 +22,25 @@ export default function SettingsPage() {
         const fetchUserData = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const res = await fetch(`${REST_API}/users/profile`, {
+                if (!token) throw new Error("No authorization token found");
+
+                // Using REST_API directly with template literals
+                const res = await fetch(`${REST_API}/settings/profile`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
+
                 const result = await res.json();
+
                 if (result.success) {
-                    setUserData({ fullName: result.data.fullName, email: result.data.email });
+                    setUserData({
+                        fullName: result.data.fullName,
+                        email: result.data.email
+                    });
                     setBio(result.data.bio || '');
                 }
             } catch (err) {
-                console.error("Failed to fetch profile");
+                console.error("Failed to fetch profile:", err);
+                setStatusMsg({ text: 'Session expired. Please login again.', type: 'error' });
             } finally {
                 setLoading(false);
             }
@@ -48,8 +58,9 @@ export default function SettingsPage() {
         const token = localStorage.getItem('token');
 
         try {
+            // Update Bio Logic
             if (activeSection === 'profile') {
-                const res = await fetch(`${REST_API}/users/update-bio`, {
+                const res = await fetch(`${REST_API}/settings/update-bio`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -57,14 +68,25 @@ export default function SettingsPage() {
                     },
                     body: JSON.stringify({ bio })
                 });
-                if (res.ok) setStatusMsg({ text: 'Bio updated successfully!', type: 'success' });
+
+                const result = await res.json();
+                if (result.success) {
+                    setStatusMsg({ text: 'Bio updated successfully!', type: 'success' });
+                } else {
+                    throw new Error(result.message || "Update failed");
+                }
             }
 
+            // Change Password Logic
             else if (activeSection === 'security') {
+                if (!passwords.current || !passwords.next) {
+                    throw new Error('Please fill in all password fields');
+                }
                 if (passwords.next !== passwords.confirm) {
                     throw new Error('Passwords do not match');
                 }
-                const res = await fetch(`${REST_API}/users/change-password`, {
+
+                const res = await fetch(`${REST_API}/settings/change-password`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -75,8 +97,9 @@ export default function SettingsPage() {
                         newPassword: passwords.next
                     })
                 });
+
                 const data = await res.json();
-                if (!res.ok) throw new Error(data.message || 'Failed to update password');
+                if (!data.success) throw new Error(data.message || 'Failed to update password');
 
                 setStatusMsg({ text: 'Password updated successfully!', type: 'success' });
                 setPasswords({ current: '', next: '', confirm: '' });
@@ -88,7 +111,11 @@ export default function SettingsPage() {
         }
     };
 
-    if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="animate-spin text-blue-600" /></div>;
+    if (loading) return (
+        <div className="flex h-screen items-center justify-center bg-[#0F1113]">
+            <Loader2 className="animate-spin text-blue-600" size={40} />
+        </div>
+    );
 
     return (
         <div className="p-6 lg:p-10 max-w-5xl mx-auto animate-in fade-in duration-500">
@@ -98,7 +125,7 @@ export default function SettingsPage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                {/* Sidebar - System Alerts removed as requested */}
+                {/* Sidebar Navigation */}
                 <div className="space-y-2">
                     {[
                         { id: 'profile', label: 'Identity', icon: User },
@@ -108,7 +135,7 @@ export default function SettingsPage() {
                             key={item.id}
                             onClick={() => { setActiveSection(item.id); setStatusMsg({ text: '', type: '' }); }}
                             className={`w-full flex items-center gap-3 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${activeSection === item.id
-                                ? 'bg-blue-600 text-white shadow-lg'
+                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20'
                                 : 'text-slate-500 hover:bg-[#1A1D21] hover:text-slate-300'
                                 }`}
                         >
@@ -191,7 +218,7 @@ export default function SettingsPage() {
                         </div>
                     )}
 
-                    {/* Status Messages */}
+                    {/* Feedback Messages */}
                     {statusMsg.text && (
                         <div className={`flex items-center gap-3 p-4 rounded-2xl border ${statusMsg.type === 'error' ? 'bg-red-500/10 border-red-500/20 text-red-500' : 'bg-green-500/10 border-green-500/20 text-green-500'}`}>
                             {statusMsg.type === 'error' ? <AlertTriangle size={18} /> : <CheckCircle2 size={18} />}
@@ -199,6 +226,7 @@ export default function SettingsPage() {
                         </div>
                     )}
 
+                    {/* Action Button */}
                     <div className="flex items-center justify-end gap-4 pt-4">
                         <button
                             onClick={validateAndSave}
