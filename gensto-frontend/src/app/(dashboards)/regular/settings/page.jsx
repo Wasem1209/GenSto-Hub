@@ -111,7 +111,7 @@ export default function SettingsPage() {
     return (
         <div className="p-6 lg:p-10 max-w-5xl mx-auto animate-in fade-in duration-500">
             <div className="mb-10">
-                <h1 className="text-4xl font-black text-white uppercase tracking-tighter">Account Settings</h1>
+                <h1 className="text-4xl font-black text-white uppercase tracking-tighter">Settings</h1>
                 <p className="text-slate-500 text-sm mt-1">Manage your digital identity.</p>
             </div>
 
