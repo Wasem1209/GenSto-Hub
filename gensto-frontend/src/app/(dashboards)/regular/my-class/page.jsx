@@ -1,3 +1,6 @@
+//gensto-frontend/src/app/(dashboards)/regular/my-class/page.jsx
+
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -266,7 +269,7 @@ export default function MyClassPage() {
                 </div>
             )}
 
-            {/* --- RESPONSIVE REPLAY MODAL --- */}
+            {/* RESPONSIVE REPLAY MODAL  */}
             {selectedVideo && (
                 <div className="fixed inset-0 z-[100] bg-slate-900/95 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8">
                     <div className="bg-white w-full max-w-5xl max-h-[90vh] rounded-[2.5rem] overflow-hidden relative shadow-2xl flex flex-col">

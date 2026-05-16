@@ -1,262 +1,103 @@
 'use client';
 
-import React, { useState, useEffect, use } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { MeetingProvider } from '@videosdk.live/react-sdk';
-import RoomView from './RoomView';
-
-
-export default function LearningRoomPage({ params }) {
-    const searchParams = useSearchParams();
-
-
-    const unwrappedParams = use(params);
-    const roomId = unwrappedParams.id;
-
-
-    const studentId = searchParams.get('student_id') || "Inanst Student";
-    const courseId = searchParams.get('course_id');
-
-    const [token, setToken] = useState('');
-    const [error, setError] = useState(null);
-
-
-    useEffect(() => {
-        const fetchSessionToken = async () => {
-            try {
-
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/live/get-token`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ roomId, studentId, courseId })
-                });
-
-                const result = await response.json();
-                if (result.success && result.token) {
-                    setToken(result.token);
-                } else {
-                    setError(result.message || "Failed to retrieve authorized gateway streams.");
-                }
-            } catch (err) {
-                console.error("Token Server Error:", err);
-                setError("Could not establish authorization synchronization tunnel.");
-            }
-        };
-
-        if (roomId) {
-            fetchSessionToken();
-        }
-    }, [roomId, studentId, courseId]);
-
-
-    if (error) {
-        return (
-            <div className="h-screen bg-[#0F1113] flex flex-col items-center justify-center text-slate-200 p-4 font-sans">
-                <div className="bg-red-500/10 border border-red-500/20 max-w-sm p-6 rounded-2xl text-center space-y-3">
-                    <p className="text-red-400 font-black text-xs uppercase tracking-wider">Gateway Error</p>
-                    <p className="text-xs text-slate-400">{error}</p>
-                </div>
-            </div>
-        );
-    }
-
-    if (!token) {
-        return (
-            <div className="h-screen bg-[#0F1113] flex items-center justify-center text-slate-200 font-sans">
-                <div className="text-center space-y-3">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping mx-auto" />
-                    <p className="animate-pulse tracking-[0.2em] text-[10px] font-black uppercase text-slate-500">
-                        Synchronizing Secure Media Infrastructure...
-                    </p>
-                </div>
-            </div>
-        );
-    }
-
-    return (
-        <MeetingProvider
-            config={{
-                meetingId: roomId,
-                micEnabled: false,
-                webcamEnabled: false,
-                name: studentId,
-                mode: "VIEWER",
-            }}
-            token={token}
-        >
-
-            <RoomView roomId={roomId} studentId={studentId} />
-        </MeetingProvider>
-    );
-}
-
-
-/*
-'use client';
-
-import React, { useState, useEffect, useRef, use } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Mic, MicOff, MonitorUp, MessageSquare,
     Send, Users, ShieldCheck, X,
-    Camera, CameraOff, Maximize, Minimize,
-    AlertCircle, Hand, Circle,
+    Camera, CameraOff, AlertCircle, Hand, Circle,
     LayoutGrid, UserSquare
 } from 'lucide-react';
-import { io } from 'socket.io-client';
 import { useRouter } from 'next/navigation';
+import { useMeeting, usePubSub } from '@videosdk.live/react-sdk';
+import LiveParticipantView from '@/components/LiveParticipantView';
 
 
-export default function LearningRoomPage({ params }) {
+export default function RoomView({ roomId, studentId }) {
     const router = useRouter();
 
-    // --- UNWRAP NEXT.JS 15 ASYNC PARAMS ---
-    const unwrappedParams = use(params);
-    const roomId = unwrappedParams.id;
-
-    // --- UI & MEDIA STATE ---
-    const [isMuted, setIsMuted] = useState(true);
-    const [isCameraOn, setIsCameraOn] = useState(false);
-    const [isSharingScreen, setIsSharingScreen] = useState(false);
+    // UI CONTROLS & TOGGLES
     const [isChatMaximized, setIsChatMaximized] = useState(false);
     const [viewMode, setViewMode] = useState('speaker');
     const [isHandRaised, setIsHandRaised] = useState(false);
     const [showEndConfirm, setShowEndConfirm] = useState(false);
-
-    // --- DATA STATE ---
-    const [messages, setMessages] = useState([]);
     const [inputText, setInputText] = useState('');
-    const [participants, setParticipants] = useState(1);
-    const [socket, setSocket] = useState(null);
 
-    const mainVideoRef = useRef(null);
-    const selfVideoRef = useRef(null);
-    const cameraStreamRef = useRef(null);
-    const screenTrackRef = useRef(null);
     const chatEndRef = useRef(null);
 
-   
+    // Video SDK Meeting Hook
+    const {
+        join,
+        leave,
+        toggleMic,
+        toggleWebcam,
+        toggleScreenShare,
+        localMicOn,
+        localWebcamOn,
+        localScreenShareOn,
+        participants,
+    } = useMeeting({
+        onMeetingJoined: () => {
+            console.log("Successfully connected to secure WebRTC room matrix.");
+        },
+        onMeetingLeft: () => {
+            router.push('/regular/my-class');
+        },
+        onError: (error) => {
+            console.error("VideoSDK Pipeline Error:", error.message);
+        }
+    });
+
+    //  REAL-TIME  CHAT MATRIX
+    const { publish, messages: chatMessages } = usePubSub(`CHAT_${roomId}`);
+
+
     useEffect(() => {
-        const newSocket = io('https://your-websocket-server.com', {
-            query: { roomId: roomId }
-        });
+        join();
+        return () => leave();
+    }, []);
 
-        newSocket.on('connect', () => {
-            newSocket.emit('join-room', { roomId: roomId, role: 'student' });
-        });
 
-        newSocket.on('new-message', (msg) => {
-            setMessages((prev) => [...prev, msg]);
-        });
-
-        newSocket.on('room-update', (data) => {
-            setParticipants(data.count);
-        });
-
-        setSocket(newSocket);
-        return () => { if (newSocket) newSocket.disconnect(); };
-    }, [roomId]);
-
-    // --- AUTO-SCROLL CHAT ---
     useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
+    }, [chatMessages]);
 
-    
-    const toggleMic = async () => {
-        try {
-            if (isMuted) {
-                await navigator.mediaDevices.getUserMedia({ audio: true });
-                setIsMuted(false);
-            } else {
-                setIsMuted(true);
-            }
-            socket?.emit('toggle-audio', { roomId, muted: !isMuted });
-        } catch (err) {
-            console.error("Mic access denied", err);
-        }
-    };
 
-    const toggleCamera = async () => {
-        try {
-            if (!isCameraOn) {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                cameraStreamRef.current = stream;
-                if (selfVideoRef.current) {
-                    selfVideoRef.current.srcObject = stream;
-                }
-                setIsCameraOn(true);
-            } else {
-                cameraStreamRef.current?.getTracks().forEach(track => track.stop());
-                setIsCameraOn(false);
-            }
-            socket?.emit('toggle-video', { roomId, enabled: !isCameraOn });
-        } catch (err) {
-            console.error("Camera error", err);
-        }
-    };
+    const handleSendMessage = (e) => {
+        e.preventDefault();
+        if (!inputText.trim()) return;
 
-    
-    useEffect(() => {
-        if (isCameraOn && cameraStreamRef.current && selfVideoRef.current) {
-            selfVideoRef.current.srcObject = cameraStreamRef.current;
-        }
-    }, [isCameraOn]);
 
-    const toggleScreenShare = async () => {
-        try {
-            if (!isSharingScreen) {
-                const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-                screenTrackRef.current = stream.getTracks()[0];
-                if (mainVideoRef.current) mainVideoRef.current.srcObject = stream;
-                screenTrackRef.current.onended = () => setIsSharingScreen(false);
-                setIsSharingScreen(true);
-            } else {
-                screenTrackRef.current?.stop();
-                setIsSharingScreen(false);
-            }
-        } catch (err) {
-            console.error("Screen share error", err);
-        }
+        publish(inputText, { persist: true });
+        setInputText('');
     };
 
     const handleRaiseHand = () => {
         const newState = !isHandRaised;
         setIsHandRaised(newState);
-        socket?.emit('raise-hand', { roomId, raised: newState });
+
+
+        publish(JSON.stringify({ type: 'RAISE_HAND', state: newState }), {
+            topic: `ROOM_ALERTS_${roomId}`
+        });
     };
 
-    const sendMessage = (e) => {
-        e.preventDefault();
-        if (!inputText.trim()) return;
-        const msgData = {
-            id: Date.now(),
-            text: inputText,
-            sender: 'You',
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        };
-        socket?.emit('send-message', { roomId, ...msgData });
-        setMessages((prev) => [...prev, msgData]);
-        setInputText('');
-    };
-
-    
     const handleLeaveClass = () => {
-       
-        if (cameraStreamRef.current) {
-            cameraStreamRef.current.getTracks().forEach(track => track.stop());
-        }
-        
-        if (screenTrackRef.current) {
-            screenTrackRef.current.stop();
-        }
-       
-        router.push('/regular/my-class');
+        leave();
     };
+
+
+    const participantArray = Array.from(participants.values());
+
+
+    const instructorUser = participantArray.find(p => p.mode === "CONFERENCE");
+
+
+    const liveCount = participantArray.length;
 
     return (
         <div className="fixed inset-0 z-[9999] flex flex-col h-screen bg-[#0F1113] text-slate-200 overflow-hidden font-sans">
 
-           
+            {/* TOP BAR */}
             <header className="h-12 bg-[#1A1D21] border-b border-slate-800 flex items-center justify-between px-4 z-20 shrink-0">
                 <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2 bg-slate-800/50 px-2 py-1 rounded border border-slate-700">
@@ -278,10 +119,10 @@ export default function LearningRoomPage({ params }) {
                 </div>
             </header>
 
-            
+            {/* VIEWPORT */}
             <main className="flex-1 flex overflow-hidden">
                 <div className="flex-1 flex flex-col relative bg-black">
-                   
+                    {/* Toggles */}
                     <div className="absolute top-4 left-4 z-10 flex gap-1 bg-black/40 backdrop-blur-md p-1 rounded-lg border border-white/10">
                         <button
                             onClick={() => setViewMode('speaker')}
@@ -297,60 +138,73 @@ export default function LearningRoomPage({ params }) {
                         </button>
                     </div>
 
-                   
+                    {/* VIDEO STAGE */}
                     <div className={`flex-1 flex items-center justify-center p-4 ${viewMode === 'gallery' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : 'relative'}`}>
 
-                        
+                        {/* Instructor View */}
                         <div className="relative w-full h-full bg-[#1A1D21] rounded-2xl flex items-center justify-center border border-white/5 overflow-hidden group">
-                            <video ref={mainVideoRef} autoPlay playsInline className="w-full h-full object-contain" />
-                            {!isSharingScreen && (
+                            {instructorUser ? (
+                                <LiveParticipantView participant={instructorUser} isMainStage={true} />
+                            ) : (
                                 <div className="text-center">
                                     <div className="w-20 h-20 rounded-full bg-blue-600/10 border border-blue-500/20 flex items-center justify-center mx-auto mb-4 text-blue-500/50">
                                         <Users size={32} />
                                     </div>
-                                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em]">Instructor Stream</p>
+                                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em]">
+                                        Waiting for Instructor Streams...
+                                    </p>
                                 </div>
                             )}
                             <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-lg text-[10px] font-bold border border-white/5">
-                                Instructor: Dr. Sarah James
+                                Instructor: {instructorUser?.displayName || "Dr. Sarah James"}
                             </div>
                         </div>
 
-                       
-                        {(viewMode === 'gallery' || isCameraOn) && (
+                        {/* Student  View */}
+                        {(viewMode === 'gallery' || localWebcamOn) && (
                             <div className={`${viewMode === 'gallery' ? 'relative w-full h-full' : 'absolute bottom-6 right-6 w-52 aspect-video'} bg-[#1A1D21] rounded-2xl border-2 ${isHandRaised ? 'border-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.2)]' : 'border-blue-600'} overflow-hidden shadow-2xl transition-all duration-300 z-10`}>
-                                {isCameraOn ? (
-                                    <video ref={selfVideoRef} autoPlay muted playsInline className="w-full h-full object-cover -scale-x-100" />
+                                {localWebcamOn ? (
+
+                                    <LiveParticipantView participant={participants.get(useMeeting().localParticipant?.id)} isMainStage={false} />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center bg-slate-800">
                                         <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-[10px] font-black text-slate-500 uppercase">You</div>
                                     </div>
                                 )}
                                 <div className="absolute bottom-2 left-2 bg-black/60 px-2 py-0.5 rounded text-[9px] font-bold flex items-center gap-2">
-                                    You {isMuted && <MicOff size={10} className="text-red-500" />}
+                                    You {!localMicOn && <MicOff size={10} className="text-red-500" />}
                                 </div>
                             </div>
                         )}
                     </div>
                 </div>
 
-               
+                {/* SIDEBAR CHAT */}
                 {isChatMaximized && (
                     <aside className="w-80 bg-[#1A1D21] border-l border-slate-800 flex flex-col">
                         <div className="p-4 border-b border-slate-800 flex justify-between items-center">
-                            <h2 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Class Chat</h2>
+                            <div className="flex items-center gap-2">
+                                <h2 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Class Chat</h2>
+                                <span className="bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[9px] px-1.5 py-0.5 rounded-full font-bold">
+                                    {liveCount} active
+                                </span>
+                            </div>
                             <X size={14} className="text-slate-600 cursor-pointer" onClick={() => setIsChatMaximized(false)} />
                         </div>
                         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                            {messages.map(msg => (
+                            {chatMessages.map((msg) => (
                                 <div key={msg.id}>
-                                    <span className="font-bold text-blue-400 text-[10px] block mb-1 uppercase tracking-tighter">{msg.sender} • {msg.time}</span>
-                                    <div className="text-slate-300 text-xs leading-relaxed bg-[#0F1113] p-3 rounded-xl border border-slate-800">{msg.text}</div>
+                                    <span className="font-bold text-blue-400 text-[10px] block mb-1 uppercase tracking-tighter">
+                                        {msg.senderName} • {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </span>
+                                    <div className="text-slate-300 text-xs leading-relaxed bg-[#0F1113] p-3 rounded-xl border border-slate-800">
+                                        {msg.message}
+                                    </div>
                                 </div>
                             ))}
                             <div ref={chatEndRef} />
                         </div>
-                        <form onSubmit={sendMessage} className="p-4 border-t border-slate-800">
+                        <form onSubmit={handleSendMessage} className="p-4 border-t border-slate-800">
                             <div className="flex items-center gap-2 bg-[#0F1113] border border-slate-700 rounded-xl px-3 py-2">
                                 <input
                                     type="text" value={inputText} onChange={(e) => setInputText(e.target.value)}
@@ -363,26 +217,26 @@ export default function LearningRoomPage({ params }) {
                 )}
             </main>
 
-            
+            {/* FOOTER CONTROLS */}
             <footer className="h-20 bg-[#1A1D21] border-t border-slate-800 px-8 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-2">
                     <div className="flex flex-col items-center w-16">
-                        <button onClick={toggleMic} className={`p-3 rounded-xl transition-all ${isMuted ? 'text-red-500 bg-red-500/5 border border-red-500/20' : 'hover:bg-slate-700 text-slate-300'}`}>
-                            {isMuted ? <MicOff size={22} /> : <Mic size={22} />}
+                        <button onClick={() => toggleMic()} className={`p-3 rounded-xl transition-all ${!localMicOn ? 'text-red-500 bg-red-500/5 border border-red-500/20' : 'hover:bg-slate-700 text-slate-300'}`}>
+                            {!localMicOn ? <MicOff size={22} /> : <Mic size={22} />}
                         </button>
                         <span className="text-[8px] font-black uppercase tracking-widest mt-1.5 text-slate-500">Mute</span>
                     </div>
                     <div className="flex flex-col items-center w-16">
-                        <button onClick={toggleCamera} className={`p-3 rounded-xl transition-all ${!isCameraOn ? 'text-red-500 bg-red-500/5 border border-red-500/20' : 'hover:bg-slate-700 text-slate-300'}`}>
-                            {isCameraOn ? <Camera size={22} /> : <CameraOff size={22} />}
+                        <button onClick={() => toggleWebcam()} className={`p-3 rounded-xl transition-all ${!localWebcamOn ? 'text-red-500 bg-red-500/5 border border-red-500/20' : 'hover:bg-slate-700 text-slate-300'}`}>
+                            {localWebcamOn ? <Camera size={22} /> : <CameraOff size={22} />}
                         </button>
                         <span className="text-[8px] font-black uppercase tracking-widest mt-1.5 text-slate-500">Video</span>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <div className="flex flex-col items-center w-16 group" onClick={toggleScreenShare}>
-                        <div className={`p-3 rounded-xl transition-all ${isSharingScreen ? 'text-green-500 bg-green-500/10' : 'hover:bg-slate-700 text-slate-300'}`}>
+                    <div className="flex flex-col items-center w-16 group" onClick={() => toggleScreenShare()}>
+                        <div className={`p-3 rounded-xl transition-all ${localScreenShareOn ? 'text-green-500 bg-green-500/10' : 'hover:bg-slate-700 text-slate-300'}`}>
                             <MonitorUp size={22} />
                         </div>
                         <span className="text-[8px] font-black uppercase tracking-widest mt-1.5 text-slate-500">Share</span>
@@ -411,7 +265,7 @@ export default function LearningRoomPage({ params }) {
                 </button>
             </footer>
 
-            
+            {/* CONFIRMATION MODAL */}
             {showEndConfirm && (
                 <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
                     <div className="bg-[#1A1D21] border border-slate-800 rounded-[2.5rem] p-10 max-w-sm w-full text-center space-y-6 shadow-2xl">
@@ -442,4 +296,3 @@ export default function LearningRoomPage({ params }) {
         </div>
     );
 }
-*/
