@@ -9,10 +9,9 @@ import RoomView from './RoomView';
 export default function LearningRoomPage({ params }) {
     const searchParams = useSearchParams();
 
-
+    // Correctly unwrap asynchronous route parameters
     const unwrappedParams = use(params);
     const roomId = unwrappedParams.id;
-
 
     const studentId = searchParams.get('student_id') || "Inanst Student";
     const courseId = searchParams.get('course_id');
@@ -20,12 +19,14 @@ export default function LearningRoomPage({ params }) {
     const [token, setToken] = useState('');
     const [error, setError] = useState(null);
 
-
     useEffect(() => {
         const fetchSessionToken = async () => {
             try {
 
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/live/get-token`, {
+                const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+                const endpoint = `${baseUrl}/api/live/get-token`;
+
+                const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ roomId, studentId, courseId })
@@ -47,7 +48,6 @@ export default function LearningRoomPage({ params }) {
             fetchSessionToken();
         }
     }, [roomId, studentId, courseId]);
-
 
     if (error) {
         return (
@@ -78,18 +78,17 @@ export default function LearningRoomPage({ params }) {
             config={{
                 meetingId: roomId,
                 micEnabled: false,
-                webcamEnabled: false,
+                webcamEnabled: true,
                 name: studentId,
-                mode: "VIEWER",
+
+                mode: "CONFERENCE",
             }}
             token={token}
         >
-
             <RoomView roomId={roomId} studentId={studentId} />
         </MeetingProvider>
     );
 }
-
 
 /*
 'use client';

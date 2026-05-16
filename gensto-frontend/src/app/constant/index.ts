@@ -55,6 +55,8 @@ export const API_ROUTES = {
     SETTINGS_PROFILE: `${REST_API}/settings/profile`,
     SETTINGS_BIO: `${REST_API}/settings/update-bio`,
     SETTINGS_PASSWORD: `${REST_API}/settings/change-password`,
+    LIVE_GET_TOKEN: `${REST_API}/api/live/get-token`,
+    LIVE_CREATE_ROOM: `${REST_API}/api/live/create-room`,
 };
 
 
