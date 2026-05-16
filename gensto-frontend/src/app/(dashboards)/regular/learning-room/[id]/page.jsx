@@ -3,13 +3,14 @@
 import React, { useState, useEffect, use } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { MeetingProvider } from '@videosdk.live/react-sdk';
+import { AlertTriangle } from 'lucide-react';
 import RoomView from './RoomView';
-
+import { REST_API } from '../../../../constant';
 
 export default function LearningRoomPage({ params }) {
     const searchParams = useSearchParams();
 
-    // Correctly unwrap asynchronous route parameters
+    // Correctly unwrap asynchronous Next.js route parameters
     const unwrappedParams = use(params);
     const roomId = unwrappedParams.id;
 
@@ -22,9 +23,8 @@ export default function LearningRoomPage({ params }) {
     useEffect(() => {
         const fetchSessionToken = async () => {
             try {
-
-                const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-                const endpoint = `${baseUrl}/api/live/get-token`;
+                // Production URL built straight from your central REST_API constant
+                const endpoint = `${REST_API}/api/live/get-token`;
 
                 const response = await fetch(endpoint, {
                     method: 'POST',
@@ -49,23 +49,46 @@ export default function LearningRoomPage({ params }) {
         }
     }, [roomId, studentId, courseId]);
 
+    // Immersive, Premium Error State Layout matching your dashboard tokens
     if (error) {
         return (
-            <div className="h-screen bg-[#0F1113] flex flex-col items-center justify-center text-slate-200 p-4 font-sans">
-                <div className="bg-red-500/10 border border-red-500/20 max-w-sm p-6 rounded-2xl text-center space-y-3">
-                    <p className="text-red-400 font-black text-xs uppercase tracking-wider">Gateway Error</p>
-                    <p className="text-xs text-slate-400">{error}</p>
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#0F1113] p-4 font-sans">
+                <div className="bg-[#1A1D21] border border-slate-800/80 rounded-[2.5rem] p-8 max-w-sm w-full text-center space-y-6 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
+                    {/* Pulsing Warning Icon Container */}
+                    <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto border border-red-500/20 relative">
+                        <div className="absolute inset-0 rounded-full bg-red-500/5 animate-ping" />
+                        <AlertTriangle size={24} />
+                    </div>
+
+                    <div className="space-y-2">
+                        <h3 className="text-sm font-black text-white uppercase tracking-wider">
+                            Gateway Disrupted
+                        </h3>
+                        <p className="text-slate-400 text-xs leading-relaxed max-w-[260px] mx-auto">
+                            {error}
+                        </p>
+                    </div>
+
+                    <div className="pt-2">
+                        <button
+                            onClick={() => window.location.reload()}
+                            className="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all border border-slate-700/50"
+                        >
+                            Retry Connection
+                        </button>
+                    </div>
                 </div>
             </div>
         );
     }
 
+    // High-fidelity Minimal Syncing State
     if (!token) {
         return (
             <div className="h-screen bg-[#0F1113] flex items-center justify-center text-slate-200 font-sans">
-                <div className="text-center space-y-3">
+                <div className="text-center space-y-4">
                     <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping mx-auto" />
-                    <p className="animate-pulse tracking-[0.2em] text-[10px] font-black uppercase text-slate-500">
+                    <p className="animate-pulse tracking-[0.25em] text-[10px] font-black uppercase text-slate-500">
                         Synchronizing Secure Media Infrastructure...
                     </p>
                 </div>
@@ -80,7 +103,6 @@ export default function LearningRoomPage({ params }) {
                 micEnabled: false,
                 webcamEnabled: true,
                 name: studentId,
-
                 mode: "CONFERENCE",
             }}
             token={token}
@@ -89,7 +111,6 @@ export default function LearningRoomPage({ params }) {
         </MeetingProvider>
     );
 }
-
 /*
 'use client';
 
