@@ -37,21 +37,21 @@ export default function InstructorPage() {
     const menuCards = [
         { label: 'Number of schools', value: stats?.schoolCount || 0, icon: School, path: '/instructors/schools', color: 'text-blue-600 bg-blue-50' },
         { label: 'Number of Students', value: stats?.studentCount || 0, icon: Users, path: '/instructors/students', color: 'text-indigo-600 bg-indigo-50' },
-        { label: 'Schedule Class', value: 'Plan', icon: Calendar, path: '/schedule', color: 'text-purple-600 bg-purple-50' },
+        { label: 'Schedule Class', value: 'Plan', icon: Calendar, path: '/instructors/classes/active', color: 'text-purple-600 bg-purple-50' },
         { label: 'Assignment', value: 'Create', icon: FileText, path: '/instructors/assignments/create', color: 'text-amber-600 bg-amber-50' },
-        { label: 'View Assignment', value: 'Review', icon: ClipboardList, path: '/instructors/assignments', color: 'text-emerald-600 bg-emerald-50' },
-        { label: 'Student progress', value: 'Analytics', icon: TrendingUp, path: '/instructors/progress', color: 'text-rose-600 bg-rose-50' },
-        { label: 'Active class', value: stats?.activeClasses || 0, icon: PlayCircle, path: '/classes/active', color: 'text-cyan-600 bg-cyan-50' },
-        { label: 'Active Cohort', value: stats?.activeCohorts || 0, icon: Layers, path: '/instructors/cohorts', color: 'text-orange-600 bg-orange-50' },
+        { label: 'View Assignment', value: 'Review', icon: ClipboardList, path: '/assignments', color: 'text-emerald-600 bg-emerald-50' },
+        { label: 'Student progress', value: 'Analytics', icon: TrendingUp, path: '/progress', color: 'text-rose-600 bg-rose-50' },
+        { label: 'Active class', value: stats?.activeClasses || 0, icon: PlayCircle, path: '/instructors/classes/active', color: 'text-cyan-600 bg-cyan-50' },
+        { label: 'Active Cohort', value: stats?.activeCohorts || 0, icon: Layers, path: '/cohorts', color: 'text-orange-600 bg-orange-50' },
 
         // New Added Cards
-        { label: 'Quiz', value: 'Manage', icon: HelpCircle, path: '/instructors/quiz', color: 'text-violet-600 bg-violet-50' },
-        { label: 'Test', value: 'Evaluate', icon: CheckSquare, path: '/instructors/tests', color: 'text-pink-600 bg-pink-50' },
-        { label: 'Exam', value: 'Portal', icon: GraduationCap, path: '/instructors/exams', color: 'text-red-600 bg-red-600 bg-red-50' },
-        { label: 'Weekly Task', value: 'Track', icon: ListTodo, path: '/instructors/tasks/weekly', color: 'text-lime-600 bg-lime-50' },
-        { label: 'Monthly Task', value: 'Overview', icon: ClipboardList, path: '/instructors/tasks/monthly', color: 'text-teal-600 bg-teal-50' },
-        { label: 'Materials', value: 'Library', icon: BookOpen, path: '/instructors/materials', color: 'text-sky-600 bg-sky-50' },
-        { label: 'Results', value: 'Grades', icon: BarChart, path: '/instructors/results', color: 'text-fuchsia-600 bg-fuchsia-50' },
+        { label: 'Quiz', value: 'Manage', icon: HelpCircle, path: '/quiz', color: 'text-violet-600 bg-violet-50' },
+        { label: 'Test', value: 'Evaluate', icon: CheckSquare, path: '/tests', color: 'text-pink-600 bg-pink-50' },
+        { label: 'Exam', value: 'Portal', icon: GraduationCap, path: '/exams', color: 'text-red-600 bg-red-600 bg-red-50' },
+        { label: 'Weekly Task', value: 'Track', icon: ListTodo, path: '/tasks/weekly', color: 'text-lime-600 bg-lime-50' },
+        { label: 'Monthly Task', value: 'Overview', icon: ClipboardList, path: '/tasks/monthly', color: 'text-teal-600 bg-teal-50' },
+        { label: 'Materials', value: 'Library', icon: BookOpen, path: '/materials', color: 'text-sky-600 bg-sky-50' },
+        { label: 'Results', value: 'Grades', icon: BarChart, path: '/results', color: 'text-fuchsia-600 bg-fuchsia-50' },
     ];
 
     if (loading) {
