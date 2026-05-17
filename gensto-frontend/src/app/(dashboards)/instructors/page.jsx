@@ -37,11 +37,11 @@ export default function InstructorPage() {
     const menuCards = [
         { label: 'Number of schools', value: stats?.schoolCount || 0, icon: School, path: '/instructors/schools', color: 'text-blue-600 bg-blue-50' },
         { label: 'Number of Students', value: stats?.studentCount || 0, icon: Users, path: '/instructors/students', color: 'text-indigo-600 bg-indigo-50' },
-        { label: 'Schedule Class', value: 'Plan', icon: Calendar, path: '/instructors/schedule', color: 'text-purple-600 bg-purple-50' },
+        { label: 'Schedule Class', value: 'Plan', icon: Calendar, path: '/instructors/schedule-class', color: 'text-purple-600 bg-purple-50' },
         { label: 'Assignment', value: 'Create', icon: FileText, path: '/instructors/assignments/create', color: 'text-amber-600 bg-amber-50' },
         { label: 'View Assignment', value: 'Review', icon: ClipboardList, path: '/instructors/assignments', color: 'text-emerald-600 bg-emerald-50' },
         { label: 'Student progress', value: 'Analytics', icon: TrendingUp, path: '/progress', color: 'text-rose-600 bg-rose-50' },
-        { label: 'Active class', value: stats?.activeClasses || 0, icon: PlayCircle, path: '/instructors/classes/active', color: 'text-cyan-600 bg-cyan-50' },
+        { label: 'Active class', value: stats?.activeClasses || 0, icon: PlayCircle, path: '/instructors/classes-active', color: 'text-cyan-600 bg-cyan-50' },
         { label: 'Active Cohort', value: stats?.activeCohorts || 0, icon: Layers, path: '/cohorts', color: 'text-orange-600 bg-orange-50' },
 
         // New Added Cards

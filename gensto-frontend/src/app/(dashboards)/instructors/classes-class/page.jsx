@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Radio, Video, User, Clock, Loader2, Play, AlertCircle } from 'lucide-react';
-import { REST_API } from '../../../../constant';
+import { REST_API } from '../../../constant';
 
 export default function ActiveClassesPage() {
     const router = useRouter();
