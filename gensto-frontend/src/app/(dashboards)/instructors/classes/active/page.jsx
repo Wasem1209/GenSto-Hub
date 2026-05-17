@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Radio, Video, User, Clock, Loader2, Play, AlertCircle } from 'lucide-react';
-import { REST_API } from '../../../constant';
+// Fixed relative path to step out of active -> classes -> instructors -> (dashboards) into app
+import { REST_API } from '../../../../constant';
 
 export default function ActiveClassesPage() {
     const router = useRouter();
@@ -46,7 +47,6 @@ export default function ActiveClassesPage() {
     }, []);
 
     const handleJoinAsInstructor = (roomId, courseId) => {
-        // Direct routing connection link for instructor streaming orchestration
         router.push(`/regular/learning-room/${roomId}?course_id=${courseId}&role=instructor`);
     };
 
@@ -61,7 +61,6 @@ export default function ActiveClassesPage() {
 
     return (
         <div className="p-6 lg:p-10 max-w-7xl mx-auto animate-in fade-in duration-500 font-sans">
-            {/* Header section matching INANST standards */}
             <div className="mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <div className="flex items-center gap-3 mb-2">
