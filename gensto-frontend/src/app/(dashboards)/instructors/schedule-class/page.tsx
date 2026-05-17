@@ -1,9 +1,18 @@
+// gensto-frontend/src/app/(dashboards)/instructors/schedule-class/page.tsx
+
 'use client';
 
-import React, { useState, ChangeEvent, FormEvent } from 'react';
-import { Calendar, Video, BookOpen, User, Loader2, CheckCircle2, AlertTriangle, X, Copy, Check } from 'lucide-react';
+import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import { Calendar, Video, BookOpen, Loader2, CheckCircle2, AlertTriangle, X, Copy, Check } from 'lucide-react';
 
 import { REST_API } from '../../../constant';
+
+// Define a structural interface for a School record coming from your DB
+interface SchoolTrack {
+    _id: string;        // Database record unique identifier
+    name: string;       // Human-readable string e.g., "School of Frontend Web"
+    category: string;   // Enum matching target system rules e.g., "SCHOOL_OF_FRONTEND_WEB"
+}
 
 export default function ScheduleClassPage() {
     const [saving, setSaving] = useState<boolean>(false);
@@ -12,12 +21,63 @@ export default function ScheduleClassPage() {
     const [statusMsg, setStatusMsg] = useState<{ text: string; type: 'success' | 'error' | '' }>({ text: '', type: '' });
     const [generatedRoomId, setGeneratedRoomId] = useState<string>('');
     
+    // Asynchronous States for Database Records
+    const [schools, setSchools] = useState<SchoolTrack[]>([]);
+    const [loadingSchools, setLoadingSchools] = useState<boolean>(true);
+    
     const [formData, setFormData] = useState({
         courseTitle: '',
-        courseId: '',
-        instructorName: '',
-        schoolCategory: 'SCHOOL_OF_FRONTEND_WEB'
+        schoolId: '', 
+        schoolCategory: '' // Default placeholder initialized dynamically once loaded
     });
+
+    // Lifecycle Hook to load options on view assembly mount
+    useEffect(() => {
+        const fetchSchools = async () => {
+            const token = localStorage.getItem('token');
+            try {
+                // Update the route endpoint string here according to your precise API layout architecture
+                const response = await fetch(`${REST_API}/api/schools`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to load school domains from backend: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                // Expecting structure: { success: true, data: [...] } or direct array matching
+                const fetchedData: SchoolTrack[] = result.data || result;
+
+                if (Array.isArray(fetchedData) && fetchedData.length > 0) {
+                    setSchools(fetchedData);
+                    setFormData(prev => ({ ...prev, schoolCategory: fetchedData[0].category }));
+                } else {
+                    throw new Error("Empty tracking category catalog payload returned from context server.");
+                }
+            } catch (err) {
+                console.warn('Dynamic category pull failed, falling back to static structures:', err);
+                
+                // Safe robust client side interface redundancy logic if connection drops
+                const fallbacks: SchoolTrack[] = [
+                    { _id: '1', name: 'School of Frontend Web', category: 'SCHOOL_OF_FRONTEND_WEB' },
+                    { _id: '2', name: 'School of Backend Web', category: 'SCHOOL_OF_BACKEND_WEB' },
+                    { _id: '3', name: 'School of Software Engineering', category: 'SCHOOL_OF_SOFTWARE_ENGINEERING' }
+                ];
+                setSchools(fallbacks);
+                setFormData(prev => ({ ...prev, schoolCategory: fallbacks[0].category }));
+            } finally {
+                setLoadingSchools(false);
+            }
+        };
+
+        fetchSchools();
+    }, []);
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -57,31 +117,35 @@ export default function ScheduleClassPage() {
                 },
                 body: JSON.stringify({
                     title: formData.courseTitle,
-                    courseId: formData.courseId,
-                    instructorName: formData.instructorName,
+                    schoolId: formData.schoolId, 
                     category: formData.schoolCategory
                 })
             });
 
-            // 1. Guard against non-200 responses (like HTML 404/500 errors) before parsing JSON
             if (!response.ok) {
+                if (response.status === 403) {
+                    throw new Error("Access Denied: You do not possess instructor clearance credentials to allocate live streaming assets.");
+                }
                 if (response.status === 404) {
                     throw new Error(`Endpoint not found (404). Please verify that the VideoSDK live-room service is online and mapped to '${REST_API}/api/live/create-room'.`);
                 }
                 throw new Error(`Server responded with an error status code: ${response.status}`);
             }
 
-            // 2. Safe to parse now that we know it's a valid ok status code
             const result = await response.json();
 
-            if (result.success) {
-                setGeneratedRoomId(result.data.roomId || '');
+            if (result.success && result.data?.roomId) {
+                setGeneratedRoomId(result.data.roomId);
                 setStatusMsg({ 
                     text: 'Live workspace broadcast instance successfully provisioned and mapped down to student streams.', 
                     type: 'success' 
                 });
                 setShowModal(true);
-                setFormData({ courseTitle: '', courseId: '', instructorName: '', schoolCategory: 'SCHOOL_OF_FRONTEND_WEB' });
+                setFormData({ 
+                    courseTitle: '', 
+                    schoolId: '', 
+                    schoolCategory: schools[0]?.category || 'SCHOOL_OF_FRONTEND_WEB' 
+                });
             } else {
                 throw new Error(result.message || 'Failed to initialize remote stream environment.');
             }
@@ -128,52 +192,48 @@ export default function ScheduleClassPage() {
 
                         <div className="space-y-2">
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 flex items-center gap-2">
-                                <Video size={12} /> Target Course / Classroom ID
+                                <Video size={12} /> Target School ID
                             </label>
                             <input 
                                 type="text" 
-                                name="courseId"
+                                name="schoolId"
                                 required
-                                value={formData.courseId}
+                                value={formData.schoolId}
                                 onChange={handleInputChange}
-                                placeholder="e.g., Inanst875" 
+                                placeholder="e.g., School ID Key (Inanst875)" 
                                 className="w-full bg-[#0F1113] border border-slate-800 rounded-2xl p-4 text-white text-sm focus:border-blue-600 outline-none transition-all"
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 flex items-center gap-2">
-                                <User size={12} /> Assigned Instructor Name
-                            </label>
-                            <input 
-                                type="text" 
-                                name="instructorName"
-                                required
-                                value={formData.instructorName}
-                                onChange={handleInputChange}
-                                placeholder="e.g., Dr. Sarah Jenkins" 
-                                className="w-full bg-[#0F1113] border border-slate-800 rounded-2xl p-4 text-white text-sm focus:border-blue-600 outline-none transition-all"
-                            />
-                        </div>
-
-                        <div className="space-y-2">
+                        <div className="space-y-2 md:col-span-2">
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">School Department Tracks</label>
                             <div className="relative">
-                                <select 
-                                    name="schoolCategory"
-                                    value={formData.schoolCategory}
-                                    onChange={handleInputChange}
-                                    className="w-full bg-[#0F1113] border border-slate-800 rounded-2xl p-4 text-white text-sm focus:border-blue-600 outline-none transition-all appearance-none cursor-pointer"
-                                >
-                                    <option value="SCHOOL_OF_FRONTEND_WEB">School of Frontend Web</option>
-                                    <option value="SCHOOL_OF_BACKEND_WEB">School of Backend Web</option>
-                                    <option value="SCHOOL_OF_SOFTWARE_ENGINEENGINEERING">School of Software Engineering</option>
-                                </select>
-                                <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-500">
-                                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-                                    </svg>
-                                </div>
+                                {loadingSchools ? (
+                                    <div className="w-full bg-[#0F1113] border border-slate-800 rounded-2xl p-4 text-slate-400 text-sm flex items-center gap-2">
+                                        <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                                        <span>Resolving remote database tracks...</span>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <select 
+                                            name="schoolCategory"
+                                            value={formData.schoolCategory}
+                                            onChange={handleInputChange}
+                                            className="w-full bg-[#0F1113] border border-slate-800 rounded-2xl p-4 text-white text-sm focus:border-blue-600 outline-none transition-all appearance-none cursor-pointer"
+                                        >
+                                            {schools.map((school) => (
+                                                <option key={school._id} value={school.category}>
+                                                    {school.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-500">
+                                            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                                            </svg>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -181,7 +241,7 @@ export default function ScheduleClassPage() {
                     <div className="flex items-center justify-end pt-4">
                         <button
                             type="submit"
-                            disabled={saving}
+                            disabled={saving || loadingSchools}
                             className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white px-10 py-5 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-lg"
                         >
                             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Calendar size={16} />}

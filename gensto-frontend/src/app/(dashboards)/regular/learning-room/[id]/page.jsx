@@ -1,53 +1,72 @@
 'use client';
 
 import React, { useState, useEffect, use } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { MeetingProvider } from '@videosdk.live/react-sdk';
 import { AlertTriangle } from 'lucide-react';
 import RoomView from './RoomView';
 import { REST_API } from '../../../../constant';
 
 export default function LearningRoomPage({ params }) {
-    const searchParams = useSearchParams();
-
     // Correctly unwrap asynchronous Next.js route parameters
     const unwrappedParams = use(params);
     const roomId = unwrappedParams.id;
 
-    const studentId = searchParams.get('student_id') || "Inanst Student";
-    const courseId = searchParams.get('course_id');
-
     const [token, setToken] = useState('');
+    const [studentDisplayName, setStudentDisplayName] = useState('Inanst Student');
     const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchSessionToken = async () => {
             try {
-                // Production URL built straight from your central REST_API constant
+                // Pull the user's authentic JWT token from storage
+                const authToken = localStorage.getItem('token');
+
+                if (!authToken) {
+                    setError("Authentication missing. Please sign in to access the learning hub.");
+                    return;
+                }
+
                 const endpoint = `${REST_API}/api/live/get-token`;
 
                 const response = await fetch(endpoint, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ roomId, studentId, courseId })
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ roomId })
                 });
 
+                // Fail gracefully if response hits a 401, 403, or 500 error before parsing JSON
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        throw new Error("Access Denied: Your profile is not registered within this specific school tier.");
+                    }
+                    throw new Error(`Operational Stream Error (Status: ${response.status})`);
+                }
+
                 const result = await response.json();
+
                 if (result.success && result.token) {
                     setToken(result.token);
+                    // Use backend-verified user info for screen display name if returned
+                    if (result.userData?.name) {
+                        setStudentDisplayName(result.userData.name);
+                    }
                 } else {
                     setError(result.message || "Failed to retrieve authorized gateway streams.");
                 }
             } catch (err) {
                 console.error("Token Server Error:", err);
-                setError("Could not establish authorization synchronization tunnel.");
+                const errorMessage = err instanceof Error ? err.message : "Could not establish authorization synchronization tunnel.";
+                setError(errorMessage);
             }
         };
 
         if (roomId) {
             fetchSessionToken();
         }
-    }, [roomId, studentId, courseId]);
+    }, [roomId]);
 
     // Immersive, Premium Error State Layout matching your dashboard tokens
     if (error) {
@@ -102,12 +121,12 @@ export default function LearningRoomPage({ params }) {
                 meetingId: roomId,
                 micEnabled: false,
                 webcamEnabled: true,
-                name: studentId,
+                name: studentDisplayName,
                 mode: "CONFERENCE",
             }}
             token={token}
         >
-            <RoomView roomId={roomId} studentId={studentId} />
+            <RoomView roomId={roomId} studentId={studentDisplayName} />
         </MeetingProvider>
     );
 }
