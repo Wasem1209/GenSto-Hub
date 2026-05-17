@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Radio, Video, User, Clock, Loader2, Play, AlertCircle } from 'lucide-react';
-// Fixed relative path to step out of active -> classes -> instructors -> (dashboards) into app
 import { REST_API } from '../../../../constant';
 
 export default function ActiveClassesPage() {
