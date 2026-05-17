@@ -2,6 +2,7 @@
 
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { Calendar, Video, BookOpen, User, Loader2, CheckCircle2, AlertTriangle, X, Copy, Check } from 'lucide-react';
+
 import { REST_API } from '../../../constant';
 
 export default function ScheduleClassPage() {
@@ -62,6 +63,15 @@ export default function ScheduleClassPage() {
                 })
             });
 
+            // 1. Guard against non-200 responses (like HTML 404/500 errors) before parsing JSON
+            if (!response.ok) {
+                if (response.status === 404) {
+                    throw new Error(`Endpoint not found (404). Please verify that the VideoSDK live-room service is online and mapped to '${REST_API}/api/live/create-room'.`);
+                }
+                throw new Error(`Server responded with an error status code: ${response.status}`);
+            }
+
+            // 2. Safe to parse now that we know it's a valid ok status code
             const result = await response.json();
 
             if (result.success) {
@@ -71,7 +81,6 @@ export default function ScheduleClassPage() {
                     type: 'success' 
                 });
                 setShowModal(true);
-                // Reset form fields neatly
                 setFormData({ courseTitle: '', courseId: '', instructorName: '', schoolCategory: 'SCHOOL_OF_FRONTEND_WEB' });
             } else {
                 throw new Error(result.message || 'Failed to initialize remote stream environment.');
@@ -88,7 +97,6 @@ export default function ScheduleClassPage() {
 
     return (
         <div className="p-6 lg:p-10 max-w-4xl mx-auto animate-in fade-in duration-500 font-sans relative">
-            {/* Header section matching INANST standards */}
             <div className="mb-10">
                 <div className="flex items-center gap-3 mb-2">
                     <div className="p-2 bg-blue-600/10 text-blue-500 rounded-xl border border-blue-500/10">
@@ -100,12 +108,9 @@ export default function ScheduleClassPage() {
                 <p className="text-slate-500 text-sm mt-1">Deploy real-time infrastructure pipelines for upcoming learning pathways.</p>
             </div>
 
-            {/* Premium Container Card */}
             <div className="bg-[#1A1D21] border border-slate-800 rounded-[2.5rem] p-8 space-y-8 shadow-2xl">
                 <form onSubmit={handleCreateSession} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        
-                        {/* Session Title */}
                         <div className="space-y-2">
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 flex items-center gap-2">
                                 <BookOpen size={12} /> Session Title
@@ -121,7 +126,6 @@ export default function ScheduleClassPage() {
                             />
                         </div>
 
-                        {/* Course ID Connection Link */}
                         <div className="space-y-2">
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 flex items-center gap-2">
                                 <Video size={12} /> Target Course / Classroom ID
@@ -137,7 +141,6 @@ export default function ScheduleClassPage() {
                             />
                         </div>
 
-                        {/* Instructor Identity Mapping */}
                         <div className="space-y-2">
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 flex items-center gap-2">
                                 <User size={12} /> Assigned Instructor Name
@@ -153,7 +156,6 @@ export default function ScheduleClassPage() {
                             />
                         </div>
 
-                        {/* Department Track Selector */}
                         <div className="space-y-2">
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">School Department Tracks</label>
                             <div className="relative">
@@ -165,7 +167,7 @@ export default function ScheduleClassPage() {
                                 >
                                     <option value="SCHOOL_OF_FRONTEND_WEB">School of Frontend Web</option>
                                     <option value="SCHOOL_OF_BACKEND_WEB">School of Backend Web</option>
-                                    <option value="SCHOOL_OF_SOFTWARE_ENGINEERING">School of Software Engineering</option>
+                                    <option value="SCHOOL_OF_SOFTWARE_ENGINEENGINEERING">School of Software Engineering</option>
                                 </select>
                                 <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-500">
                                     <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -176,7 +178,6 @@ export default function ScheduleClassPage() {
                         </div>
                     </div>
 
-                    {/* Submit Handler Control */}
                     <div className="flex items-center justify-end pt-4">
                         <button
                             type="submit"
@@ -190,7 +191,6 @@ export default function ScheduleClassPage() {
                 </form>
             </div>
 
-            {/* Premium Action Status Modal Overlay */}
             {showModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
                     <div 
@@ -198,10 +198,8 @@ export default function ScheduleClassPage() {
                         role="dialog"
                         aria-modal="true"
                     >
-                        {/* Decorative Top Accent Line */}
                         <div className={`absolute top-0 inset-x-0 h-1.5 ${statusMsg.type === 'error' ? 'bg-red-500' : 'bg-green-500'}`} />
 
-                        {/* Close Action Trigger */}
                         <button 
                             onClick={() => setShowModal(false)}
                             className="absolute top-5 right-5 p-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition-all outline-none"
@@ -210,22 +208,18 @@ export default function ScheduleClassPage() {
                         </button>
 
                         <div className="flex flex-col items-center text-center mt-4 space-y-4">
-                            {/* Icon Indicator */}
                             <div className={`p-4 rounded-full ${statusMsg.type === 'error' ? 'bg-red-500/10 text-red-500' : 'bg-green-500/10 text-green-500'}`}>
                                 {statusMsg.type === 'error' ? <AlertTriangle size={32} /> : <CheckCircle2 size={32} />}
                             </div>
 
-                            {/* Status Header Title */}
                             <h3 className="text-xl font-black text-white uppercase tracking-tight">
                                 {statusMsg.type === 'error' ? 'Deployment Error' : 'Stream Success'}
                             </h3>
 
-                            {/* Status Body Text Message */}
                             <p className="text-slate-400 text-xs px-2 leading-relaxed font-medium">
                                 {statusMsg.text}
                             </p>
 
-                            {/* Conditional Room ID Content Row Layout */}
                             {statusMsg.type === 'success' && generatedRoomId && (
                                 <div className="w-full bg-[#0F1113] border border-slate-800 rounded-2xl p-3.5 flex items-center justify-between gap-3 mt-2 group">
                                     <div className="flex flex-col items-start text-left">
@@ -246,7 +240,6 @@ export default function ScheduleClassPage() {
                                 </div>
                             )}
 
-                            {/* Primary Dimiss Action Call */}
                             <button
                                 onClick={() => setShowModal(false)}
                                 className={`w-full mt-4 py-4 rounded-xl font-black uppercase text-[10px] tracking-[0.15em] text-white transition-all shadow-md ${
