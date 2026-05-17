@@ -41,7 +41,7 @@ export default function InstructorPage() {
         { label: 'Assignment', value: 'Create', icon: FileText, path: '/instructors/assignments/create', color: 'text-amber-600 bg-amber-50' },
         { label: 'View Assignment', value: 'Review', icon: ClipboardList, path: '/instructors/assignments', color: 'text-emerald-600 bg-emerald-50' },
         { label: 'Student progress', value: 'Analytics', icon: TrendingUp, path: '/progress', color: 'text-rose-600 bg-rose-50' },
-        { label: 'Active class', value: stats?.activeClasses || 0, icon: PlayCircle, path: '/instructors/classes-active', color: 'text-cyan-600 bg-cyan-50' },
+        { label: 'Classes Active', value: stats?.activeClasses || 0, icon: PlayCircle, path: '/instructors/classes-active', color: 'text-cyan-600 bg-cyan-50' },
         { label: 'Active Cohort', value: stats?.activeCohorts || 0, icon: Layers, path: '/cohorts', color: 'text-orange-600 bg-orange-50' },
 
         // New Added Cards
