@@ -269,10 +269,14 @@ export default function ScheduleClassPage() {
                                             name="schoolId"
                                             value={formData.schoolId}
                                             onChange={handleDropdownChange}
-                                            className="w-full bg-[#0F1113] border border-slate-800 rounded-2xl p-4 text-white text-sm focus:border-blue-600 outline-none transition-all appearance-none cursor-pointer"
+                                            className="w-full bg-[#0F1113] border border-slate-800 rounded-2xl p-4 text-white text-sm focus:border-blue-600 outline-none transition-all appearance-none cursor-pointer pr-10"
                                         >
                                             {schools.map((school) => (
-                                                <option key={school._id} value={school._id}>
+                                                <option 
+                                                    key={school._id} 
+                                                    value={school._id}
+                                                    className="bg-[#1A1D21] text-white"
+                                                >
                                                     {school.name}
                                                 </option>
                                             ))}
@@ -311,13 +315,13 @@ export default function ScheduleClassPage() {
                                 name="duration"
                                 value={formData.duration}
                                 onChange={handleInputChange}
-                                className="w-full bg-[#0F1113] border border-slate-800 rounded-2xl p-4 text-white text-sm focus:border-blue-600 outline-none transition-all cursor-pointer"
+                                className="w-full bg-[#0F1113] border border-slate-800 rounded-2xl p-4 text-white text-sm focus:border-blue-600 outline-none transition-all cursor-pointer pr-10"
                             >
-                                <option value="30">30 Minutes</option>
-                                <option value="45">45 Minutes</option>
-                                <option value="60">1 Hour</option>
-                                <option value="90">1.5 Hours</option>
-                                <option value="120">2 Hours</option>
+                                <option value="30" className="bg-[#1A1D21] text-white">30 Minutes</option>
+                                <option value="45" className="bg-[#1A1D21] text-white">45 Minutes</option>
+                                <option value="60" className="bg-[#1A1D21] text-white">1 Hour</option>
+                                <option value="90" className="bg-[#1A1D21] text-white">1.5 Hours</option>
+                                <option value="120" className="bg-[#1A1D21] text-white">2 Hours</option>
                             </select>
                         </div>
 
