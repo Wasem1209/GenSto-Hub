@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
-import { Calendar, BookOpen, Loader2, CheckCircle2, AlertTriangle, X, Copy, Check } from 'lucide-react';
+import { Calendar, BookOpen, Loader2, CheckCircle2, AlertTriangle, X, Copy, Check, Clock, User } from 'lucide-react';
 import { API_ROUTES } from '../../../constant';
 
 interface SchoolTrack {
@@ -20,13 +20,17 @@ export default function ScheduleClassPage() {
     const [schools, setSchools] = useState<SchoolTrack[]>([]);
     const [loadingSchools, setLoadingSchools] = useState<boolean>(true);
     
+    
     const [formData, setFormData] = useState({
         courseTitle: '',
-        schoolId: '',       
-        schoolCategory: ''  
+        schoolId: '',      
+        schoolCategory: '',
+        instructorName: '', 
+        scheduledStartTime: '', 
+        duration: '60' 
     });
 
-    // Debugging tool: Inspect user token to verify role configuration
+   
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
@@ -36,7 +40,15 @@ export default function ScheduleClassPage() {
                 const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
                     return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
                 }).join(''));
-                console.log("Current Logged-in User Token Payload:", JSON.parse(jsonPayload));
+                
+                const parsedUser = JSON.parse(jsonPayload);
+                console.log("Current Logged-in User Token Payload:", parsedUser);
+
+                // Auto-fill instructor name if present in token profile context
+                if (parsedUser.name || parsedUser.firstName) {
+                    const fallbackName = parsedUser.name || `${parsedUser.firstName} ${parsedUser.lastName || ''}`;
+                    setFormData(prev => ({ ...prev, instructorName: fallbackName.trim() }));
+                }
             } catch (e) {
                 console.error("Failed to parse auth token for role debugging:", e);
             }
@@ -61,7 +73,6 @@ export default function ScheduleClassPage() {
 
                 const result = await response.json();
                 
-                // Flexible parsing to handle direct arrays, result.data, or result.schools structures
                 let fetchedData: SchoolTrack[] = [];
                 if (Array.isArray(result)) fetchedData = result;
                 else if (result && Array.isArray(result.data)) fetchedData = result.data;
@@ -112,7 +123,7 @@ export default function ScheduleClassPage() {
         }
     };
 
-    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
@@ -148,10 +159,14 @@ export default function ScheduleClassPage() {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
+                
                 body: JSON.stringify({
                     title: formData.courseTitle,
                     schoolId: formData.schoolId, 
-                    category: formData.schoolCategory
+                    category: formData.schoolCategory,
+                    instructorName: formData.instructorName || 'Lead Instructor',
+                    startTime: formData.scheduledStartTime || new Date().toISOString(),
+                    durationMinutes: parseInt(formData.duration, 10) || 60
                 })
             });
 
@@ -174,11 +189,13 @@ export default function ScheduleClassPage() {
                     type: 'success' 
                 });
                 setShowModal(true);
-                setFormData({ 
+                
+                // Clear state keeping baseline configurations populated
+                setFormData(prev => ({ 
+                    ...prev,
                     courseTitle: '', 
-                    schoolId: schools[0]?._id || '', 
-                    schoolCategory: schools[0]?.category || '' 
-                });
+                    scheduledStartTime: '',
+                }));
             } else {
                 throw new Error(result.message || 'Failed to initialize remote stream environment.');
             }
@@ -207,9 +224,10 @@ export default function ScheduleClassPage() {
 
             <div className="bg-[#1A1D21] border border-slate-800 rounded-[2.5rem] p-8 space-y-8 shadow-2xl">
                 <form onSubmit={handleCreateSession} className="space-y-6">
-                    <div className="grid grid-cols-1 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
                         {/* Session Title */}
-                        <div className="space-y-2">
+                        <div className="space-y-2 md:col-span-2">
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 flex items-center gap-2">
                                 <BookOpen size={12} /> Session Title
                             </label>
@@ -220,6 +238,22 @@ export default function ScheduleClassPage() {
                                 value={formData.courseTitle}
                                 onChange={handleInputChange}
                                 placeholder="e.g., Advanced React Patterns & Hooks" 
+                                className="w-full bg-[#0F1113] border border-slate-800 rounded-2xl p-4 text-white text-sm focus:border-blue-600 outline-none transition-all"
+                            />
+                        </div>
+
+                        {/* Instructor Identity (New Field) */}
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 flex items-center gap-2">
+                                <User size={12} /> Hosting Instructor
+                            </label>
+                            <input 
+                                type="text" 
+                                name="instructorName"
+                                required
+                                value={formData.instructorName}
+                                onChange={handleInputChange}
+                                placeholder="e.g., Engr. Alex Rivera" 
                                 className="w-full bg-[#0F1113] border border-slate-800 rounded-2xl p-4 text-white text-sm focus:border-blue-600 outline-none transition-all"
                             />
                         </div>
@@ -256,6 +290,41 @@ export default function ScheduleClassPage() {
                                 )}
                             </div>
                         </div>
+
+                        {/* Start Date & Time (New Field) */}
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 flex items-center gap-2">
+                                <Calendar size={12} /> Scheduled Start Date & Time
+                            </label>
+                            <input 
+                                type="datetime-local" 
+                                name="scheduledStartTime"
+                                required
+                                value={formData.scheduledStartTime}
+                                onChange={handleInputChange}
+                                className="w-full bg-[#0F1113] border border-slate-800 rounded-2xl p-4 text-white text-sm focus:border-blue-600 outline-none transition-all custom-datetime-picker"
+                            />
+                        </div>
+
+                        {/* Block Duration (New Field) */}
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 flex items-center gap-2">
+                                <Clock size={12} /> Session Block Duration
+                            </label>
+                            <select 
+                                name="duration"
+                                value={formData.duration}
+                                onChange={handleInputChange}
+                                className="w-full bg-[#0F1113] border border-slate-800 rounded-2xl p-4 text-white text-sm focus:border-blue-600 outline-none transition-all cursor-pointer"
+                            >
+                                <option value="30">30 Minutes</option>
+                                <option value="45">45 Minutes</option>
+                                <option value="60">1 Hour</option>
+                                <option value="90">1.5 Hours</option>
+                                <option value="120">2 Hours</option>
+                            </select>
+                        </div>
+
                     </div>
 
                     <div className="flex items-center justify-end pt-4">
