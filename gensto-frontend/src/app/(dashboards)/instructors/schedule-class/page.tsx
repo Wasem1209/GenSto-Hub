@@ -3,15 +3,15 @@
 'use client';
 
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
-import { Calendar, Video, BookOpen, Loader2, CheckCircle2, AlertTriangle, X, Copy, Check } from 'lucide-react';
+import { Calendar, BookOpen, Loader2, CheckCircle2, AlertTriangle, X, Copy, Check } from 'lucide-react';
 
-import { REST_API } from '../../../constant';
+// Centralized unified routes
+import { API_ROUTES } from '../../../constant';
 
-// Define a structural interface for a School record coming from your DB
 interface SchoolTrack {
-    _id: string;        // Database record unique identifier
-    name: string;       // Human-readable string e.g., "School of Frontend Web"
-    category: string;   // Enum matching target system rules e.g., "SCHOOL_OF_FRONTEND_WEB"
+    _id: string;        
+    name: string;       
+    category: string;   
 }
 
 export default function ScheduleClassPage() {
@@ -21,23 +21,22 @@ export default function ScheduleClassPage() {
     const [statusMsg, setStatusMsg] = useState<{ text: string; type: 'success' | 'error' | '' }>({ text: '', type: '' });
     const [generatedRoomId, setGeneratedRoomId] = useState<string>('');
     
-    // Asynchronous States for Database Records
+    // Database Records States
     const [schools, setSchools] = useState<SchoolTrack[]>([]);
     const [loadingSchools, setLoadingSchools] = useState<boolean>(true);
     
     const [formData, setFormData] = useState({
         courseTitle: '',
-        schoolId: '', 
-        schoolCategory: '' // Default placeholder initialized dynamically once loaded
+        schoolId: '',       
+        schoolCategory: ''  
     });
 
-    // Lifecycle Hook to load options on view assembly mount
+    // Fetch available schools from the database dynamically
     useEffect(() => {
         const fetchSchools = async () => {
             const token = localStorage.getItem('token');
             try {
-                // Update the route endpoint string here according to your precise API layout architecture
-                const response = await fetch(`${REST_API}/api/schools`, {
+                const response = await fetch(API_ROUTES.SCHOOLS, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -46,31 +45,38 @@ export default function ScheduleClassPage() {
                 });
 
                 if (!response.ok) {
-                    throw new Error(`Failed to load school domains from backend: ${response.status}`);
+                    throw new Error(`Server returned status: ${response.status}`);
                 }
 
                 const result = await response.json();
-                
-                // Expecting structure: { success: true, data: [...] } or direct array matching
                 const fetchedData: SchoolTrack[] = result.data || result;
 
                 if (Array.isArray(fetchedData) && fetchedData.length > 0) {
                     setSchools(fetchedData);
-                    setFormData(prev => ({ ...prev, schoolCategory: fetchedData[0].category }));
+                    // Automatically initialize form fields with the first database record
+                    setFormData(prev => ({ 
+                        ...prev, 
+                        schoolId: fetchedData[0]._id,
+                        schoolCategory: fetchedData[0].category 
+                    }));
                 } else {
-                    throw new Error("Empty tracking category catalog payload returned from context server.");
+                    throw new Error("No tracking categories returned from database server.");
                 }
             } catch (err) {
-                console.warn('Dynamic category pull failed, falling back to static structures:', err);
+                console.warn('Database pool pull failed, using fallback tracking records:', err);
                 
-                // Safe robust client side interface redundancy logic if connection drops
+                // Fallbacks stay purely as a safety net so UI doesn't crash if connection drops
                 const fallbacks: SchoolTrack[] = [
                     { _id: '1', name: 'School of Frontend Web', category: 'SCHOOL_OF_FRONTEND_WEB' },
                     { _id: '2', name: 'School of Backend Web', category: 'SCHOOL_OF_BACKEND_WEB' },
                     { _id: '3', name: 'School of Software Engineering', category: 'SCHOOL_OF_SOFTWARE_ENGINEERING' }
                 ];
                 setSchools(fallbacks);
-                setFormData(prev => ({ ...prev, schoolCategory: fallbacks[0].category }));
+                setFormData(prev => ({ 
+                    ...prev, 
+                    schoolId: fallbacks[0]._id,
+                    schoolCategory: fallbacks[0].category 
+                }));
             } finally {
                 setLoadingSchools(false);
             }
@@ -79,7 +85,21 @@ export default function ScheduleClassPage() {
         fetchSchools();
     }, []);
 
-    const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    // Handles changing dropdown selection and auto-mapping both ID and Category
+    const handleDropdownChange = (e: ChangeEvent<HTMLSelectElement>) => {
+        const selectedId = e.target.value;
+        const matchingSchool = schools.find(school => school._id === selectedId);
+
+        if (matchingSchool) {
+            setFormData(prev => ({
+                ...prev,
+                schoolId: matchingSchool._id,
+                schoolCategory: matchingSchool.category
+            }));
+        }
+    };
+
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
@@ -109,7 +129,7 @@ export default function ScheduleClassPage() {
         }
 
         try {
-            const response = await fetch(`${REST_API}/api/live/create-room`, {
+            const response = await fetch(API_ROUTES.LIVE_CREATE_ROOM, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -117,17 +137,17 @@ export default function ScheduleClassPage() {
                 },
                 body: JSON.stringify({
                     title: formData.courseTitle,
-                    schoolId: formData.schoolId, 
+                    schoolId: formData.schoolId, // Sent automatically from selected track
                     category: formData.schoolCategory
                 })
             });
 
             if (!response.ok) {
                 if (response.status === 403) {
-                    throw new Error("Access Denied: You do not possess instructor clearance credentials to allocate live streaming assets.");
+                    throw new Error("Access Denied: You do not possess instructor clearance credentials.");
                 }
                 if (response.status === 404) {
-                    throw new Error(`Endpoint not found (404). Please verify that the VideoSDK live-room service is online and mapped to '${REST_API}/api/live/create-room'.`);
+                    throw new Error(`Endpoint not found (404). Check duplicated paths or missing endpoints at: '${API_ROUTES.LIVE_CREATE_ROOM}'.`);
                 }
                 throw new Error(`Server responded with an error status code: ${response.status}`);
             }
@@ -143,8 +163,8 @@ export default function ScheduleClassPage() {
                 setShowModal(true);
                 setFormData({ 
                     courseTitle: '', 
-                    schoolId: '', 
-                    schoolCategory: schools[0]?.category || 'SCHOOL_OF_FRONTEND_WEB' 
+                    schoolId: schools[0]?._id || '', 
+                    schoolCategory: schools[0]?.category || '' 
                 });
             } else {
                 throw new Error(result.message || 'Failed to initialize remote stream environment.');
@@ -175,7 +195,8 @@ export default function ScheduleClassPage() {
             <div className="bg-[#1A1D21] border border-slate-800 rounded-[2.5rem] p-8 space-y-8 shadow-2xl">
                 <form onSubmit={handleCreateSession} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
+                        {/* Session Title */}
+                        <div className="space-y-2 md:col-span-2">
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 flex items-center gap-2">
                                 <BookOpen size={12} /> Session Title
                             </label>
@@ -190,21 +211,7 @@ export default function ScheduleClassPage() {
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 flex items-center gap-2">
-                                <Video size={12} /> Target School ID
-                            </label>
-                            <input 
-                                type="text" 
-                                name="schoolId"
-                                required
-                                value={formData.schoolId}
-                                onChange={handleInputChange}
-                                placeholder="e.g., School ID Key (Inanst875)" 
-                                className="w-full bg-[#0F1113] border border-slate-800 rounded-2xl p-4 text-white text-sm focus:border-blue-600 outline-none transition-all"
-                            />
-                        </div>
-
+                        {/* School Dropdown Tracker — Extracts both Name, ID, and Category */}
                         <div className="space-y-2 md:col-span-2">
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">School Department Tracks</label>
                             <div className="relative">
@@ -216,13 +223,13 @@ export default function ScheduleClassPage() {
                                 ) : (
                                     <>
                                         <select 
-                                            name="schoolCategory"
-                                            value={formData.schoolCategory}
-                                            onChange={handleInputChange}
+                                            name="schoolId"
+                                            value={formData.schoolId}
+                                            onChange={handleDropdownChange}
                                             className="w-full bg-[#0F1113] border border-slate-800 rounded-2xl p-4 text-white text-sm focus:border-blue-600 outline-none transition-all appearance-none cursor-pointer"
                                         >
                                             {schools.map((school) => (
-                                                <option key={school._id} value={school.category}>
+                                                <option key={school._id} value={school._id}>
                                                     {school.name}
                                                 </option>
                                             ))}
@@ -251,19 +258,13 @@ export default function ScheduleClassPage() {
                 </form>
             </div>
 
+            {/* Modal Status Window */}
             {showModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-                    <div 
-                        className="bg-[#1A1D21] border border-slate-800 w-full max-w-md rounded-[2rem] p-6 shadow-2xl relative overflow-hidden animate-in zoom-in-95 duration-300"
-                        role="dialog"
-                        aria-modal="true"
-                    >
+                    <div className="bg-[#1A1D21] border border-slate-800 w-full max-w-md rounded-[2rem] p-6 shadow-2xl relative overflow-hidden animate-in zoom-in-95 duration-300" role="dialog" aria-modal="true">
                         <div className={`absolute top-0 inset-x-0 h-1.5 ${statusMsg.type === 'error' ? 'bg-red-500' : 'bg-green-500'}`} />
 
-                        <button 
-                            onClick={() => setShowModal(false)}
-                            className="absolute top-5 right-5 p-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition-all outline-none"
-                        >
+                        <button onClick={() => setShowModal(false)} className="absolute top-5 right-5 p-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition-all outline-none">
                             <X size={14} />
                         </button>
 
@@ -276,7 +277,7 @@ export default function ScheduleClassPage() {
                                 {statusMsg.type === 'error' ? 'Deployment Error' : 'Stream Success'}
                             </h3>
 
-                            <p className="text-slate-400 text-xs px-2 leading-relaxed font-medium">
+                            <p className="text-slate-400 text-xs px-2 leading-relaxed font-mediumOr">
                                 {statusMsg.text}
                             </p>
 
@@ -286,28 +287,14 @@ export default function ScheduleClassPage() {
                                         <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider">Assigned Room Container ID</span>
                                         <span className="text-sm font-mono font-bold text-blue-400 mt-0.5 tracking-wide">{generatedRoomId}</span>
                                     </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => copyToClipboard(generatedRoomId)}
-                                        className="p-2.5 rounded-xl bg-[#1A1D21] border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700 transition-all flex items-center gap-1.5 group/btn"
-                                        title="Copy Stream ID Token"
-                                    >
+                                    <button type="button" onClick={() => copyToClipboard(generatedRoomId)} className="p-2.5 rounded-xl bg-[#1A1D21] border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700 transition-all flex items-center gap-1.5 group/btn" title="Copy Stream ID Token">
                                         {copied ? <Check size={14} className="text-green-500" /> : <Copy size={14} />}
-                                        <span className="text-[9px] font-black uppercase tracking-wider hidden sm:inline">
-                                            {copied ? 'Copied' : 'Copy'}
-                                        </span>
+                                        <span className="text-[9px] font-black uppercase tracking-wider hidden sm:inline">{copied ? 'Copied' : 'Copy'}</span>
                                     </button>
                                 </div>
                             )}
 
-                            <button
-                                onClick={() => setShowModal(false)}
-                                className={`w-full mt-4 py-4 rounded-xl font-black uppercase text-[10px] tracking-[0.15em] text-white transition-all shadow-md ${
-                                    statusMsg.type === 'error' 
-                                        ? 'bg-red-600 hover:bg-red-700' 
-                                        : 'bg-blue-600 hover:bg-blue-700'
-                                }`}
-                            >
+                            <button onClick={() => setShowModal(false)} className={`w-full mt-4 py-4 rounded-xl font-black uppercase text-[10px] tracking-[0.15em] text-white transition-all shadow-md ${statusMsg.type === 'error' ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'}`}>
                                 Acknowledge Operations
                             </button>
                         </div>

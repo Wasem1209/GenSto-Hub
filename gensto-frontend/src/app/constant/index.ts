@@ -34,7 +34,7 @@ export const API_ROUTES = {
 
     // Dashboard & Stats
     DASHBOARD_STATS: `${REST_API}/v1/stats/dashboard`,
-    UNIT_OVERSIGHT: `${REST_API}/api/v1/admin/oversight-stats`,
+    UNIT_OVERSIGHT: `${REST_API}/v1/admin/oversight-stats`,
     UNIT_UPDATE_ROLE: `${REST_API}/v1/unit/update-role`,
     SCHOOLS: `${REST_API}/schools`,
     INTERNSHIPS: `${REST_API}/internships`,
@@ -55,8 +55,8 @@ export const API_ROUTES = {
     SETTINGS_PROFILE: `${REST_API}/settings/profile`,
     SETTINGS_BIO: `${REST_API}/settings/update-bio`,
     SETTINGS_PASSWORD: `${REST_API}/settings/change-password`,
-    LIVE_GET_TOKEN: `${REST_API}/api/live/get-token`,
-    LIVE_CREATE_ROOM: `${REST_API}/api/live/create-room`,
+    LIVE_GET_TOKEN: `${REST_API}/live/get-token`,
+    LIVE_CREATE_ROOM: `${REST_API}/live/create-room`,
 };
 
 
