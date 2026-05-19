@@ -57,6 +57,8 @@ export const API_ROUTES = {
     SETTINGS_PASSWORD: `${REST_API}/settings/change-password`,
     LIVE_GET_TOKEN: `${REST_API}/live/get-token`,
     LIVE_CREATE_ROOM: `${REST_API}/live/create-room`,
+    LIVE_SCHOOLS: `${REST_API}/live/schools`,
+
 };
 
 
