@@ -47,13 +47,13 @@ export default function ScheduleClassPage() {
         const fetchSchools = async () => {
             const token = localStorage.getItem('token');
             try {
-                const response = await fetch(API_ROUTES.SCHOOLS, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
+                const response = await fetch(API_ROUTES.LIVE_SCHOOLS, {  
+                  method: 'GET',
+                  headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                           }
+                 });
 
                 if (!response.ok) {
                     throw new Error(`Backend fetch rejected with status: ${response.status}`);
