@@ -1,17 +1,13 @@
-// gensto-frontend/src/app/(dashboards)/instructors/schedule-class/page.tsx
-
 'use client';
 
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { Calendar, BookOpen, Loader2, CheckCircle2, AlertTriangle, X, Copy, Check } from 'lucide-react';
-
-// Centralized unified routes
 import { API_ROUTES } from '../../../constant';
 
 interface SchoolTrack {
-    _id: string;        
-    name: string;       
-    category: string;   
+    _id: string;
+    name: string;
+    category: string;
 }
 
 export default function ScheduleClassPage() {
@@ -21,7 +17,6 @@ export default function ScheduleClassPage() {
     const [statusMsg, setStatusMsg] = useState<{ text: string; type: 'success' | 'error' | '' }>({ text: '', type: '' });
     const [generatedRoomId, setGeneratedRoomId] = useState<string>('');
     
-    // Database Records States
     const [schools, setSchools] = useState<SchoolTrack[]>([]);
     const [loadingSchools, setLoadingSchools] = useState<boolean>(true);
     
@@ -31,7 +26,23 @@ export default function ScheduleClassPage() {
         schoolCategory: ''  
     });
 
-    // Fetch available schools from the database dynamically
+    // Debugging tool: Inspect user token to verify role configuration
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                console.log("Current Logged-in User Token Payload:", JSON.parse(jsonPayload));
+            } catch (e) {
+                console.error("Failed to parse auth token for role debugging:", e);
+            }
+        }
+    }, []);
+
     useEffect(() => {
         const fetchSchools = async () => {
             const token = localStorage.getItem('token');
@@ -45,31 +56,34 @@ export default function ScheduleClassPage() {
                 });
 
                 if (!response.ok) {
-                    throw new Error(`Server returned status: ${response.status}`);
+                    throw new Error(`Backend fetch rejected with status: ${response.status}`);
                 }
 
                 const result = await response.json();
-                const fetchedData: SchoolTrack[] = result.data || result;
+                
+                // Flexible parsing to handle direct arrays, result.data, or result.schools structures
+                let fetchedData: SchoolTrack[] = [];
+                if (Array.isArray(result)) fetchedData = result;
+                else if (result && Array.isArray(result.data)) fetchedData = result.data;
+                else if (result && Array.isArray(result.schools)) fetchedData = result.schools;
 
-                if (Array.isArray(fetchedData) && fetchedData.length > 0) {
+                if (fetchedData.length > 0) {
                     setSchools(fetchedData);
-                    // Automatically initialize form fields with the first database record
                     setFormData(prev => ({ 
                         ...prev, 
                         schoolId: fetchedData[0]._id,
                         schoolCategory: fetchedData[0].category 
                     }));
                 } else {
-                    throw new Error("No tracking categories returned from database server.");
+                    throw new Error("No departmental schools available in database records.");
                 }
             } catch (err) {
-                console.warn('Database pool pull failed, using fallback tracking records:', err);
+                console.warn('Database connection failed, deploying UI fallback records:', err);
                 
-                // Fallbacks stay purely as a safety net so UI doesn't crash if connection drops
                 const fallbacks: SchoolTrack[] = [
-                    { _id: '1', name: 'School of Frontend Web', category: 'SCHOOL_OF_FRONTEND_WEB' },
-                    { _id: '2', name: 'School of Backend Web', category: 'SCHOOL_OF_BACKEND_WEB' },
-                    { _id: '3', name: 'School of Software Engineering', category: 'SCHOOL_OF_SOFTWARE_ENGINEERING' }
+                    { _id: 'fallback-frontend', name: 'School of Frontend Web', category: 'SCHOOL_OF_FRONTEND_WEB' },
+                    { _id: 'fallback-backend', name: 'School of Backend Web', category: 'SCHOOL_OF_BACKEND_WEB' },
+                    { _id: 'fallback-software', name: 'School of Software Engineering', category: 'SCHOOL_OF_SOFTWARE_ENGINEERING' }
                 ];
                 setSchools(fallbacks);
                 setFormData(prev => ({ 
@@ -85,7 +99,6 @@ export default function ScheduleClassPage() {
         fetchSchools();
     }, []);
 
-    // Handles changing dropdown selection and auto-mapping both ID and Category
     const handleDropdownChange = (e: ChangeEvent<HTMLSelectElement>) => {
         const selectedId = e.target.value;
         const matchingSchool = schools.find(school => school._id === selectedId);
@@ -110,7 +123,7 @@ export default function ScheduleClassPage() {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         } catch (err) {
-            console.error('Failed to copy room ID keys:', err);
+            console.error('Failed to copy Room ID:', err);
         }
     };
 
@@ -137,17 +150,17 @@ export default function ScheduleClassPage() {
                 },
                 body: JSON.stringify({
                     title: formData.courseTitle,
-                    schoolId: formData.schoolId, // Sent automatically from selected track
+                    schoolId: formData.schoolId, 
                     category: formData.schoolCategory
                 })
             });
 
             if (!response.ok) {
                 if (response.status === 403) {
-                    throw new Error("Access Denied: You do not possess instructor clearance credentials.");
+                    throw new Error("Access Denied: Your account role does not match the specific permission string required by the backend middleware.");
                 }
                 if (response.status === 404) {
-                    throw new Error(`Endpoint not found (404). Check duplicated paths or missing endpoints at: '${API_ROUTES.LIVE_CREATE_ROOM}'.`);
+                    throw new Error(`Endpoint not found (404). Verify that the path configuration matches your server routing maps.`);
                 }
                 throw new Error(`Server responded with an error status code: ${response.status}`);
             }
@@ -180,7 +193,7 @@ export default function ScheduleClassPage() {
     };
 
     return (
-        <div className="p-6 lg:p-10 max-w-4xl mx-auto animate-in fade-in duration-500 font-sans relative">
+        <div className="p-6 lg:p-10 max-w-4xl mx-auto font-sans relative">
             <div className="mb-10">
                 <div className="flex items-center gap-3 mb-2">
                     <div className="p-2 bg-blue-600/10 text-blue-500 rounded-xl border border-blue-500/10">
@@ -194,9 +207,9 @@ export default function ScheduleClassPage() {
 
             <div className="bg-[#1A1D21] border border-slate-800 rounded-[2.5rem] p-8 space-y-8 shadow-2xl">
                 <form onSubmit={handleCreateSession} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 gap-6">
                         {/* Session Title */}
-                        <div className="space-y-2 md:col-span-2">
+                        <div className="space-y-2">
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 flex items-center gap-2">
                                 <BookOpen size={12} /> Session Title
                             </label>
@@ -211,8 +224,8 @@ export default function ScheduleClassPage() {
                             />
                         </div>
 
-                        {/* School Dropdown Tracker — Extracts both Name, ID, and Category */}
-                        <div className="space-y-2 md:col-span-2">
+                        {/* School Dropdown Tracks */}
+                        <div className="space-y-2">
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">School Department Tracks</label>
                             <div className="relative">
                                 {loadingSchools ? (
@@ -258,10 +271,10 @@ export default function ScheduleClassPage() {
                 </form>
             </div>
 
-            {/* Modal Status Window */}
+            {/* Status Modal Window */}
             {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-                    <div className="bg-[#1A1D21] border border-slate-800 w-full max-w-md rounded-[2rem] p-6 shadow-2xl relative overflow-hidden animate-in zoom-in-95 duration-300" role="dialog" aria-modal="true">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+                    <div className="bg-[#1A1D21] border border-slate-800 w-full max-w-md rounded-[2rem] p-6 shadow-2xl relative overflow-hidden" role="dialog" aria-modal="true">
                         <div className={`absolute top-0 inset-x-0 h-1.5 ${statusMsg.type === 'error' ? 'bg-red-500' : 'bg-green-500'}`} />
 
                         <button onClick={() => setShowModal(false)} className="absolute top-5 right-5 p-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition-all outline-none">
@@ -277,7 +290,7 @@ export default function ScheduleClassPage() {
                                 {statusMsg.type === 'error' ? 'Deployment Error' : 'Stream Success'}
                             </h3>
 
-                            <p className="text-slate-400 text-xs px-2 leading-relaxed font-mediumOr">
+                            <p className="text-slate-400 text-xs px-2 leading-relaxed font-medium">
                                 {statusMsg.text}
                             </p>
 
@@ -287,7 +300,7 @@ export default function ScheduleClassPage() {
                                         <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider">Assigned Room Container ID</span>
                                         <span className="text-sm font-mono font-bold text-blue-400 mt-0.5 tracking-wide">{generatedRoomId}</span>
                                     </div>
-                                    <button type="button" onClick={() => copyToClipboard(generatedRoomId)} className="p-2.5 rounded-xl bg-[#1A1D21] border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700 transition-all flex items-center gap-1.5 group/btn" title="Copy Stream ID Token">
+                                    <button type="button" onClick={() => copyToClipboard(generatedRoomId)} className="p-2.5 rounded-xl bg-[#1A1D21] border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700 transition-all flex items-center gap-1.5" title="Copy Stream ID Token">
                                         {copied ? <Check size={14} className="text-green-500" /> : <Copy size={14} />}
                                         <span className="text-[9px] font-black uppercase tracking-wider hidden sm:inline">{copied ? 'Copied' : 'Copy'}</span>
                                     </button>
