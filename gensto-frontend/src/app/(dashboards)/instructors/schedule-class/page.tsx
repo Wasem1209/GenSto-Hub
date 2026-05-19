@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { Calendar, BookOpen, Loader2, CheckCircle2, AlertTriangle, X, Copy, Check, Clock, User } from 'lucide-react';
-import { API_ROUTES } from '../../../constant';
+import { REST_API } from '../../../constant';
 
 interface SchoolTrack {
     _id: string;
@@ -20,7 +20,6 @@ export default function ScheduleClassPage() {
     const [schools, setSchools] = useState<SchoolTrack[]>([]);
     const [loadingSchools, setLoadingSchools] = useState<boolean>(true);
     
-    
     const [formData, setFormData] = useState({
         courseTitle: '',
         schoolId: '',      
@@ -30,7 +29,6 @@ export default function ScheduleClassPage() {
         duration: '60' 
     });
 
-   
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
@@ -59,13 +57,13 @@ export default function ScheduleClassPage() {
         const fetchSchools = async () => {
             const token = localStorage.getItem('token');
             try {
-                const response = await fetch(API_ROUTES.LIVE_SCHOOLS, {  
-                  method: 'GET',
-                  headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                           }
-                 });
+                const response = await fetch(`${REST_API}/live/schools`, {  
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
 
                 if (!response.ok) {
                     throw new Error(`Backend fetch rejected with status: ${response.status}`);
@@ -153,13 +151,12 @@ export default function ScheduleClassPage() {
         }
 
         try {
-            const response = await fetch(API_ROUTES.LIVE_CREATE_ROOM, {
+            const response = await fetch(`${REST_API}/live/create-room`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                
                 body: JSON.stringify({
                     title: formData.courseTitle,
                     schoolId: formData.schoolId, 
@@ -190,7 +187,6 @@ export default function ScheduleClassPage() {
                 });
                 setShowModal(true);
                 
-                // Clear state keeping baseline configurations populated
                 setFormData(prev => ({ 
                     ...prev,
                     courseTitle: '', 
@@ -242,7 +238,7 @@ export default function ScheduleClassPage() {
                             />
                         </div>
 
-                        {/* Instructor Identity (New Field) */}
+                        {/* Instructor Identity */}
                         <div className="space-y-2">
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 flex items-center gap-2">
                                 <User size={12} /> Hosting Instructor
@@ -291,7 +287,7 @@ export default function ScheduleClassPage() {
                             </div>
                         </div>
 
-                        {/* Start Date & Time (New Field) */}
+                        {/* Start Date & Time */}
                         <div className="space-y-2">
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 flex items-center gap-2">
                                 <Calendar size={12} /> Scheduled Start Date & Time
@@ -306,7 +302,7 @@ export default function ScheduleClassPage() {
                             />
                         </div>
 
-                        {/* Block Duration (New Field) */}
+                        {/* Block Duration */}
                         <div className="space-y-2">
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 flex items-center gap-2">
                                 <Clock size={12} /> Session Block Duration
